@@ -1,0 +1,25 @@
+{
+  "name": "webpack-sources",
+  "version": "0.1.0",
+  "description": "Source code handling classes for webpack",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jevan0307/rust-webpack-sources.git"
+  },
+  "author": "Jevan Chan <jevan.cnchan@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jevan0307/rust-webpack-sources/issues"
+  },
+  "homepage": "https://github.com/jevan0307/rust-webpack-sources#readme",
+  "dependencies": {
+    "source-map": "^0.7.3"
+  },
+  "devDependencies": {
+    "prettier": "^1.13.4"
+  }
+}
