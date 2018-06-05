@@ -4,8 +4,15 @@ fn split_code(mut code: &str) -> Vec<&str> {
     let mut result: Vec<&str> = Vec::new();
     while !code.is_empty() {
         let pos = code.find(&['\n', '\r', ';', '{', '}'][..]);
-        if let Some(pos) = pos {
-            let splitted = code.split_at(pos + 1);
+        if let Some(mut pos) = pos {
+            for c in code.chars().skip(pos) {
+                if ['\n', '\r', ';', '{', '}'].contains(&c) {
+                    pos += 1;
+                } else {
+                    break;
+                }
+            }
+            let splitted = code.split_at(pos);
             result.push(splitted.0);
             code = splitted.1;
         } else {

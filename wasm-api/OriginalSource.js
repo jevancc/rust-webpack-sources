@@ -23,7 +23,7 @@ class OriginalSource extends wasm._OriginalSource {
 
 	node(options) {
 		options = options || {};
-		return this._node_bool(!!options.columns);
+		return this._node_bool(!(options.columns === false));
 	}
 
 	listMap(options) {
