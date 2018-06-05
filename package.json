@@ -2,9 +2,11 @@
   "name": "webpack-sources",
   "version": "0.1.0",
   "description": "Source code handling classes for webpack",
-  "main": "index.js",
+  "main": "wasm-api",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:wasm": "node scripts/buildWebAssembly.js",
+    "test": "mocha ./test-js --full-trace --check-leaks",
+    "test:source-list-map": "mocha ./test-js/source-list-map --full-trace --check-leaks"
   },
   "repository": {
     "type": "git",
@@ -17,9 +19,12 @@
   },
   "homepage": "https://github.com/jevan0307/rust-webpack-sources#readme",
   "dependencies": {
-    "source-map": "^0.7.3"
+    "source-list-map": "git+https://github.com/webpack/source-list-map.git",
+    "source-map": "^0.6.1"
   },
   "devDependencies": {
-    "prettier": "^1.13.4"
+    "mocha": "^5.2.0",
+    "prettier": "^1.13.4",
+    "should": "^13.2.1"
   }
 }
