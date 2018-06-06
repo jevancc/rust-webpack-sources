@@ -2,6 +2,7 @@
 
 var wasm = require("../build/webpack_sources");
 var SourceListMap = require("./SourceListMap");
+var StringVec = require("./utils").StringVec;
 
 module.exports = function fromStringWithSourceMap(code, map) {
     var sources = StringVec(map.sources || []);
@@ -18,5 +19,3 @@ module.exports = function fromStringWithSourceMap(code, map) {
 
     return slp;
 };
-
-var StringVec = require("./utils").StringVec;

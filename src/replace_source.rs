@@ -70,7 +70,7 @@ impl ReplaceSource {
             mf.replacement_idx -= 1;
         }
 
-        if extra_code.len() > 0 {
+        if !extra_code.is_empty() {
             map.add(Node::NString(extra_code), None, None);
         }
         map

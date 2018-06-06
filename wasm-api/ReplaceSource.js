@@ -16,18 +16,21 @@ class ReplaceSource extends wasm._ReplaceSource {
 		super(0);
 		this._source = source;
 		this._name = name;
+		this._replacements = null;
 		this.ptr = ReplaceSource._new().ptr;
 	}
 
 	replace(start, end, newValue) {
 		if(typeof newValue !== "string")
 			throw new Error("insertion must be a string, but is a " + typeof newValue);
+		this._replacements = null;
 		this._replace_number_number_string(start, end, newValue);
 	}
 
 	insert(pos, newValue) {
 		if(typeof newValue !== "string")
 			throw new Error("insertion must be a string, but is a " + typeof newValue + ": " + newValue);
+		this._replacements = null;
 		this._insert_number_string(pos, newValue);
 	}
 
@@ -41,7 +44,10 @@ class ReplaceSource extends wasm._ReplaceSource {
 	}
 
 	replacements() {
-		return JSON.parse(this._replacements_to_string());
+		if (this._replacements == null) {
+			this._replacements = JSON.parse(this._replacements_to_string());
+		}
+		return this._replacements;
 	}
 
 	node(options) {

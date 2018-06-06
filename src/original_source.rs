@@ -1,17 +1,20 @@
 use SourceNode;
 
+#[inline]
+fn is_splitter(c: char) -> bool {
+    match c {
+        '\n' | '\r' | ';' | '{' | '}' => true,
+        _ => false,
+    }
+}
+
 fn split_code(mut code: &str) -> Vec<&str> {
     let mut result: Vec<&str> = Vec::new();
     while !code.is_empty() {
-        let pos = code.find(&['\n', '\r', ';', '{', '}'][..]);
-        if let Some(mut pos) = pos {
-            for c in code.chars().skip(pos) {
-                if ['\n', '\r', ';', '{', '}'].contains(&c) {
-                    pos += 1;
-                } else {
-                    break;
-                }
-            }
+        let chars = code.chars().enumerate();
+        let chars = chars.skip_while(|c| !is_splitter(c.1));
+        let mut chars = chars.skip_while(|c| is_splitter(c.1));
+        if let Some((pos, _)) = chars.next() {
             let splitted = code.split_at(pos);
             result.push(splitted.0);
             code = splitted.1;
@@ -48,8 +51,8 @@ impl OriginalSource {
                 let mut sn2 = SourceNode::new_null_null_null();
                 let mut pos: usize = 0;
                 let splitted_codes = split_code(&content);
-                for item in splitted_codes.iter() {
-                    if item.trim().len() == 0 {
+                for item in &splitted_codes {
+                    if item.trim().is_empty() {
                         sn2.add_string(item);
                     } else {
                         let mut sn3 = SourceNode::new_number_number_string(

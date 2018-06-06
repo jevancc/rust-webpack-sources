@@ -138,10 +138,10 @@ module.exports.__wbg_f_setSourceContent_setSourceContent_SourceNode = function(a
     __wbg_f_setSourceContent_setSourceContent_SourceNode_target.call(getObject(arg0), varg1, varg3);
 };
 
-class _OriginalSource {
+class _CodeNode {
 
                 static __construct(ptr) {
-                    return new _OriginalSource(ptr);
+                    return new _CodeNode(ptr);
                 }
 
                 constructor(ptr) {
@@ -151,41 +151,17 @@ class _OriginalSource {
             free() {
                 const ptr = this.ptr;
                 this.ptr = 0;
-                wasm.__wbg__originalsource_free(ptr);
+                wasm.__wbg__codenode_free(ptr);
             }
-        static _new_string_string(arg0, arg1) {
+        static _new_string(arg0) {
     const [ptr0, len0] = passStringToWasm(arg0);
-    const [ptr1, len1] = passStringToWasm(arg1);
-    return _OriginalSource.__construct(wasm._originalsource__new_string_string(ptr0, len0, ptr1, len1));
+    return _CodeNode.__construct(wasm._codenode__new_string(ptr0, len0));
 }
-_source() {
-    const retptr = globalArgumentPtr();
-    wasm._originalsource__source(retptr, this.ptr);
-    const mem = getUint32Memory();
-    const ptr = mem[retptr / 4];
-    const len = mem[retptr / 4 + 1];
-    const realRet = getStringFromWasm(ptr, len).slice();
-    wasm.__wbindgen_free(ptr, len * 1);
-    return realRet;
-}
-_size() {
-    return wasm._originalsource__size(this.ptr);
-}
-_name() {
-    const retptr = globalArgumentPtr();
-    wasm._originalsource__name(retptr, this.ptr);
-    const mem = getUint32Memory();
-    const ptr = mem[retptr / 4];
-    const len = mem[retptr / 4 + 1];
-    const realRet = getStringFromWasm(ptr, len).slice();
-    wasm.__wbindgen_free(ptr, len * 1);
-    return realRet;
-}
-_node_bool(arg0) {
-    return takeObject(wasm._originalsource__node_bool(this.ptr, arg0 ? 1 : 0));
+_clone() {
+    return _CodeNode.__construct(wasm._codenode__clone(this.ptr));
 }
 }
-module.exports._OriginalSource = _OriginalSource;
+module.exports._CodeNode = _CodeNode;
 
 class _SingleLineNode {
 
@@ -217,6 +193,62 @@ _clone() {
 }
 }
 module.exports._SingleLineNode = _SingleLineNode;
+
+class StringVec {
+
+                static __construct(ptr) {
+                    return new StringVec(ptr);
+                }
+
+                constructor(ptr) {
+                    this.ptr = ptr;
+                }
+
+            free() {
+                const ptr = this.ptr;
+                this.ptr = 0;
+                wasm.__wbg_stringvec_free(ptr);
+            }
+        static new() {
+    return StringVec.__construct(wasm.stringvec_new());
+}
+push_string(arg0) {
+    const [ptr0, len0] = passStringToWasm(arg0);
+    return wasm.stringvec_push_string(this.ptr, ptr0, len0);
+}
+}
+module.exports.StringVec = StringVec;
+
+class _SourceNode {
+
+                static __construct(ptr) {
+                    return new _SourceNode(ptr);
+                }
+
+                constructor(ptr) {
+                    this.ptr = ptr;
+                }
+
+            free() {
+                const ptr = this.ptr;
+                this.ptr = 0;
+                wasm.__wbg__sourcenode_free(ptr);
+            }
+        static _new_string_null_null_number(arg0, arg1) {
+    const [ptr0, len0] = passStringToWasm(arg0);
+    return _SourceNode.__construct(wasm._sourcenode__new_string_null_null_number(ptr0, len0, arg1));
+}
+static _new_string_string_string_number(arg0, arg1, arg2, arg3) {
+    const [ptr0, len0] = passStringToWasm(arg0);
+    const [ptr1, len1] = passStringToWasm(arg1);
+    const [ptr2, len2] = passStringToWasm(arg2);
+    return _SourceNode.__construct(wasm._sourcenode__new_string_string_string_number(ptr0, len0, ptr1, len1, ptr2, len2, arg3));
+}
+_clone() {
+    return _SourceNode.__construct(wasm._sourcenode__clone(this.ptr));
+}
+}
+module.exports._SourceNode = _SourceNode;
 
 class _SourceListMap {
 
@@ -309,6 +341,92 @@ _map_generated_code_prefix(arg0) {
 }
 module.exports._SourceListMap = _SourceListMap;
 
+class _OriginalSource {
+
+                static __construct(ptr) {
+                    return new _OriginalSource(ptr);
+                }
+
+                constructor(ptr) {
+                    this.ptr = ptr;
+                }
+
+            free() {
+                const ptr = this.ptr;
+                this.ptr = 0;
+                wasm.__wbg__originalsource_free(ptr);
+            }
+        static _new_string_string(arg0, arg1) {
+    const [ptr0, len0] = passStringToWasm(arg0);
+    const [ptr1, len1] = passStringToWasm(arg1);
+    return _OriginalSource.__construct(wasm._originalsource__new_string_string(ptr0, len0, ptr1, len1));
+}
+_source() {
+    const retptr = globalArgumentPtr();
+    wasm._originalsource__source(retptr, this.ptr);
+    const mem = getUint32Memory();
+    const ptr = mem[retptr / 4];
+    const len = mem[retptr / 4 + 1];
+    const realRet = getStringFromWasm(ptr, len).slice();
+    wasm.__wbindgen_free(ptr, len * 1);
+    return realRet;
+}
+_size() {
+    return wasm._originalsource__size(this.ptr);
+}
+_name() {
+    const retptr = globalArgumentPtr();
+    wasm._originalsource__name(retptr, this.ptr);
+    const mem = getUint32Memory();
+    const ptr = mem[retptr / 4];
+    const len = mem[retptr / 4 + 1];
+    const realRet = getStringFromWasm(ptr, len).slice();
+    wasm.__wbindgen_free(ptr, len * 1);
+    return realRet;
+}
+_node_bool(arg0) {
+    return takeObject(wasm._originalsource__node_bool(this.ptr, arg0 ? 1 : 0));
+}
+}
+module.exports._OriginalSource = _OriginalSource;
+
+class NodeVec {
+
+                static __construct(ptr) {
+                    return new NodeVec(ptr);
+                }
+
+                constructor(ptr) {
+                    this.ptr = ptr;
+                }
+
+            free() {
+                const ptr = this.ptr;
+                this.ptr = 0;
+                wasm.__wbg_nodevec_free(ptr);
+            }
+        static new() {
+    return NodeVec.__construct(wasm.nodevec_new());
+}
+push_string(arg0) {
+    const [ptr0, len0] = passStringToWasm(arg0);
+    return wasm.nodevec_push_string(this.ptr, ptr0, len0);
+}
+push_sourcenode(arg0) {
+    return wasm.nodevec_push_sourcenode(this.ptr, arg0.ptr);
+}
+push_codenode(arg0) {
+    return wasm.nodevec_push_codenode(this.ptr, arg0.ptr);
+}
+push_singlelinenode(arg0) {
+    return wasm.nodevec_push_singlelinenode(this.ptr, arg0.ptr);
+}
+push_sourcelistmap(arg0) {
+    return wasm.nodevec_push_sourcelistmap(this.ptr, arg0.ptr);
+}
+}
+module.exports.NodeVec = NodeVec;
+
 class _ReplaceSource {
 
                 static __construct(ptr) {
@@ -361,124 +479,6 @@ _replacements_to_string() {
 }
 }
 module.exports._ReplaceSource = _ReplaceSource;
-
-class NodeVec {
-
-                static __construct(ptr) {
-                    return new NodeVec(ptr);
-                }
-
-                constructor(ptr) {
-                    this.ptr = ptr;
-                }
-
-            free() {
-                const ptr = this.ptr;
-                this.ptr = 0;
-                wasm.__wbg_nodevec_free(ptr);
-            }
-        static new() {
-    return NodeVec.__construct(wasm.nodevec_new());
-}
-push_string(arg0) {
-    const [ptr0, len0] = passStringToWasm(arg0);
-    return wasm.nodevec_push_string(this.ptr, ptr0, len0);
-}
-push_sourcenode(arg0) {
-    return wasm.nodevec_push_sourcenode(this.ptr, arg0.ptr);
-}
-push_codenode(arg0) {
-    return wasm.nodevec_push_codenode(this.ptr, arg0.ptr);
-}
-push_singlelinenode(arg0) {
-    return wasm.nodevec_push_singlelinenode(this.ptr, arg0.ptr);
-}
-push_sourcelistmap(arg0) {
-    return wasm.nodevec_push_sourcelistmap(this.ptr, arg0.ptr);
-}
-}
-module.exports.NodeVec = NodeVec;
-
-class _SourceNode {
-
-                static __construct(ptr) {
-                    return new _SourceNode(ptr);
-                }
-
-                constructor(ptr) {
-                    this.ptr = ptr;
-                }
-
-            free() {
-                const ptr = this.ptr;
-                this.ptr = 0;
-                wasm.__wbg__sourcenode_free(ptr);
-            }
-        static _new_string_null_null_number(arg0, arg1) {
-    const [ptr0, len0] = passStringToWasm(arg0);
-    return _SourceNode.__construct(wasm._sourcenode__new_string_null_null_number(ptr0, len0, arg1));
-}
-static _new_string_string_string_number(arg0, arg1, arg2, arg3) {
-    const [ptr0, len0] = passStringToWasm(arg0);
-    const [ptr1, len1] = passStringToWasm(arg1);
-    const [ptr2, len2] = passStringToWasm(arg2);
-    return _SourceNode.__construct(wasm._sourcenode__new_string_string_string_number(ptr0, len0, ptr1, len1, ptr2, len2, arg3));
-}
-_clone() {
-    return _SourceNode.__construct(wasm._sourcenode__clone(this.ptr));
-}
-}
-module.exports._SourceNode = _SourceNode;
-
-class StringVec {
-
-                static __construct(ptr) {
-                    return new StringVec(ptr);
-                }
-
-                constructor(ptr) {
-                    this.ptr = ptr;
-                }
-
-            free() {
-                const ptr = this.ptr;
-                this.ptr = 0;
-                wasm.__wbg_stringvec_free(ptr);
-            }
-        static new() {
-    return StringVec.__construct(wasm.stringvec_new());
-}
-push_string(arg0) {
-    const [ptr0, len0] = passStringToWasm(arg0);
-    return wasm.stringvec_push_string(this.ptr, ptr0, len0);
-}
-}
-module.exports.StringVec = StringVec;
-
-class _CodeNode {
-
-                static __construct(ptr) {
-                    return new _CodeNode(ptr);
-                }
-
-                constructor(ptr) {
-                    this.ptr = ptr;
-                }
-
-            free() {
-                const ptr = this.ptr;
-                this.ptr = 0;
-                wasm.__wbg__codenode_free(ptr);
-            }
-        static _new_string(arg0) {
-    const [ptr0, len0] = passStringToWasm(arg0);
-    return _CodeNode.__construct(wasm._codenode__new_string(ptr0, len0));
-}
-_clone() {
-    return _CodeNode.__construct(wasm._codenode__clone(this.ptr));
-}
-}
-module.exports._CodeNode = _CodeNode;
 
 module.exports.__wbindgen_object_clone_ref = function(idx) {
     // If this object is on the stack promote it to the heap.

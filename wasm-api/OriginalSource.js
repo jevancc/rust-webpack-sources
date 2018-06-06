@@ -8,8 +8,6 @@ var wasm = require("./build/webpack_sources");
 class OriginalSource extends wasm._OriginalSource {
 	constructor(value, name) {
 		super(0);
-		value = value || "";
-		name = name || "";
 		this.ptr = OriginalSource._new_string_string(value, name).ptr;
 	}
 
