@@ -54,7 +54,7 @@ class PrefixSource extends Source {
 	listMap(options) {
 		var prefix = this._prefix;
 		var map = this._source.listMap(options);
-		return map.mapGeneratedCode(map.PrefixMappingFunction, prefix);
+		return map.mapGeneratedCode(map.MappingFunction.Prefix, prefix);
 	}
 
 	updateHash(hash) {

@@ -26,7 +26,7 @@ describe("mapGeneratedCode", function() {
 		map.add(source + "\n", "file.txt", source + "\n");
 		map.add(source + "\n");
 		map.add(source, "file.txt", source);
-		var newMap = map.mapGeneratedCode(map.TestMappingFunction);
+		var newMap = map.mapGeneratedCode(map.MappingFunction.Test);
 		var result = newMap.toStringWithSourceMap({ file: "test.txt" });
 		var expectedPart = [
 			"AACA",
@@ -64,7 +64,7 @@ describe("mapGeneratedCode", function() {
 		var source = bigString + "MyLine\n" + bigString;
 		var map = new SourceListMap();
 		map.add(source, "file.txt", source);
-		var newMap = map.mapGeneratedCode(map.IdenticalMappingFunction);
+		var newMap = map.mapGeneratedCode(map.MappingFunction.Identical);
 		var result = newMap.toStringWithSourceMap({ file: "test.txt" });
 		result.source.should.be.eql(source);
 		result.map.sourcesContent[0].should.be.eql(source);

@@ -44,13 +44,13 @@ class SourceListMap extends wasm._SourceListMap {
     mapGeneratedCode(fnIdx) {
         var newSlp = new SourceListMap(-1);
         switch (fnIdx) {
-            case this.TestMappingFunction:
+            case this.MappingFunction.Test:
                 newSlp.ptr = this._map_generated_code_test().ptr;
                 break;
-            case this.IdenticalMappingFunction:
+            case this.MappingFunction.Identical:
                 newSlp.ptr = this._map_generated_code_identical().ptr;
                 break;
-            case this.PrefixMappingFunction:
+            case this.MappingFunction.Prefix:
                 newSlp.ptr = this._map_generated_code_prefix(arguments[1]).ptr;
                 break;
             default:
@@ -78,8 +78,10 @@ class SourceListMap extends wasm._SourceListMap {
     }
 }
 
-SourceListMap.prototype.TestMappingFunction = 1;
-SourceListMap.prototype.IdenticalMappingFunction = 2;
-SourceListMap.prototype.PrefixMappingFunction = 3;
+SourceListMap.prototype.MappingFunction = {
+    Test: 1,
+    Identical: 2,
+    Prefix: 3
+};
 SourceListMap.prototype.isSourceListMap = true;
 module.exports = SourceListMap;
