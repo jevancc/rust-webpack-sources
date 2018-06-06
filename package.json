@@ -5,7 +5,7 @@
   "main": "wasm-api",
   "scripts": {
     "build:wasm": "node scripts/buildWebAssembly.js",
-    "test": "mocha ./test-js --full-trace --check-leaks",
+    "test": "mocha ./test-js/source-list-map ./test-js --full-trace --check-leaks",
     "test:source-list-map": "mocha ./test-js/source-list-map --full-trace --check-leaks"
   },
   "repository": {
