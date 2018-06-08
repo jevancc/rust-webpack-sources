@@ -7,7 +7,7 @@
     "build:wasm": "node scripts/buildWebAssembly.js",
     "test": "mocha ./test-js/source-list-map ./test-js --full-trace --check-leaks",
     "test:source-list-map": "mocha ./test-js/source-list-map --full-trace --check-leaks",
-    "pretty": "prettier --write \"wasm-api/**/*.js\" \"test-js/**/*.js\" \"scripts/**/*.js\""
+    "pretty": "prettier --write \"wasm-api/**/*.js\" \"test-js/*.js\" \"test-js/source_list_map/*.js\" \"scripts/**/*.js\""
   },
   "repository": {
     "type": "git",
