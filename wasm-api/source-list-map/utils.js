@@ -15,12 +15,10 @@ exports.NodeVec = function NodeVec(nodes) {
     for (var i = 0; i < nodes.length; i++) {
         if (typeof nodes[i] === "string") nodeVec.push_string(nodes[i]);
         else if (nodes[i].isCodeNode) nodeVec.push_codenode(nodes[i]);
-        else if (nodes[i].isSourceNode)
-            nodeVec.push_sourcenode(nodes[i]);
+        else if (nodes[i].isSourceNode) nodeVec.push_sourcenode(nodes[i]);
         else if (nodes[i].isSingleLineNode)
             nodeVec.push_singlelinenode(nodes[i]);
-        else if (nodes[i].isSourceListMap)
-            nodeVec.push_sourcelistmap(nodes[i]);
+        else if (nodes[i].isSourceListMap) nodeVec.push_sourcelistmap(nodes[i]);
         else throw "Invalid node type";
     }
     return nodeVec;

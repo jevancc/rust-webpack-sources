@@ -9,30 +9,30 @@ var SourceNode = require("source-map").SourceNode;
 var SourceListMap = require("./source-list-map").SourceListMap;
 
 class RawSource extends Source {
-	constructor(value) {
-		super();
-		this._value = value;
-	}
+    constructor(value) {
+        super();
+        this._value = value;
+    }
 
-	source() {
-		return this._value;
-	}
+    source() {
+        return this._value;
+    }
 
-	map(options) {
-		return null;
-	}
+    map(options) {
+        return null;
+    }
 
-	node(options) {
-		return new SourceNode(null, null, null, this._value);
-	}
+    node(options) {
+        return new SourceNode(null, null, null, this._value);
+    }
 
-	listMap(options) {
-		return new SourceListMap(this._value);
-	}
+    listMap(options) {
+        return new SourceListMap(this._value);
+    }
 
-	updateHash(hash) {
-		hash.update(this._value);
-	}
+    updateHash(hash) {
+        hash.update(this._value);
+    }
 }
 
 module.exports = RawSource;

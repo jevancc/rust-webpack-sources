@@ -60,7 +60,7 @@ impl ReplaceSource {
         results.join("")
     }
 
-    pub fn list_map(&mut self, map: &SourceListMap) -> SourceListMap {
+    pub fn list_map(&mut self, map: SourceListMap) -> SourceListMap {
         let mut mf = ReplaceMappingFunction::new(&self.replacements);
         let mut map = map.map_generated_code(&mut mf);
 
@@ -161,6 +161,7 @@ impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
     }
 }
 
+#[inline]
 fn split_string(s: &str, pos: i32) -> (&str, &str) {
     if pos <= 0 {
         ("", s)

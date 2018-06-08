@@ -20,6 +20,7 @@ class SourceListMap extends wasm._SourceListMap {
                     this.add(generatedCode, source, originalSource);
                 }
             }
+            this.stringWithSourceMapCache = null;
         }
     }
 
@@ -30,6 +31,7 @@ class SourceListMap extends wasm._SourceListMap {
         } else {
             this._add_node(nodes);
         }
+        this.stringWithSourceMapCache = null;
     }
 
     prepend(generatedCode, source, originalSource) {
@@ -39,19 +41,27 @@ class SourceListMap extends wasm._SourceListMap {
         } else {
             this._prepend_node(nodes);
         }
+        this.stringWithSourceMapCache = null;
     }
 
     mapGeneratedCode(fnIdx) {
         var newSlp = new SourceListMap(-1);
         switch (fnIdx) {
             case this.MappingFunction.Test:
-                newSlp.ptr = this._map_generated_code_test().ptr;
+                newSlp.ptr = wasm._sourcelistmap_map_generated_code_test(
+                    this
+                ).ptr;
                 break;
             case this.MappingFunction.Identical:
-                newSlp.ptr = this._map_generated_code_identical().ptr;
+                newSlp.ptr = wasm._sourcelistmap_map_generated_code_identical(
+                    this
+                ).ptr;
                 break;
             case this.MappingFunction.Prefix:
-                newSlp.ptr = this._map_generated_code_prefix(arguments[1]).ptr;
+                newSlp.ptr = wasm._sourcelistmap_map_generated_code_prefix(
+                    this,
+                    arguments[1]
+                ).ptr;
                 break;
             default:
                 throw new Error("Invalid mapping function index");
@@ -64,17 +74,17 @@ class SourceListMap extends wasm._SourceListMap {
     }
 
     toStringWithSourceMap(options) {
-        if (options.file) {
-            return JSON.parse(
-                this._to_string_with_source_map_string(options.file)
+        if (!this.stringWithSourceMapCache) {
+            this.stringWithSourceMapCache = JSON.parse(
+                this._to_string_with_source_map()
             );
-        } else {
-            return JSON.parse(this._to_string_with_source_map());
         }
+        this.stringWithSourceMapCache.map.file = options.file;
+        return this.stringWithSourceMapCache;
     }
 
     static isSourceListMap(obj) {
-        return (obj instanceof wasm._SourceListMap);
+        return obj instanceof wasm._SourceListMap;
     }
 }
 

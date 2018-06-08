@@ -1,0 +1,7 @@
+# Ignore all paths.
+**/*.*
+
+# Enable prettier for the following paths.
+!test-js/**/*.js
+!wasm-api/**/*.js
+!scripts/**/*.js

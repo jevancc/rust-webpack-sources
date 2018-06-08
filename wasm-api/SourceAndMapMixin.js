@@ -5,33 +5,35 @@
 "use strict";
 
 module.exports = function mixinSourceAndMap(proto) {
-	proto.map = function(options) {
-		options = options || {};
-		if(options.columns === false) {
-			return this.listMap(options).toStringWithSourceMap({
-				file: "x"
-			}).map;
-		}
-		return this.node(options).toStringWithSourceMap({
-			file: "x"
-		}).map.toJSON();
-	};
+    proto.map = function(options) {
+        options = options || {};
+        if (options.columns === false) {
+            return this.listMap(options).toStringWithSourceMap({
+                file: "x"
+            }).map;
+        }
+        return this.node(options)
+            .toStringWithSourceMap({
+                file: "x"
+            })
+            .map.toJSON();
+    };
 
-	proto.sourceAndMap = function(options) {
-		options = options || {};
-		if(options.columns === false) {
-			//console.log(this.listMap(options).debugInfo());
-			return this.listMap(options).toStringWithSourceMap({
-				file: "x"
-			});
-		}
+    proto.sourceAndMap = function(options) {
+        options = options || {};
+        if (options.columns === false) {
+            //console.log(this.listMap(options).debugInfo());
+            return this.listMap(options).toStringWithSourceMap({
+                file: "x"
+            });
+        }
 
-		var res = this.node(options).toStringWithSourceMap({
-			file: "x"
-		});
-		return {
-			source: res.code,
-			map: res.map.toJSON()
-		};
-	};
-}
+        var res = this.node(options).toStringWithSourceMap({
+            file: "x"
+        });
+        return {
+            source: res.code,
+            map: res.map.toJSON()
+        };
+    };
+};

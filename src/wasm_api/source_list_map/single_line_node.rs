@@ -26,8 +26,8 @@ impl _SingleLineNode {
         _SingleLineNode {
             val: SingleLineNode::new(
                 generated_code,
-                Some(source),
-                Some(original_source),
+                Some(StringPtr::Str(source)),
+                Some(StringPtr::Str(original_source)),
                 starting_line as usize,
             ),
         }

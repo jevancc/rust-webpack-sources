@@ -28,8 +28,8 @@ impl _ReplaceSource {
         self.val.replace_string(&code)
     }
 
-    pub fn _list_map_sourcelistmap(&mut self, map: &_SourceListMap) -> _SourceListMap {
-        let map = self.val.list_map(map.get());
+    pub fn _list_map_sourcelistmap(&mut self, map: _SourceListMap) -> _SourceListMap {
+        let map = self.val.list_map(map.get_raw());
         _SourceListMap::new(map)
     }
 

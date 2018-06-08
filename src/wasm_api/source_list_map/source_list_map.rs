@@ -17,15 +17,14 @@ impl _SourceListMap {
         }
     }
 
-    // TODO: reduce clone
     pub fn _new_nodes(nv: NodeVec) -> _SourceListMap {
         _SourceListMap {
-            val: SourceListMap::new(Some(GenCode::CodeVec(nv.get().clone())), None, None),
+            val: SourceListMap::new(Some(GenCode::CodeVec(nv.get_raw())), None, None),
         }
     }
 
     pub fn _add_node(&mut self, nv: NodeVec) {
-        self.val.add(nv.get()[0].clone(), None, None);
+        self.val.add(nv.get_raw_first(), None, None);
     }
 
     pub fn _add_node_string_string(
@@ -34,12 +33,15 @@ impl _SourceListMap {
         source: String,
         original_source: String,
     ) {
-        self.val
-            .add(nv.get()[0].clone(), Some(source), Some(original_source));
+        self.val.add(
+            nv.get_raw_first(),
+            Some(StringPtr::Str(source)),
+            Some(StringPtr::Str(original_source)),
+        );
     }
 
     pub fn _prepend_node(&mut self, nv: NodeVec) {
-        self.val.prepend(nv.get()[0].clone(), None, None);
+        self.val.prepend(nv.get_raw_first(), None, None);
     }
 
     pub fn _prepend_node_string_string(
@@ -48,8 +50,11 @@ impl _SourceListMap {
         source: String,
         original_source: String,
     ) {
-        self.val
-            .prepend(nv.get()[0].clone(), Some(source), Some(original_source));
+        self.val.prepend(
+            nv.get_raw_first(),
+            Some(StringPtr::Str(source)),
+            Some(StringPtr::Str(original_source)),
+        );
     }
 
     pub fn _to_string(&self) -> String {
@@ -65,29 +70,35 @@ impl _SourceListMap {
         let obj = self.val.to_string_with_source_map(Some(options_file));
         utils::string_with_srcmap_to_json(&obj).to_string()
     }
+}
 
-    pub fn _map_generated_code_identical(&self) -> _SourceListMap {
-        let mut mf = IdenticalFunction {};
+#[wasm_bindgen]
+pub fn _sourcelistmap_map_generated_code_identical(slp: _SourceListMap) -> _SourceListMap {
+    let mut mf = IdenticalFunction {};
 
-        _SourceListMap {
-            val: self.val.map_generated_code(&mut mf),
-        }
+    _SourceListMap {
+        val: slp.val.map_generated_code(&mut mf),
     }
+}
 
-    pub fn _map_generated_code_test(&self) -> _SourceListMap {
-        let mut mf = TestMappingFunction {};
+#[wasm_bindgen]
+pub fn _sourcelistmap_map_generated_code_test(slp: _SourceListMap) -> _SourceListMap {
+    let mut mf = TestMappingFunction {};
 
-        _SourceListMap {
-            val: self.val.map_generated_code(&mut mf),
-        }
+    _SourceListMap {
+        val: slp.val.map_generated_code(&mut mf),
     }
+}
 
-    pub fn _map_generated_code_prefix(&self, prefix: String) -> _SourceListMap {
-        let mut mf = PrefixMappingFunction { prefix };
+#[wasm_bindgen]
+pub fn _sourcelistmap_map_generated_code_prefix(
+    slp: _SourceListMap,
+    prefix: String,
+) -> _SourceListMap {
+    let mut mf = PrefixMappingFunction { prefix };
 
-        _SourceListMap {
-            val: self.val.map_generated_code(&mut mf),
-        }
+    _SourceListMap {
+        val: slp.val.map_generated_code(&mut mf),
     }
 }
 
@@ -102,5 +113,9 @@ impl _SourceListMap {
 
     pub fn get_mut(&mut self) -> &mut SourceListMap {
         &mut self.val
+    }
+
+    pub fn get_raw(self) -> SourceListMap {
+        self.val
     }
 }

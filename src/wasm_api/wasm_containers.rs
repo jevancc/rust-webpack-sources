@@ -68,4 +68,12 @@ impl NodeVec {
     pub fn get_mut(&mut self) -> &mut Vec<Node> {
         &mut self.val
     }
+
+    pub fn get_raw(self) -> Vec<Node> {
+        self.val
+    }
+
+    pub fn get_raw_first(mut self) -> Node {
+        self.val.pop().unwrap()
+    }
 }
