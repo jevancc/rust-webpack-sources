@@ -16,12 +16,19 @@ impl _ReplaceSource {
         }
     }
 
-    pub fn _replace_number_number_string(&mut self, start: i32, end: i32, new_value: String) {
-        self.val.replace(start, end, new_value);
+    pub fn _replace_number_number_string_number_number(
+        &mut self,
+        start: i32,
+        end: i32,
+        new_value: String,
+        ord_s: i32,
+        ord_e: i32,
+    ) {
+        self.val.replace(start, end, new_value, ord_s, ord_e);
     }
 
-    pub fn _insert_number_string(&mut self, pos: i32, new_value: String) {
-        self.val.insert(pos, new_value);
+    pub fn _insert_number_string_number(&mut self, pos: i32, new_value: String, ord: i32) {
+        self.val.insert(pos, new_value, ord);
     }
 
     pub fn _source_string(&mut self, code: String) -> String {

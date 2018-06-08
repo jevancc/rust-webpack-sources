@@ -27,7 +27,13 @@ class ReplaceSource extends wasm._ReplaceSource {
                 "insertion must be a string, but is a " + typeof newValue
             );
         this._replacements = null;
-        this._replace_number_number_string(start, end, newValue);
+        this._replace_number_number_string_number_number(
+            Math.floor(start),
+            Math.floor(end),
+            newValue,
+            Math.floor((start % 1) * 8),
+            Math.floor((end % 1) * 8)
+        );
     }
 
     insert(pos, newValue) {
@@ -39,7 +45,11 @@ class ReplaceSource extends wasm._ReplaceSource {
                     newValue
             );
         this._replacements = null;
-        this._insert_number_string(pos, newValue);
+        this._insert_number_string_number(
+            Math.floor(pos),
+            newValue,
+            Math.floor((pos % 1) * 8)
+        );
     }
 
     source(options) {
@@ -63,16 +73,10 @@ class ReplaceSource extends wasm._ReplaceSource {
         var result = [this._source.node(options)];
         replacements.forEach(function(repl) {
             var remSource = result.pop();
-            var splitted1 = this._splitSourceNode(
-                remSource,
-                Math.floor(repl[1] + 1)
-            );
+            var splitted1 = this._splitSourceNode(remSource, repl[1] + 1);
             var splitted2;
             if (Array.isArray(splitted1)) {
-                splitted2 = this._splitSourceNode(
-                    splitted1[0],
-                    Math.floor(repl[0])
-                );
+                splitted2 = this._splitSourceNode(splitted1[0], repl[0]);
                 if (Array.isArray(splitted2)) {
                     result.push(
                         splitted1[1],
@@ -87,10 +91,7 @@ class ReplaceSource extends wasm._ReplaceSource {
                     );
                 }
             } else {
-                splitted2 = this._splitSourceNode(
-                    remSource,
-                    Math.floor(repl[0])
-                );
+                splitted2 = this._splitSourceNode(remSource, repl[0]);
                 if (Array.isArray(splitted2)) {
                     result.push(
                         this._replacementToSourceNode(splitted2[1], repl[2]),
