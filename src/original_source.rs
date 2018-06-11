@@ -41,7 +41,7 @@ impl OriginalSource {
         let mut lines = self.value.split('\n').enumerate().peekable();
 
         while let Some((idx, line)) = lines.next() {
-            let content = String::from(line) + if lines.peek() != None { "\n" } else { "" };
+            let content = String::from(line) + if lines.peek().is_some() { "\n" } else { "" };
 
             if !columns {
                 let mut sn2 = SourceNode::new_number_number_string(idx as u32 + 1, 0, &self.name);

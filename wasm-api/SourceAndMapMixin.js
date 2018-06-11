@@ -8,9 +8,14 @@ module.exports = function mixinSourceAndMap(proto) {
     proto.map = function(options) {
         options = options || {};
         if (options.columns === false) {
-            return this.listMap(options).toStringWithSourceMap({
+            var listMap = this.listMap(options);
+            var ret = listMap.toStringWithSourceMap({
                 file: "x"
             }).map;
+            if (listMap.free) {
+                listMap.free();
+            }
+            return ret;
         }
         return this.node(options)
             .toStringWithSourceMap({
@@ -22,10 +27,14 @@ module.exports = function mixinSourceAndMap(proto) {
     proto.sourceAndMap = function(options) {
         options = options || {};
         if (options.columns === false) {
-            //console.log(this.listMap(options).debugInfo());
-            return this.listMap(options).toStringWithSourceMap({
+            var listMap = this.listMap(options);
+            var ret = listMap.toStringWithSourceMap({
                 file: "x"
             });
+            if (listMap.free) {
+                listMap.free();
+            }
+            return ret;
         }
 
         var res = this.node(options).toStringWithSourceMap({

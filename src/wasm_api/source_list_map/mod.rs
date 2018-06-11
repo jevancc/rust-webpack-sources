@@ -4,7 +4,6 @@ mod mapping_functions;
 mod single_line_node;
 mod source_list_map;
 mod source_node;
-mod utils;
 
 pub use wasm_api::source_list_map::code_node::*;
 pub use wasm_api::source_list_map::from_string_with_source_map::*;
