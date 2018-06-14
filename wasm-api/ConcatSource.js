@@ -5,7 +5,7 @@
 "use strict";
 
 const SourceNode = require("source-map").SourceNode;
-const SourceListMap = require("./source-list-map").SourceListMap;
+const SourceListMap = require("./wasm-source-list-map").SourceListMap;
 const Source = require("./Source");
 
 class ConcatSource extends Source {

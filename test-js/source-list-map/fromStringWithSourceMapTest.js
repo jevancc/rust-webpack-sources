@@ -5,7 +5,6 @@ var SourceListMap = require("../../").SourceListMap;
 var fromStringWithSourceMap = require("../../").fromStringWithSourceMap;
 
 describe("fromStringWithSourceMap", function() {
-    console.log("asdasd");
     fs.readdirSync(path.resolve(__dirname, "fixtures/from-to-tests"))
         .filter(function(name) {
             return /\.input\.map$/.test(name);

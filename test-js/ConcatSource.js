@@ -1,7 +1,7 @@
 var should = require("should");
-var ConcatSource = require("../wasm-api/ConcatSource");
-var RawSource = require("../wasm-api/RawSource");
-var OriginalSource = require("../wasm-api/OriginalSource");
+var ConcatSource = require("../").ConcatSource;
+var RawSource = require("../").RawSource;
+var OriginalSource = require("../").OriginalSource;
 
 describe("ConcatSource", function() {
     it("should concat two sources", function() {

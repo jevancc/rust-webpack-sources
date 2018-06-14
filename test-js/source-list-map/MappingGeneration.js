@@ -1,7 +1,7 @@
 var should = require("should");
 var SourceListMap = require("../../").SourceListMap;
-var SingleLineNode = require("../../wasm-api/source-list-map/SingleLineNode");
-var SourceNode = require("../../wasm-api/source-list-map/SourceNode");
+var SingleLineNode = require("../../").SingleLineNode;
+var SourceNode = require("../../").SourceNode;
 
 describe("MappingGeneration", function() {
     it("should generate mappings", function() {

@@ -19,16 +19,16 @@ impl ReplaceSource {
 
     pub fn replace(&mut self, start: i32, end: i32, new_value: String, ord_s: i32, ord_e: i32) {
         let len = self.replacements.len();
-        let start = ((start as i64) << 3) + ord_s as i64;
-        let end = ((end as i64) << 3) + ord_e as i64;
+        let start = ((start as i64) << 4) + ord_s as i64;
+        let end = ((end as i64) << 4) + ord_e as i64;
         self.replacements.push((start, end, new_value, len));
         self.is_sorted = false;
     }
 
     pub fn insert(&mut self, pos: i32, new_value: String, ord: i32) {
         let len = self.replacements.len();
-        let pos_s = ((pos as i64) << 3) + ord as i64;
-        let pos_e = (((pos - 1) as i64) << 3) + ord as i64;
+        let pos_s = ((pos as i64) << 4) + ord as i64;
+        let pos_e = (((pos - 1) as i64) << 4) + ord as i64;
         self.replacements.push((pos_s, pos_e, new_value, len));
         self.is_sorted = false;
     }
@@ -54,8 +54,8 @@ impl ReplaceSource {
         self.sort_replacements();
         for repl in &self.replacements {
             let rem_source = results.pop().unwrap();
-            let splitted1 = split_string(rem_source, (repl.1 >> 3) as i32 + 1);
-            let splitted2 = split_string(splitted1.0, (repl.0 >> 3) as i32);
+            let splitted1 = split_string(rem_source, (repl.1 >> 4) as i32 + 1);
+            let splitted2 = split_string(splitted1.0, (repl.0 >> 4) as i32);
             results.push(splitted1.1);
             results.push(&repl.2);
             results.push(splitted2.0);
@@ -85,13 +85,13 @@ impl ReplaceSource {
         let repls: Vec<(i64, i64, &str, usize)> = self
             .replacements
             .iter()
-            .map(|x| (x.0 >> 3, x.1 >> 3, x.2.as_str(), x.3))
+            .map(|x| (x.0 >> 4, x.1 >> 4, x.2.as_str(), x.3))
             .collect();
         serde_json::to_string(&repls).unwrap()
     }
 }
 
-struct ReplaceMappingFunction<'a> {
+pub struct ReplaceMappingFunction<'a> {
     pub current_idx: i32,
     pub replacement_idx: i32,
     pub remove_chars: i32,
@@ -132,11 +132,11 @@ impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
             let mut final_str = String::new();
             while self.replacement_idx >= 0
                 && self.replacements[self.replacement_idx as usize].0
-                    < ((new_current_idx as i64) << 3)
+                    < ((new_current_idx as i64) << 4)
             {
                 let repl = &self.replacements[self.replacement_idx as usize];
-                let start = (repl.0 >> 3) as i32;
-                let end = (repl.1 >> 3) as i32 + 1;
+                let start = (repl.0 >> 4) as i32;
+                let end = (repl.1 >> 4) as i32 + 1;
                 let mut before;
                 if start - self.current_idx <= 0 {
                     before = String::new();

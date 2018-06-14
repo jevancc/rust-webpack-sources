@@ -2,7 +2,7 @@
 
 var SourceNode = require("source-map").SourceNode;
 var SourceMapConsumer = require("source-map").SourceMapConsumer;
-var SourceListMap = require("./source-list-map").SourceListMap;
+var SourceListMap = require("./wasm-source-list-map").SourceListMap;
 var wasm = require("./build/webpack_sources");
 
 class OriginalSource extends wasm._OriginalSource {

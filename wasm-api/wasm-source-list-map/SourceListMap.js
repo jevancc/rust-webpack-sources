@@ -63,6 +63,24 @@ class SourceListMap extends wasm._SourceListMap {
                     arguments[1]
                 ).ptr;
                 break;
+            case this.MappingFunction.Replace:
+                let replacements = [];
+                for (var i in arguments[1]) {
+                    var repl = arguments[1][i];
+                    replacements.push([
+                        (Math.floor(repl[0]) << 4) +
+                            Math.floor((repl[0] % 1) * 16),
+                        (Math.floor(repl[1]) << 4) +
+                            Math.floor((repl[1] % 1) * 16),
+                        repl[2],
+                        repl[3]
+                    ]);
+                }
+                newSlp.ptr = wasm._sourcelistmap_map_generated_code_replace(
+                    this,
+                    JSON.stringify(replacements)
+                ).ptr;
+                break;
             default:
                 throw new Error("Invalid mapping function index");
         }
@@ -114,7 +132,8 @@ class SourceListMap extends wasm._SourceListMap {
 SourceListMap.prototype.MappingFunction = {
     Test: 1,
     Identical: 2,
-    Prefix: 3
+    Prefix: 3,
+    Replace: 4
 };
 SourceListMap.prototype.isSourceListMap = true;
 module.exports = SourceListMap;

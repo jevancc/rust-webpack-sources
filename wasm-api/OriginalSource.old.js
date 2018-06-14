@@ -6,7 +6,7 @@
 
 var SourceNode = require("source-map").SourceNode;
 var SourceMapConsumer = require("source-map").SourceMapConsumer;
-var SourceListMap = require("./source-list-map").SourceListMap;
+var SourceListMap = require("./wasm-source-list-map").SourceListMap;
 var Source = require("./Source");
 
 function isSplitter(c) {
@@ -33,7 +33,6 @@ function _splitCode(code) {
         }
     }
     if (j < code.length) result.push(code.substr(j));
-    // console.log(result)
     return result;
 }
 

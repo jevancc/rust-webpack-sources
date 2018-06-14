@@ -1,8 +1,8 @@
 var should = require("should");
-var PrefixSource = require("../wasm-api/PrefixSource");
-var RawSource = require("../wasm-api/RawSource");
-var OriginalSource = require("../wasm-api/OriginalSource");
-var ConcatSource = require("../wasm-api/ConcatSource");
+var PrefixSource = require("../").PrefixSource;
+var RawSource = require("../").RawSource;
+var OriginalSource = require("../").OriginalSource;
+var ConcatSource = require("../").ConcatSource;
 
 describe("PrefixSource", function() {
     it("should prefix a source", function() {

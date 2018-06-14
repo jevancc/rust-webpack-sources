@@ -6,8 +6,8 @@
 
 var Source = require("./Source");
 var SourceNode = require("source-map").SourceNode;
-var SourceListMap = require("./source-list-map").SourceListMap;
-var fromStringWithSourceMap = require("./source-list-map")
+var SourceListMap = require("./wasm-source-list-map").SourceListMap;
+var fromStringWithSourceMap = require("./wasm-source-list-map")
     .fromStringWithSourceMap;
 var SourceMapConsumer = require("source-map").SourceMapConsumer;
 var wasm = require("./build/webpack_sources");
@@ -31,8 +31,8 @@ class ReplaceSource extends wasm._ReplaceSource {
             Math.floor(start),
             Math.floor(end),
             newValue,
-            Math.floor((start % 1) * 8),
-            Math.floor((end % 1) * 8)
+            Math.floor((start % 1) * 16),
+            Math.floor((end % 1) * 16)
         );
     }
 
@@ -48,7 +48,7 @@ class ReplaceSource extends wasm._ReplaceSource {
         this._insert_number_string_number(
             Math.floor(pos),
             newValue,
-            Math.floor((pos % 1) * 8)
+            Math.floor((pos % 1) * 16)
         );
     }
 

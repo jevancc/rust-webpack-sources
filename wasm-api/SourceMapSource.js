@@ -7,8 +7,8 @@
 var SourceNode = require("source-map").SourceNode;
 var SourceMapConsumer = require("source-map").SourceMapConsumer;
 var SourceMapGenerator = require("source-map").SourceMapGenerator;
-var SourceListMap = require("./source-list-map").SourceListMap;
-var fromStringWithSourceMap = require("./source-list-map")
+var SourceListMap = require("./wasm-source-list-map").SourceListMap;
+var fromStringWithSourceMap = require("./wasm-source-list-map")
     .fromStringWithSourceMap;
 var Source = require("./Source");
 

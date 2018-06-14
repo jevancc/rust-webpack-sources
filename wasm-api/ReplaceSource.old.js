@@ -64,7 +64,6 @@ class ReplaceSource extends Source {
             if (diff !== 0) return diff;
             return b[3] - a[3];
         });
-        console.log(this.replacements);
     }
 
     _replaceString(str) {
@@ -145,20 +144,10 @@ class ReplaceSource extends Source {
     listMap(options) {
         this._sortReplacements();
         var map = this._source.listMap(options);
-        var currentIndex = 0;
-        var replacements = this.replacements;
-        var idxReplacement = replacements.length - 1;
-        var removeChars = 0;
-        map = map.mapGeneratedCode(2);
-        var extraCode = "";
-        while (idxReplacement >= 0) {
-            extraCode += replacements[idxReplacement][2];
-            idxReplacement--;
-        }
-        if (extraCode) {
-            map.add(extraCode);
-        }
-        return map;
+        return map.mapGeneratedCode(
+            map.MappingFunction.Replace,
+            this.replacements
+        );
     }
 
     _replacementToSourceNode(oldNode, newString) {

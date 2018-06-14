@@ -6,7 +6,7 @@
 
 var SourceNode = require("source-map").SourceNode;
 var SourceMapConsumer = require("source-map").SourceMapConsumer;
-var SourceListMap = require("./source-list-map").SourceListMap;
+var SourceListMap = require("./wasm-source-list-map").SourceListMap;
 var Source = require("./Source");
 
 class LineToLineMappedSource extends Source {

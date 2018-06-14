@@ -6,7 +6,7 @@
 
 var Source = require("./Source");
 var SourceNode = require("source-map").SourceNode;
-var SourceListMap = require("./source-list-map").SourceListMap;
+var SourceListMap = require("./wasm-source-list-map").SourceListMap;
 
 class RawSource extends Source {
     constructor(value) {

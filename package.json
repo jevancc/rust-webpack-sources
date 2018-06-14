@@ -1,5 +1,5 @@
 {
-  "name": "webpack-sources",
+  "name": "wasm-webpack-sources",
   "version": "0.1.0",
   "description": "Source code handling classes for webpack",
   "main": "wasm-api",
@@ -10,18 +10,21 @@
     "test:source-list-map": "mocha ./test-js/source-list-map --full-trace --check-leaks",
     "pretty": "prettier --write \"wasm-api/**/*.js\" \"test-js/*.js\" \"test-js/source_list_map/*.js\" \"scripts/**/*.js\""
   },
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jevan0307/rust-webpack-sources.git"
+    "url": "git+https://github.com/jevancc/rust-webpack-sources.git"
   },
-  "author": "Jevan Chan <jevan.cnchan@gmail.com>",
+  "author": "Jevan Chan @jevancc <jevan.cnchan@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jevan0307/rust-webpack-sources/issues"
+    "url": "https://github.com/jevancc/rust-webpack-sources/issues"
   },
-  "homepage": "https://github.com/jevan0307/rust-webpack-sources#readme",
+  "homepage": "https://github.com/jevancc/rust-webpack-sources#readme",
   "dependencies": {
-    "source-list-map": "git+https://github.com/webpack/source-list-map.git",
+    "source-list-map": "^2.0.0",
     "source-map": "^0.6.1"
   },
   "devDependencies": {
