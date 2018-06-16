@@ -26,3 +26,9 @@ extern {
     #[wasm_bindgen(method)]
     pub fn setSourceContent(this: &SourceNode, sourceFile: &str, sourceContent: &str);
 }
+
+#[wasm_bindgen]
+extern {
+    #[wasm_bindgen(js_namespace = console, js_name=log)]
+    pub fn clog(s: &str);
+}

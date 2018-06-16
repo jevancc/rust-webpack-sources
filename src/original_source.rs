@@ -11,9 +11,10 @@ fn is_splitter(c: char) -> bool {
 fn split_code(mut code: &str) -> Vec<&str> {
     let mut result: Vec<&str> = Vec::new();
     while !code.is_empty() {
-        let chars = code.chars().enumerate();
-        let chars = chars.skip_while(|c| !is_splitter(c.1));
-        let mut chars = chars.skip_while(|c| is_splitter(c.1));
+        let chars = code.char_indices();
+        let mut chars = chars
+            .skip_while(|c| !is_splitter(c.1))
+            .skip_while(|c| is_splitter(c.1));
         if let Some((pos, _)) = chars.next() {
             let splitted = code.split_at(pos);
             result.push(splitted.0);

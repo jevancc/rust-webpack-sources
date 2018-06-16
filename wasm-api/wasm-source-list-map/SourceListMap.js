@@ -68,10 +68,8 @@ class SourceListMap extends wasm._SourceListMap {
                 for (var i in arguments[1]) {
                     var repl = arguments[1][i];
                     replacements.push([
-                        (Math.floor(repl[0]) << 4) +
-                            Math.floor((repl[0] % 1) * 16),
-                        (Math.floor(repl[1]) << 4) +
-                            Math.floor((repl[1] % 1) * 16),
+                        Math.floor(repl[0] * 16),
+                        Math.floor(repl[1] * 16),
                         repl[2],
                         repl[3]
                     ]);
@@ -93,33 +91,32 @@ class SourceListMap extends wasm._SourceListMap {
 
     toStringWithSourceMap(options) {
         var srcMap = this._to_string_with_source_map();
+
+        var mapSources = [];
+        var sourcesLen = srcMap.get_map_sources_len();
+        for (var i = 0; i < sourcesLen; i++) {
+            mapSources.push(srcMap.get_map_sources_nth(i) || null);
+        }
+
+        var mapSourcesContent = [];
+        var contentsLen = srcMap.get_map_contents_len();
+        for (var i = 0; i < contentsLen; i++) {
+            mapSourcesContent.push(srcMap.get_map_contents_nth(i));
+        }
+
         var ret = {
             source: srcMap.get_source(),
             map: {
-                file: options.file,
+                file: options && options.file,
                 version: 3,
+                sources: mapSources,
+                sourcesContent:
+                    mapSourcesContent.length != 0
+                        ? mapSourcesContent
+                        : undefined,
                 mappings: srcMap.get_mappings()
             }
         };
-
-        var sourcesLen = srcMap.get_map_sources_len();
-        if (sourcesLen > 0) {
-            ret.map.sources = [];
-            for (var i = 0; i < sourcesLen; i++) {
-                ret.map.sources.push(srcMap.get_map_sources_nth(i));
-            }
-        } else {
-            ret.map.sources = [null];
-        }
-
-        var contentsLen = srcMap.get_map_contents_len();
-        if (contentsLen > 0) {
-            ret.map.sourcesContent = [];
-            for (var i = 0; i < contentsLen; i++) {
-                ret.map.sourcesContent.push(srcMap.get_map_contents_nth(i));
-            }
-        }
-
         srcMap.free();
         return ret;
     }

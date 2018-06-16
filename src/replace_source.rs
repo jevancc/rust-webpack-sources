@@ -65,6 +65,7 @@ impl ReplaceSource {
     }
 
     pub fn list_map(&mut self, map: SourceListMap) -> SourceListMap {
+        self.sort_replacements();
         let mut mf = ReplaceMappingFunction::new(&self.replacements);
         let mut map = map.map_generated_code(&mut mf);
 
@@ -112,8 +113,8 @@ impl<'a> ReplaceMappingFunction<'a> {
 impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
     // TODO: Enhance performance
     fn map(&mut self, mut code: String) -> String {
-        let code_len = code.len() as i32;
-        let new_current_idx = self.current_idx + code_len;
+        let code_len = code.chars().count() as i32;
+        let new_current_idx = self.current_idx + code_len as i32;
 
         if self.remove_chars > code_len {
             self.remove_chars -= code_len;
@@ -121,10 +122,10 @@ impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
             String::new()
         } else {
             if self.remove_chars > 0 {
-                code = if self.remove_chars as usize >= code.len() {
-                    String::new()
+                if self.remove_chars >= code_len {
+                    code = String::new()
                 } else {
-                    code.split_off(self.remove_chars as usize)
+                    code = code.chars().skip(self.remove_chars as usize).collect()
                 };
                 self.current_idx += self.remove_chars;
                 self.remove_chars = 0;
@@ -137,24 +138,27 @@ impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
                 let repl = &self.replacements[self.replacement_idx as usize];
                 let start = (repl.0 >> 4) as i32;
                 let end = (repl.1 >> 4) as i32 + 1;
-                let mut before;
+                let before: String;
                 if start - self.current_idx <= 0 {
                     before = String::new();
-                } else if (start - self.current_idx) as usize >= code.len() {
+                } else if start - self.current_idx >= code_len {
                     before = code.clone();
                 } else {
-                    before = code.clone();
-                    before.split_off((start - self.current_idx) as usize);
+                    before = code
+                        .chars()
+                        .take((start - self.current_idx) as usize)
+                        .collect();
                 }
 
                 final_str += &(before + &repl.2);
                 if end <= new_current_idx {
-                    code = if end - self.current_idx <= 0 {
-                        code
-                    } else if (end - self.current_idx) as usize >= code.len() {
-                        String::new()
-                    } else {
-                        code.split_off((end - self.current_idx) as usize)
+                    if end - self.current_idx >= code_len {
+                        code = String::new()
+                    } else if end - self.current_idx > 0 {
+                        code = code
+                            .chars()
+                            .skip((end - self.current_idx) as usize)
+                            .collect();
                     };
 
                     self.current_idx = cmp::max(self.current_idx, end);
@@ -175,9 +179,10 @@ impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
 fn split_string(s: &str, pos: i32) -> (&str, &str) {
     if pos <= 0 {
         ("", s)
-    } else if pos as usize >= s.len() {
+    } else if pos >= s.chars().count() as i32 {
         (s, "")
     } else {
-        s.split_at(pos as usize)
+        let pos = s.char_indices().skip(pos as usize).next().unwrap().0;
+        s.split_at(pos)
     }
 }

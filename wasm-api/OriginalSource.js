@@ -9,14 +9,16 @@ class OriginalSource extends wasm._OriginalSource {
     constructor(value, name) {
         super(0);
         this.ptr = OriginalSource._new_string_string(value, name).ptr;
+        this._value = value;
+        this._name = name;
     }
 
     source() {
-        return this._source();
+        return this._value;
     }
 
     size() {
-        return this._size();
+        return this._value.length;
     }
 
     node(options) {
@@ -25,13 +27,11 @@ class OriginalSource extends wasm._OriginalSource {
     }
 
     listMap(options) {
-        var value = this._source();
-        var name = this._name();
-        return new SourceListMap(value, name, value);
+        return new SourceListMap(this._value, this._name, this._value);
     }
 
     updateHash(hash) {
-        hash.update(this._source());
+        hash.update(this._value);
     }
 }
 

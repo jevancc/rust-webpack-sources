@@ -122,9 +122,7 @@ pub fn _sourcelistmap_map_generated_code_replace(
         map.add(Node::NString(extra_code), None, None);
     }
 
-    _SourceListMap {
-        val: map.map_generated_code(&mut mf),
-    }
+    _SourceListMap { val: map }
 }
 
 impl _SourceListMap {
