@@ -3,6 +3,7 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 extern crate source_list_map;
+extern crate source_map;
 extern crate wasm_bindgen;
 
 mod original_source;

@@ -1,11 +1,13 @@
 mod original_source;
 mod replace_source;
 mod source_list_map;
+mod source_map;
 mod wasm_containers;
 
 pub use wasm_api::original_source::*;
 pub use wasm_api::replace_source::*;
 pub use wasm_api::source_list_map::*;
+pub use wasm_api::source_map::*;
 pub use wasm_api::wasm_containers::*;
 use wasm_bindgen::prelude::*;
 

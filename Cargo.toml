@@ -12,6 +12,7 @@ serde = "1.0.59"
 serde_derive = "1.0.59"
 serde_json = "1.0.17"
 source-list-map = { path = "./source-list-map" }
+source-map = { path = "./source-map" }
 
 [profile.release]
 lto = true

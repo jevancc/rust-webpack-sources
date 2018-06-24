@@ -1,3 +1,6 @@
 [submodule "source-list-map"]
 	path = source-list-map
 	url = https://github.com/jevan0307/rust-source-list-map.git
+[submodule "source-map"]
+	path = source-map
+	url = https://github.com/jevancc/rust-source-map.git
