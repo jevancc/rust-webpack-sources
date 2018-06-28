@@ -1,17 +1,21 @@
 use serde_json;
-use source_list_map::*;
 use std::cmp;
+use source::{Source, SourceTrait};
+use source_map::{SourceNode, StringPtr as SMStringPtr, Node as SMNode};
+use source_list_map::{SourceListMap, Node as SLMNode, MappingFunction};
+use std::rc::Rc;
 
 pub struct ReplaceSource {
-    // pub source: Source,   // stored in JS
+    pub source: Source,   // stored in JS
     // pub name: String,     // stored in JS
     pub replacements: Vec<(i64, i64, String, usize)>,
     is_sorted: bool,
 }
 
 impl ReplaceSource {
-    pub fn new() -> ReplaceSource {
+    pub fn new(source: Source) -> ReplaceSource {
         ReplaceSource {
+            source,
             replacements: Vec::new(),
             is_sorted: true,
         }
@@ -64,9 +68,90 @@ impl ReplaceSource {
         results.join("")
     }
 
-    pub fn list_map(&mut self, map: SourceListMap) -> SourceListMap {
+    pub fn replacements_to_string(&mut self) -> String {
+        self.sort_replacements();
+        let repls: Vec<(i64, i64, &str, usize)> = self
+            .replacements
+            .iter()
+            .map(|x| (x.0 >> 4, x.1 >> 4, x.2.as_str(), x.3))
+            .collect();
+        serde_json::to_string(&repls).unwrap()
+    }
+}
+
+impl SourceTrait for ReplaceSource {
+    fn source(&mut self) -> String {
+        let s = match &mut self.source {
+            Source::Raw(s) => s.source(),
+            Source::Original(s) => s.source(),
+            Source::Replace(s) => s.source(),
+            Source::Prefix(s) => s.source(),
+            Source::Concat(s) => s.source(),
+            Source::LineToLineMapped(s) => s.source(),
+            Source::SString(s) => *s.clone(),
+        };
+        self.replace_string(&s)
+    }
+
+    fn node(&mut self, columns: bool, module: bool) -> SourceNode {
+        self.sort_replacements();
+        let mut result = Vec::<SMNode>::new();
+        result.push(SMNode::NSourceNode(match &mut self.source {
+            Source::Raw(s) => s.node(columns, module),
+            Source::Original(s) => s.node(columns, module),
+            Source::Replace(s) => s.node(columns, module),
+            Source::Prefix(s) => s.node(columns, module),
+            Source::Concat(s) => s.node(columns, module),
+            Source::LineToLineMapped(s) => s.node(columns, module),
+            Source::SString(_) => panic!(),
+        }));
+        for repl in &self.replacements {
+            let rem_source = result.pop().unwrap();
+            match split_sourcenode(rem_source, (repl.1 >> 4) as i32 + 1) {
+                Ok((l1, r1)) => {
+                    match split_sourcenode(l1, (repl.0 >> 4) as i32) {
+                        Ok((l2, r2)) => {
+                            result.push(r1);
+                            result.push(replacement_to_sourcenode(r2, &repl.2));
+                            result.push(l2);
+                        }
+                        Err((_, l1)) => {
+                            result.push(r1.clone());
+                            result.push(replacement_to_sourcenode(r1, &repl.2));
+                            result.push(l1);
+                        }
+                    }
+                }
+                Err((_, rem_source)) => {
+                    match split_sourcenode(rem_source, (repl.0 >> 4) as i32) {
+                        Ok((l2, r2)) => {
+                            result.push(replacement_to_sourcenode(r2, &repl.2));
+                            result.push(l2);
+                        }
+                        Err((_, rem_source)) => {
+                            result.push(SMNode::NRcString(Rc::new(repl.2.clone())));
+                            result.push(rem_source);
+                        }
+                    }
+                }
+            }
+        }
+        result.reverse();
+        SourceNode::new(None, None, None, Some(SMNode::NNodeVec(result)))
+    }
+
+    fn list_map(&mut self, columns: bool, module: bool) -> SourceListMap {
         self.sort_replacements();
         let mut mf = ReplaceMappingFunction::new(&self.replacements);
+        let map = match &mut self.source {
+            Source::Raw(s) => s.list_map(columns, module),
+            Source::Original(s) => s.list_map(columns, module),
+            Source::Replace(s) => s.list_map(columns, module),
+            Source::Prefix(s) => s.list_map(columns, module),
+            Source::Concat(s) => s.list_map(columns, module),
+            Source::LineToLineMapped(s) => s.list_map(columns, module),
+            Source::SString(_) => panic!(),
+        };
         let mut map = map.map_generated_code(&mut mf);
 
         let mut extra_code = String::new();
@@ -76,19 +161,9 @@ impl ReplaceSource {
         }
 
         if !extra_code.is_empty() {
-            map.add(Node::NString(extra_code), None, None);
+            map.add(SLMNode::NString(extra_code), None, None);
         }
         map
-    }
-
-    pub fn replacements_to_string(&mut self) -> String {
-        self.sort_replacements();
-        let repls: Vec<(i64, i64, &str, usize)> = self
-            .replacements
-            .iter()
-            .map(|x| (x.0 >> 4, x.1 >> 4, x.2.as_str(), x.3))
-            .collect();
-        serde_json::to_string(&repls).unwrap()
     }
 }
 
@@ -172,6 +247,90 @@ impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
             self.current_idx = new_current_idx;
             final_str + &code
         }
+    }
+}
+
+// TODO: This function is fucking slow.
+fn split_sourcenode(node: SMNode, mut split_position: i32) -> Result<(SMNode, SMNode), (i32, SMNode)> {
+    match node {
+        SMNode::NSourceNode(n) => {
+            let mut is_splitted = false;
+            let mut left_children = Vec::<SMNode>::new();
+            let mut right_children = Vec::<SMNode>::new();
+            let c_position = n.position;
+            let c_source = n.source.map(|sp| SMStringPtr::Ptr(sp));
+            let c_name = n.name.map(|sp| SMStringPtr::Ptr(sp));
+            let c_source_contents = n.source_contents;
+            for child in n.children {
+                if !is_splitted {
+                    match split_sourcenode(child, split_position) {
+                        Ok((l, r)) => {
+                            left_children.push(l);
+                            right_children.push(r);
+                            is_splitted = true;
+                        }
+                        Err((p, n)) => {
+                            split_position = p;
+                            left_children.push(n);
+                        }
+                    }
+                } else {
+                    right_children.push(child);
+                }
+            }
+            if is_splitted {
+                let mut left = SourceNode::new(
+                    c_position.clone(),
+                    c_source.clone(),
+                    c_name.clone(),
+                    Some(SMNode::NNodeVec(left_children))
+                );
+                let right = SourceNode::new(
+                    c_position,
+                    c_source,
+                    c_name,
+                    Some(SMNode::NNodeVec(right_children))
+                );
+                left.source_contents = c_source_contents;
+                Ok((SMNode::NSourceNode(left), SMNode::NSourceNode(right)))
+            } else {
+                let mut node = SourceNode::new(
+                    c_position,
+                    c_source,
+                    c_name,
+                    Some(SMNode::NNodeVec(left_children))
+                );
+                node.source_contents = c_source_contents;
+                Err((split_position, SMNode::NSourceNode(node)))
+            }
+        }
+        SMNode::NRcString(n) => {
+            let len = n.len() as i32;
+            if split_position >= len {
+                Err((split_position - len, SMNode::NRcString(n)))
+            } else {
+                let splitted = split_string(&n, split_position);
+                let left = Rc::new(String::from(splitted.0));
+                let right = Rc::new(String::from(splitted.1));
+                Ok((SMNode::NRcString(left), SMNode::NRcString(right)))
+            }
+        }
+        SMNode::NString(n) => split_sourcenode(SMNode::NRcString(Rc::new(n)), split_position),
+        _ => panic!()
+    }
+}
+
+#[inline]
+fn replacement_to_sourcenode(old_node: SMNode, new_string: &str) -> SMNode {
+    if let SMNode::NSourceNode(node) = old_node {
+        let mut map = node.to_source_map_generator(None, None);
+        let original_mapping = map.original_position_for(1, 0);
+        let position = original_mapping.original;
+        let file = original_mapping.source.map(|sp| SMStringPtr::Ptr(sp));
+        let chunks = Some(SMNode::NRcString(Rc::new(String::from(new_string))));
+        SMNode::NSourceNode(SourceNode::new(position, file, None, chunks))
+    } else {
+        panic!()
     }
 }
 

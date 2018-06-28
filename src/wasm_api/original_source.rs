@@ -1,6 +1,6 @@
 use original_source::*;
 use wasm_bindgen::prelude::*;
-use SourceNode;
+use wasm_api::_MSourceNode;
 
 #[wasm_bindgen]
 pub struct _OriginalSource {
@@ -27,7 +27,7 @@ impl _OriginalSource {
         self.val.name.clone()
     }
 
-    pub fn _node_bool(&self, columns: bool) -> SourceNode {
-        self.val.node(columns)
+    pub fn _node_bool(&self, columns: bool) -> _MSourceNode {
+        _MSourceNode::new(self.val.node(columns))
     }
 }

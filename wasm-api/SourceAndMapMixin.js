@@ -17,11 +17,15 @@ module.exports = function mixinSourceAndMap(proto) {
             }
             return ret;
         }
-        return this.node(options)
+        var StringWithSourceMap = this.node(options)
             .toStringWithSourceMap({
                 file: "x"
-            })
-            .map.toJSON();
+            });
+        if (typeof StringWithSourceMap === "string") {
+            return JSON.parse(StringWithSourceMap).map;
+        } else {
+            return map.toJSON();
+        }
     };
 
     proto.sourceAndMap = function(options) {
@@ -40,9 +44,14 @@ module.exports = function mixinSourceAndMap(proto) {
         var res = this.node(options).toStringWithSourceMap({
             file: "x"
         });
-        return {
-            source: res.code,
-            map: res.map.toJSON()
-        };
+
+        if (typeof StringWithSourceMap === "string") {
+            return JSON.parse(StringWithSourceMap);
+        } else {
+            return {
+                source: res.code,
+                map: res.map.toJSON()
+            };
+        }
     };
 };
