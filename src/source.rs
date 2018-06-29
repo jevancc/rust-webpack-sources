@@ -27,12 +27,13 @@ pub trait SourceTrait {
     fn node(&mut self, columns: bool, module: bool) -> SourceNode;
 }
 
-// TODO: implement a marco for simple source matching 
+// TODO: implement a marco for simple source matching
 // match child {
 //     Source::Raw(s) =>
 //     Source::Original(s) =>
 //     Source::Replace(s) =>
 //     Source::Prefix(s) =>
 //     Source::Concat(s) =>
+//     Source::LineToLineMapped(s) =>
 //     Source::SString(s) =>
 // }

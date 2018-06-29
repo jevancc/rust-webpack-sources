@@ -58,8 +58,8 @@ impl ReplaceSource {
         self.sort_replacements();
         for repl in &self.replacements {
             let rem_source = results.pop().unwrap();
-            let splitted1 = split_string(rem_source, (repl.1 >> 4) as i32 + 1);
-            let splitted2 = split_string(splitted1.0, (repl.0 >> 4) as i32);
+            let splitted1 = split_string(rem_source, (repl.1 >> 4) as i32 + 1, None);
+            let splitted2 = split_string(splitted1.0, (repl.0 >> 4) as i32, None);
             results.push(splitted1.1);
             results.push(&repl.2);
             results.push(splitted2.0);
@@ -305,13 +305,13 @@ fn split_sourcenode(node: SMNode, mut split_position: i32) -> Result<(SMNode, SM
             }
         }
         SMNode::NRcString(n) => {
-            let len = n.len() as i32;
-            if split_position >= len {
-                Err((split_position - len, SMNode::NRcString(n)))
+            let n_len = n.chars().count();
+            if n_len as i32 >= split_position {
+                Err((split_position - n_len as i32, SMNode::NRcString(n)))
             } else {
-                let splitted = split_string(&n, split_position);
-                let left = Rc::new(String::from(splitted.0));
-                let right = Rc::new(String::from(splitted.1));
+                let (left, right) = split_string(&n, split_position, Some(n_len));
+                let left = Rc::new(String::from(left));
+                let right = Rc::new(String::from(right));
                 Ok((SMNode::NRcString(left), SMNode::NRcString(right)))
             }
         }
@@ -335,10 +335,12 @@ fn replacement_to_sourcenode(old_node: SMNode, new_string: &str) -> SMNode {
 }
 
 #[inline]
-fn split_string(s: &str, pos: i32) -> (&str, &str) {
+fn split_string(s: &str, pos: i32, s_len: Option<usize>) -> (&str, &str) {
+    let s_len = s_len.map_or(s.chars().count(), |l| l);
+
     if pos <= 0 {
         ("", s)
-    } else if pos >= s.chars().count() as i32 {
+    } else if pos >= s_len as i32 {
         (s, "")
     } else {
         let pos = s.char_indices().skip(pos as usize).next().unwrap().0;

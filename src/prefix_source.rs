@@ -10,7 +10,7 @@ fn clone_and_prefix(node: SMNode, prefix: &str, append: &mut Vec<String>) -> Res
             if end_with_new_line {
                 s.pop();
             }
-            s.replace('\n', &(String::from("\n") + prefix));
+            s = s.replace('\n', &(String::from("\n") + prefix));
             s.push('\n');
             s = append.pop().unwrap() + &s;
             if end_with_new_line {
@@ -111,10 +111,10 @@ impl<'a> MappingFunction for PrefixMappingFunction<'a> {
         let mut mapped = String::from(self.prefix) + &code;
         if code.ends_with('\n') {
             mapped.pop();
-            mapped.replace('\n', &self.prefix);
+            mapped = mapped.replace('\n', &self.prefix);
             mapped.push('\n');
         } else {
-            mapped.replace('\n', &self.prefix);
+            mapped = mapped.replace('\n', &self.prefix);
         }
         mapped
     }
