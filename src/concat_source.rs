@@ -7,6 +7,12 @@ pub struct ConcatSource {
 }
 
 impl ConcatSource {
+    pub fn new() -> ConcatSource {
+        ConcatSource {
+            children: Vec::new()
+        }
+    }
+    
     pub fn add(&mut self, item: Source) {
         if let Source::Concat(mut cs) = item {
             self.children.append(&mut cs.children);
