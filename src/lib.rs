@@ -13,6 +13,6 @@ mod replace_source;
 mod prefix_source;
 mod concat_source;
 mod line_to_line_mapped_source;
-// mod wasm_api;
+mod wasm_api;
 
-// pub use wasm_api::*;
+pub use wasm_api::*;

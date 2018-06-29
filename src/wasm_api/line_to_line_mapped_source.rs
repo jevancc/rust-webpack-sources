@@ -1,18 +1,18 @@
-use original_source::*;
+use line_to_line_mapped_source::*;
 use wasm_bindgen::prelude::*;
 use wasm_api::{_MSourceNode, _SourceListMap};
 use source::SourceTrait;
 
 #[wasm_bindgen]
-pub struct _OriginalSource {
-    val: Box<OriginalSource>,
+pub struct _LineToLineMappedSource {
+    val: Box<LineToLineMappedSource>,
 }
 
 #[wasm_bindgen]
-impl _OriginalSource {
-    pub fn _new_string_string(source_code: String, name: String) -> _OriginalSource {
-        _OriginalSource {
-            val: Box::new(OriginalSource::new(source_code, name)),
+impl _LineToLineMappedSource {
+    pub fn _new_string_string_string(value: String, name: String, original_source: String) -> _LineToLineMappedSource {
+        _LineToLineMappedSource {
+            val: Box::new(LineToLineMappedSource::new(value, name, original_source)),
         }
     }
 
@@ -24,10 +24,6 @@ impl _OriginalSource {
         self.val.size() as u32
     }
 
-    pub fn _name(&mut self) -> String {
-        self.val.name.clone()
-    }
-
     pub fn _list_map_bool_bool(&mut self, columns: bool, module: bool) -> _SourceListMap {
         _SourceListMap::new(self.val.list_map(columns, module))
     }
@@ -37,8 +33,8 @@ impl _OriginalSource {
     }
 }
 
-impl _OriginalSource {
-    pub fn get_raw(self) -> Box<OriginalSource> {
+impl _LineToLineMappedSource {
+    pub fn get_raw(self) -> Box<LineToLineMappedSource> {
         self.val
     }
 }
