@@ -4,70 +4,67 @@
 */
 "use strict";
 
-var Source = require("./Source");
-var SourceNode = require("source-map").SourceNode;
+var SourceNode = require("./wasm-source-map").SourceNode;
+var SourceListMap = require("./wasm-source-list-map").SourceListMap;
+var wasm = require("./build/webpack_sources");
 
-var REPLACE_REGEX = /\n(?=.|\s)/g;
 
-function cloneAndPrefix(node, prefix, append) {
-    if (typeof node === "string") {
-        var result = node.replace(REPLACE_REGEX, "\n" + prefix);
-        if (append.length > 0) result = append.pop() + result;
-        if (/\n$/.test(node)) append.push(prefix);
-        return result;
-    } else {
-        var newNode = new SourceNode(
-            node.line,
-            node.column,
-            node.source,
-            node.children.map(function(node) {
-                return cloneAndPrefix(node, prefix, append);
-            }),
-            node.name
-        );
-        newNode.sourceContents = node.sourceContents;
-        return newNode;
-    }
-}
-
-class PrefixSource extends Source {
+class PrefixSource extends wasm._PrefixSource {
     constructor(prefix, source) {
-        super();
-        this._source = source;
-        this._prefix = prefix;
+        super(0);
+        if (typeof source === "string") {
+            this.ptr = PrefixSource._new_string_string(prefix, source).ptr;
+        } else if (source.type === "RawSource") {
+            this.ptr = PrefixSource._new_string_raw_source(prefix, source).ptr;
+        } else if (source.type === "OriginalSource") {
+            this.ptr = PrefixSource._new_string_original_source(prefix, source).ptr;
+        } else if (source.type === "ReplaceSource") {
+            this.ptr = PrefixSource._new_string_replace_source(prefix, source).ptr;
+        } else if (source.type === "PrefixSource") {
+            this.ptr = PrefixSource._new_string_prefix_source(prefix, source).ptr;
+        } else if (source.type === "ConcatSource") {
+            this.ptr = PrefixSource._new_string_concat_source(prefix, source).ptr;
+        } else if (source.type === "LineToLineMappedSource") {
+            this.ptr = PrefixSource._new_string_line_to_line_mapped_source(prefix, source).ptr;
+        } else {
+            throw new Error("Invalid source");
+        }
+
+        this._js_source = source;
+        this._js_prefix = prefix;
     }
 
     source() {
-        var node =
-            typeof this._source === "string"
-                ? this._source
-                : this._source.source();
-        var prefix = this._prefix;
-        return prefix + node.replace(REPLACE_REGEX, "\n" + prefix);
+        return this._source();
+    }
+
+    size() {
+        return this._size();
     }
 
     node(options) {
-        var node = this._source.node(options);
-        var append = [this._prefix];
-        return new SourceNode(null, null, null, [
-            cloneAndPrefix(node, this._prefix, append)
-        ]);
+        var node = new SourceNode(-2);
+        options = options || {};
+        node.ptr = this._node_bool_bool(!(options.columns === false), !(options.module === false)).ptr;
+        return node;
     }
 
     listMap(options) {
-        var prefix = this._prefix;
-        var map = this._source.listMap(options);
-        return map.mapGeneratedCode(map.MappingFunction.Prefix, prefix);
+        var map = new SourceListMap(-2);
+        options = options || {};
+        map.ptr = this._list_map_bool_bool(!(options.columns === false), !(options.module === false)).ptr;
+        return map;
     }
 
     updateHash(hash) {
-        if (typeof this._source === "string") hash.update(this._source);
-        else this._source.updateHash(hash);
-        if (typeof this._prefix === "string") hash.update(this._prefix);
-        else this._prefix.updateHash(hash);
+        if (typeof this._js_source === "string") hash.update(this._js_source);
+        else this._js_source.updateHash(hash);
+        if (typeof this._js_prefix === "string") hash.update(this._js_prefix);
+        else this._js_prefix.updateHash(hash);
     }
 }
 
 require("./SourceAndMapMixin")(PrefixSource.prototype);
 
+PrefixSource.prototype.type = "PrefixSource";
 module.exports = PrefixSource;

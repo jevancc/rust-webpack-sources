@@ -1,7 +1,6 @@
 "use strict";
 
-var SourceNode = require("source-map").SourceNode;
-var SourceMapConsumer = require("source-map").SourceMapConsumer;
+var SourceNode = require("./wasm-source-map").SourceNode;
 var SourceListMap = require("./wasm-source-list-map").SourceListMap;
 var wasm = require("./build/webpack_sources");
 
@@ -22,12 +21,17 @@ class OriginalSource extends wasm._OriginalSource {
     }
 
     node(options) {
+        var node = new SourceNode(-2);
         options = options || {};
-        return this._node_bool(!(options.columns === false));
+        node.ptr = this._node_bool_bool(!(options.columns === false), !(options.module === false)).ptr;
+        return node;
     }
 
     listMap(options) {
-        return new SourceListMap(this._value, this._name, this._value);
+        var map = new SourceListMap(-2);
+        options = options || {};
+        map.ptr = this._list_map_bool_bool(!(options.columns === false), !(options.module === false)).ptr;
+        return map;
     }
 
     updateHash(hash) {
@@ -37,4 +41,5 @@ class OriginalSource extends wasm._OriginalSource {
 
 require("./SourceAndMapMixin")(OriginalSource.prototype);
 
+OriginalSource.prototype.type = "OriginalSource";
 module.exports = OriginalSource;

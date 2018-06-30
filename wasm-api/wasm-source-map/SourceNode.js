@@ -46,7 +46,18 @@ class SourceNode extends wasm._MSourceNode {
             json = this._to_string_with_source_map_null();
         }
 
-        return json;
+        var parsed = JSON.parse(json);
+        return {
+            source: parsed.source,
+            map: {
+                file: parsed.map.file,
+                mappings: parsed.map.mappings,
+                names: parsed.map.names,
+                sources: parsed.map.sources,
+                sourcesContent: parsed.map.sources_content,
+                version: parsed.map.version,
+            }
+        }
     }
 }
 

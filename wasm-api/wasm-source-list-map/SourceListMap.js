@@ -10,7 +10,7 @@ var NodeVec = require("./utils").NodeVec;
 class SourceListMap extends wasm._SourceListMap {
     constructor(generatedCode, source, originalSource) {
         super(0);
-        if (generatedCode !== -1) {
+        if (generatedCode !== -2) {
             if (Array.isArray(generatedCode)) {
                 var nodes = NodeVec(generatedCode);
                 this.ptr = SourceListMap._new_nodes(nodes);
@@ -45,7 +45,7 @@ class SourceListMap extends wasm._SourceListMap {
     }
 
     mapGeneratedCode(fnIdx) {
-        var newSlp = new SourceListMap(-1);
+        var newSlp = new SourceListMap(-2);
         switch (fnIdx) {
             case this.MappingFunction.Test:
                 newSlp.ptr = wasm._sourcelistmap_map_generated_code_test(

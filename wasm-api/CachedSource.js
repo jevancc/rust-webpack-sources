@@ -23,6 +23,9 @@ class CachedSource extends Source {
             this.listMap = function(options) {
                 return this._source.listMap(options);
             };
+
+        this.ptr = source.ptr;
+        this.type = source.type;
     }
 
     source() {

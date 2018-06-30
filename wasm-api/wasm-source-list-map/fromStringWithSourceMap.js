@@ -9,7 +9,7 @@ module.exports = function fromStringWithSourceMap(code, map) {
     var sourcesContent = StringVec(map.sourcesContent || []);
     var mappings = map.mappings;
 
-    var slp = new SourceListMap(-1);
+    var slp = new SourceListMap(-2);
     slp.ptr = wasm._from_string_with_source_map(
         code,
         sources,

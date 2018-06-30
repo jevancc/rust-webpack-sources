@@ -4,14 +4,14 @@
 */
 "use strict";
 
-var SourceNode = require("source-map").SourceNode;
-var SourceMapConsumer = require("source-map").SourceMapConsumer;
+var SourceNode = require("./wasm-source-map").SourceNode;
 var SourceListMap = require("./wasm-source-list-map").SourceListMap;
-var Source = require("./Source");
+var wasm = require("./build/webpack_sources");
 
-class LineToLineMappedSource extends Source {
+class LineToLineMappedSource extends wasm._LineToLineMappedSource {
     constructor(value, name, originalSource) {
-        super();
+        super(0);
+        this.ptr = LineToLineMappedSource._new().ptr;
         this._value = value;
         this._name = name;
         this._originalSource = originalSource;
@@ -21,29 +21,22 @@ class LineToLineMappedSource extends Source {
         return this._value;
     }
 
+    size() {
+        return this._value.length;
+    }
+
     node(options) {
-        var value = this._value;
-        var name = this._name;
-        var lines = value.split("\n");
-        var node = new SourceNode(
-            null,
-            null,
-            null,
-            lines.map(function(line, idx) {
-                return new SourceNode(
-                    idx + 1,
-                    0,
-                    name,
-                    line + (idx != lines.length - 1 ? "\n" : "")
-                );
-            })
-        );
-        node.setSourceContent(name, this._originalSource);
+        var node = new SourceNode(-2);
+        options = options || {};
+        node.ptr = this._node_bool_bool(!(options.columns === false), !(options.module === false)).ptr;
         return node;
     }
 
     listMap(options) {
-        return new SourceListMap(this._value, this._name, this._originalSource);
+        var map = new SourceListMap(-2);
+        options = options || {};
+        map.ptr = this._list_map_bool_bool(!(options.columns === false), !(options.module === false)).ptr;
+        return map;
     }
 
     updateHash(hash) {
@@ -54,4 +47,5 @@ class LineToLineMappedSource extends Source {
 
 require("./SourceAndMapMixin")(LineToLineMappedSource.prototype);
 
+LineToLineMappedSource.prototype.type = "LineToLineMappedSource";
 module.exports = LineToLineMappedSource;

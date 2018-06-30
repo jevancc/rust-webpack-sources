@@ -3,29 +3,40 @@
 	Author Tobias Koppers @sokra
 */
 "use strict";
+var SourceNode = require("./wasm-source-map").SourceNode;
+var SourceListMap = require("./wasm-source-list-map").SourceListMap;
+var wasm = require("./build/webpack_sources");
 
-const SourceNode = require("source-map").SourceNode;
-const SourceListMap = require("./wasm-source-list-map").SourceListMap;
-const Source = require("./Source");
-
-class ConcatSource extends Source {
+class ConcatSource extends wasm._ConcatSource {
     constructor() {
-        super();
+        super(0);
+        this.ptr = ConcatSource._new().ptr;
         this.children = [];
         for (var i = 0; i < arguments.length; i++) {
-            var item = arguments[i];
-            if (item instanceof ConcatSource) {
-                var children = item.children;
-                for (var j = 0; j < children.length; j++)
-                    this.children.push(children[j]);
-            } else {
-                this.children.push(item);
-            }
+            this.add(arguments[i]);
         }
     }
 
     add(item) {
-        if (item instanceof ConcatSource) {
+        if (typeof item === "string") {
+            this._add_string(item);
+        } else if (item.type === "RawSource") {
+            this._add_raw_source(item);
+        } else if (item.type === "OriginalSource") {
+            this._add_original_source(item);
+        } else if (item.type === "ReplaceSource") {
+            this._add_replace_source(item);
+        } else if (item.type === "PrefixSource") {
+            this._add_prefix_source(item);
+        } else if (item.type === "ConcatSource") {
+            this._add_concat_source(item);
+        } else if (item.type === "LineToLineMappedSource") {
+            this._add_line_to_line_mapped_source(item);
+        } else {
+            throw new Error("Invalid source");
+        }
+
+        if (item.isConcatSource) {
             var children = item.children;
             for (var j = 0; j < children.length; j++)
                 this.children.push(children[j]);
@@ -35,45 +46,24 @@ class ConcatSource extends Source {
     }
 
     source() {
-        let source = "";
-        const children = this.children;
-        for (let i = 0; i < children.length; i++) {
-            const child = children[i];
-            source += typeof child === "string" ? child : child.source();
-        }
-        return source;
+        return this._source();
     }
 
     size() {
-        let size = 0;
-        const children = this.children;
-        for (let i = 0; i < children.length; i++) {
-            const child = children[i];
-            size += typeof child === "string" ? child.length : child.size();
-        }
-        return size;
+        return this._size();
     }
 
     node(options) {
-        const node = new SourceNode(
-            null,
-            null,
-            null,
-            this.children.map(function(item) {
-                return typeof item === "string" ? item : item.node(options);
-            })
-        );
+        var node = new SourceNode(-2);
+        options = options || {};
+        node.ptr = this._node_bool_bool(!(options.columns === false), !(options.module === false)).ptr;
         return node;
     }
 
     listMap(options) {
-        const map = new SourceListMap();
-        var children = this.children;
-        for (var i = 0; i < children.length; i++) {
-            var item = children[i];
-            if (typeof item === "string") map.add(item);
-            else map.add(item.listMap(options));
-        }
+        var map = new SourceListMap(-2);
+        options = options || {};
+        map.ptr = this._list_map_bool_bool(!(options.columns === false), !(options.module === false)).ptr;
         return map;
     }
 
@@ -89,4 +79,5 @@ class ConcatSource extends Source {
 
 require("./SourceAndMapMixin")(ConcatSource.prototype);
 
+ConcatSource.prototype.type = "ConcatSource";
 module.exports = ConcatSource;

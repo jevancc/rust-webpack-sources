@@ -4,8 +4,7 @@
 */
 "use strict";
 
-var Source = require("./Source");
-var SourceNode = require("source-map").SourceNode;
+var SourceNode = require("./wasm-source-map").SourceNode;
 var SourceListMap = require("./wasm-source-list-map").SourceListMap;
 var fromStringWithSourceMap = require("./wasm-source-list-map")
     .fromStringWithSourceMap;
@@ -15,11 +14,28 @@ var wasm = require("./build/webpack_sources");
 class ReplaceSource extends wasm._ReplaceSource {
     constructor(source, name) {
         super(0);
-        this._source = source;
-        this._name = name;
+        this._js_source = source;
+        this._js_name = name;
         this._source_cache = null;
         this._replacements = null;
-        this.ptr = ReplaceSource._new().ptr;
+
+        if (typeof source === "string") {
+            this.ptr = ReplaceSource._new_string(source).ptr;
+        } else if (source.type === "RawSource") {
+            this.ptr = ReplaceSource._new_raw_source(source).ptr;
+        } else if (source.type === "OriginalSource") {
+            this.ptr = ReplaceSource._new_original_source(source).ptr;
+        } else if (source.type === "ReplaceSource") {
+            this.ptr = ReplaceSource._new_replace_source(source).ptr;
+        } else if (source.type === "PrefixSource") {
+            this.ptr = ReplaceSource._new_prefix_source(source).ptr;
+        } else if (source.type === "ConcatSource") {
+            this.ptr = ReplaceSource._new_concat_source(source).ptr;
+        } else if (source.type === "LineToLineMappedSource") {
+            this.ptr = ReplaceSource._new_line_to_line_mapped_source(source).ptr;
+        } else {
+            throw new Error("Invalid source");
+        }
     }
 
     replace(start, end, newValue) {
@@ -55,19 +71,16 @@ class ReplaceSource extends wasm._ReplaceSource {
     }
 
     size() {
-        return this.source().length;
+        return this._size();
     }
 
     source(options) {
-        var source = this._source.source();
-        if (this._source_cache === null) {
-            this._source_cache = this._source_string(source);
-        }
-        return this._source_cache;
+        return this._source();
     }
 
     original() {
-        return this._source;
+        throw new Error("ReplaceSource.original() is deprecated");
+        // return this._source;
     }
 
     replacements() {
@@ -78,103 +91,26 @@ class ReplaceSource extends wasm._ReplaceSource {
     }
 
     node(options) {
-        var replacements = this.replacements();
-        var result = [this._source.node(options)];
-        replacements.forEach(function(repl) {
-            var remSource = result.pop();
-            var splitted1 = this._splitSourceNode(remSource, repl[1] + 1);
-            var splitted2;
-            if (Array.isArray(splitted1)) {
-                splitted2 = this._splitSourceNode(splitted1[0], repl[0]);
-                if (Array.isArray(splitted2)) {
-                    result.push(
-                        splitted1[1],
-                        this._replacementToSourceNode(splitted2[1], repl[2]),
-                        splitted2[0]
-                    );
-                } else {
-                    result.push(
-                        splitted1[1],
-                        this._replacementToSourceNode(splitted1[1], repl[2]),
-                        splitted1[0]
-                    );
-                }
-            } else {
-                splitted2 = this._splitSourceNode(remSource, repl[0]);
-                if (Array.isArray(splitted2)) {
-                    result.push(
-                        this._replacementToSourceNode(splitted2[1], repl[2]),
-                        splitted2[0]
-                    );
-                } else {
-                    result.push(repl[2], remSource);
-                }
-            }
-        }, this);
-        result = result.reverse();
-        return new SourceNode(null, null, null, result);
+        var node = new SourceNode(-2);
+        options = options || {};
+        node.ptr = this._node_bool_bool(!(options.columns === false), !(options.module === false)).ptr;
+        return node;
     }
 
     listMap(options) {
-        var map = this._source.listMap(options);
-        var ret_map = new SourceListMap(-1);
-        ret_map.ptr = this._list_map_sourcelistmap(map).ptr;
-        return ret_map;
+        var map = new SourceListMap(-2);
+        options = options || {};
+        map.ptr = this._list_map_bool_bool(!(options.columns === false), !(options.module === false)).ptr;
+        return map;
     }
 
-    _replacementToSourceNode(oldNode, newString) {
-        var map = oldNode.toStringWithSourceMap({
-            file: "?"
-        }).map;
-        var original = new SourceMapConsumer(map.toJSON()).originalPositionFor({
-            line: 1,
-            column: 0
-        });
-        if (original) {
-            return new SourceNode(
-                original.line,
-                original.column,
-                original.source,
-                newString
-            );
-        } else {
-            return newString;
-        }
-    }
-
-    _splitSourceNode(node, position) {
-        if (typeof node === "string") {
-            if (node.length <= position) return position - node.length;
-            return position <= 0
-                ? ["", node]
-                : [node.substr(0, position), node.substr(position)];
-        } else {
-            for (var i = 0; i < node.children.length; i++) {
-                position = this._splitSourceNode(node.children[i], position);
-                if (Array.isArray(position)) {
-                    var leftNode = new SourceNode(
-                        node.line,
-                        node.column,
-                        node.source,
-                        node.children.slice(0, i).concat([position[0]]),
-                        node.name
-                    );
-                    var rightNode = new SourceNode(
-                        node.line,
-                        node.column,
-                        node.source,
-                        [position[1]].concat(node.children.slice(i + 1)),
-                        node.name
-                    );
-                    leftNode.sourceContents = node.sourceContents;
-                    return [leftNode, rightNode];
-                }
-            }
-            return position;
-        }
+    updateHash(hash) {
+        var source = this.source();
+        hash.update(source || "");
     }
 }
 
 require("./SourceAndMapMixin")(ReplaceSource.prototype);
 
+ReplaceSource.prototype.type = "ReplaceSource";
 module.exports = ReplaceSource;
