@@ -33,8 +33,8 @@ describe("ReplaceSource", function() {
         source.replace(7, 7, "0000");
         source.insert(line1.length + 2, "\n Multi Line\n");
         source.replace(startLine6 + 4, startLine6 + 4, " ");
-        var originalSource = source.original();
-        var originalText = originalSource.source();
+        // var originalSource = source.original();
+        // var originalText = originalSource.source();
         var resultText = source.source();
         var resultMap = source.sourceAndMap({
             columns: true
@@ -43,10 +43,11 @@ describe("ReplaceSource", function() {
             columns: false
         });
 
-        originalSource.should.be.eql(source._source);
-        originalText.should.be.eql(
-            "Hello World!\n{}\nLine 3\nLine 4\nLine 5\nLast\nLine"
-        );
+        // originalSource.should.be.eql(source._source);
+        // originalText.should.be.eql(
+        //     "Hello World!\n{}\nLine 3\nLine 4\nLine 5\nLast\nLine"
+        // );
+
         resultText.should.be.eql(
             "Hi bye W0000rld!\n{\n Multi Line\n}\nLast Line"
         );
