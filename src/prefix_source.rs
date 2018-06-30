@@ -18,7 +18,7 @@ fn clone_and_prefix(node: SMNode, prefix: &str, append: &mut Vec<String>) -> Res
             } else {
                 s = s.replace('\n', &(String::from("\n") + prefix));
             }
-            
+
             if !append.is_empty() {
                 s = append.pop().unwrap() + &s;
             }
@@ -58,38 +58,22 @@ impl PrefixSource {
 
 impl SourceTrait for PrefixSource {
     fn source(&mut self) -> String {
-        let mut node = match &mut self.source {
-            Source::Raw(s) => s.source(),
-            Source::Original(s) => s.source(),
-            Source::Replace(s) => s.source(),
-            Source::Prefix(s) => s.source(),
-            Source::Concat(s) => s.source(),
-            Source::LineToLineMapped(s) => s.source(),
-            Source::SString(s) => String::clone(&s),
-        };
+        let mut s = self.source.source();
 
-        if node.ends_with('\n') {
-            node = self.prefix.clone() + &node;
-            node.pop();
-            node = node.replace('\n', &(String::from("\n") + &self.prefix));
-            node.push('\n');
+        if s.ends_with('\n') {
+            s = self.prefix.clone() + &s;
+            s.pop();
+            s = s.replace('\n', &(String::from("\n") + &self.prefix));
+            s.push('\n');
         } else {
-            node = self.prefix.clone() + &node;
-            node = node.replace('\n', &(String::from("\n") + &self.prefix));
+            s = self.prefix.clone() + &s;
+            s = s.replace('\n', &(String::from("\n") + &self.prefix));
         }
-        node
+        s
     }
 
     fn node(&mut self, columns: bool, module: bool) -> SourceNode {
-        let node = match &mut self.source {
-            Source::Raw(s) => s.node(columns, module),
-            Source::Original(s) => s.node(columns, module),
-            Source::Replace(s) => s.node(columns, module),
-            Source::Prefix(s) => s.node(columns, module),
-            Source::Concat(s) => s.node(columns, module),
-            Source::LineToLineMapped(s) => s.node(columns, module),
-            Source::SString(_) => panic!(),
-        };
+        let node = self.source.node(columns, module);
 
         let mut append = Vec::<String>::new();
         append.push(self.prefix.clone());
@@ -100,15 +84,7 @@ impl SourceTrait for PrefixSource {
 
     fn list_map(&mut self, columns: bool, module: bool) -> SourceListMap {
         let mut mapping_fn = PrefixMappingFunction { prefix: &self.prefix };
-        let map = match &mut self.source {
-            Source::Raw(s) => s.list_map(columns, module),
-            Source::Original(s) => s.list_map(columns, module),
-            Source::Replace(s) => s.list_map(columns, module),
-            Source::Prefix(s) => s.list_map(columns, module),
-            Source::Concat(s) => s.list_map(columns, module),
-            Source::LineToLineMapped(s) => s.list_map(columns, module),
-            Source::SString(_) => panic!(),
-        };
+        let map = self.source.list_map(columns, module);
         map.map_generated_code(&mut mapping_fn)
     }
 }

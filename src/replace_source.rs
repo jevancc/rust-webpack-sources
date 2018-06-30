@@ -83,30 +83,14 @@ impl ReplaceSource {
 
 impl SourceTrait for ReplaceSource {
     fn source(&mut self) -> String {
-        let s = match &mut self.source {
-            Source::Raw(s) => s.source(),
-            Source::Original(s) => s.source(),
-            Source::Replace(s) => s.source(),
-            Source::Prefix(s) => s.source(),
-            Source::Concat(s) => s.source(),
-            Source::LineToLineMapped(s) => s.source(),
-            Source::SString(s) => *s.clone(),
-        };
+        let s = self.source.source();
         self.replace_string(&s)
     }
 
     fn node(&mut self, columns: bool, module: bool) -> SourceNode {
         self.sort_replacements();
         let mut result = Vec::<SMNode>::new();
-        result.push(SMNode::NSourceNode(match &mut self.source {
-            Source::Raw(s) => s.node(columns, module),
-            Source::Original(s) => s.node(columns, module),
-            Source::Replace(s) => s.node(columns, module),
-            Source::Prefix(s) => s.node(columns, module),
-            Source::Concat(s) => s.node(columns, module),
-            Source::LineToLineMapped(s) => s.node(columns, module),
-            Source::SString(_) => panic!(),
-        }));
+        result.push(SMNode::NSourceNode(self.source.node(columns, module)));
         for repl in &self.replacements {
             let rem_source = result.pop().unwrap();
             match split_sourcenode(rem_source, (repl.1 >> 4) as i32 + 1) {
@@ -145,15 +129,7 @@ impl SourceTrait for ReplaceSource {
     fn list_map(&mut self, columns: bool, module: bool) -> SourceListMap {
         self.sort_replacements();
         let mut mf = ReplaceMappingFunction::new(&self.replacements);
-        let map = match &mut self.source {
-            Source::Raw(s) => s.list_map(columns, module),
-            Source::Original(s) => s.list_map(columns, module),
-            Source::Replace(s) => s.list_map(columns, module),
-            Source::Prefix(s) => s.list_map(columns, module),
-            Source::Concat(s) => s.list_map(columns, module),
-            Source::LineToLineMapped(s) => s.list_map(columns, module),
-            Source::SString(_) => panic!(),
-        };
+        let map = self.source.list_map(columns, module);
         let mut map = map.map_generated_code(&mut mf);
 
         let mut extra_code = String::new();
