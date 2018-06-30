@@ -4,6 +4,7 @@ use wasm_api::{_MSourceNode, _SourceListMap};
 use source::SourceTrait;
 
 #[wasm_bindgen]
+#[derive(Debug)]
 pub struct _OriginalSource {
     val: Box<OriginalSource>,
 }

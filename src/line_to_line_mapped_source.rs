@@ -2,6 +2,7 @@ use source_map::{SourceNode, StringPtr as SMStringPtr, Node as SMNode};
 use source_list_map::{SourceListMap, GenCode, StringPtr as SLMStringPtr, Node as SLMNode};
 use source::{SourceTrait};
 
+#[derive(Debug)]
 pub struct LineToLineMappedSource {
     value: String,
     name: String,

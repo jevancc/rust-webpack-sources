@@ -2,6 +2,7 @@ use source::{Source, SourceTrait};
 use source_map::{SourceNode, Node as SMNode};
 use source_list_map::{SourceListMap, Node as SLMNode};
 
+#[derive(Debug)]
 pub struct ConcatSource {
     children: Vec<Source>,
 }
@@ -12,7 +13,7 @@ impl ConcatSource {
             children: Vec::new()
         }
     }
-    
+
     pub fn add(&mut self, item: Source) {
         if let Source::Concat(mut cs) = item {
             self.children.append(&mut cs.children);

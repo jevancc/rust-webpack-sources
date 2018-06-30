@@ -29,6 +29,7 @@ fn split_code(mut code: &str) -> Vec<&str> {
     result
 }
 
+#[derive(Debug)]
 pub struct OriginalSource {
     pub value: String,
     pub name: String,
@@ -55,7 +56,6 @@ impl SourceTrait for OriginalSource {
 
         while let Some((idx, line)) = lines.next() {
             let content = String::from(line) + if lines.peek().is_some() { "\n" } else { "" };
-
             if !columns {
                 sn.add(
                     SMNode::NSourceNode(
@@ -75,13 +75,13 @@ impl SourceTrait for OriginalSource {
                     if item.trim().is_empty() {
                         sn2.add(SMNode::NString(String::from(*item)));
                     } else {
-                        pos += item.len();
                         sn2.add(SMNode::NSourceNode(SourceNode::new(
                             Some((idx + 1, pos)),
                             Some(SMStringPtr::Str(self.name.clone())),
                             None,
                             Some(SMNode::NString(String::from(*item)))
                         )));
+                        pos += item.len();
                     }
                 }
                 sn.add(SMNode::NSourceNode(sn2))

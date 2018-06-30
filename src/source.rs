@@ -8,6 +8,7 @@ use line_to_line_mapped_source::LineToLineMappedSource;
 use source_map::SourceNode;
 use source_list_map::SourceListMap;
 
+#[derive(Debug)]
 pub enum Source {
     Raw(Box<RawSource>),
     Original(Box<OriginalSource>),

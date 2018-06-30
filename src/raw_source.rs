@@ -1,7 +1,8 @@
-use source_map::{SourceNode, StringPtr as SMStringPtr};
+use source_map::{SourceNode, StringPtr as SMStringPtr, Node as SMNode};
 use source_list_map::{SourceListMap, GenCode, Node as SLMNode};
 use source::{SourceTrait};
 
+#[derive(Debug)]
 pub struct RawSource {
     value: String,
 }
@@ -24,9 +25,7 @@ impl SourceTrait for RawSource {
     }
 
     fn node(&mut self, _columns: bool, _module: bool) -> SourceNode {
-        SourceNode::new(None,
-            Some(SMStringPtr::Str(self.value.clone())),
-        None, None)
+        SourceNode::new(None, None, None, Some(SMNode::NString(self.value.clone())))
     }
 
     fn list_map(&mut self, _columns: bool, _module: bool) -> SourceListMap {

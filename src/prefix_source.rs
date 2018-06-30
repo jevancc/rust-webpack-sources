@@ -1,22 +1,31 @@
 use source_map::{SourceNode, Node as SMNode};
 use source_list_map::{SourceListMap, MappingFunction};
 use source::{Source, SourceTrait};
+use std::rc::Rc;
 
 // TODO: `append` to be a counter
 fn clone_and_prefix(node: SMNode, prefix: &str, append: &mut Vec<String>) -> Result<SMNode, &'static str> {
     match node {
+        SMNode::NRcString(s) => {
+            Ok(clone_and_prefix(SMNode::NString((*s).clone()), prefix, append).unwrap())
+        }
         SMNode::NString(mut s) => {
             let end_with_new_line = s.ends_with('\n');
             if end_with_new_line {
                 s.pop();
+                s = s.replace('\n', &(String::from("\n") + prefix));
+                s.push('\n');
+            } else {
+                s = s.replace('\n', &(String::from("\n") + prefix));
             }
-            s = s.replace('\n', &(String::from("\n") + prefix));
-            s.push('\n');
-            s = append.pop().unwrap() + &s;
+            
+            if !append.is_empty() {
+                s = append.pop().unwrap() + &s;
+            }
             if end_with_new_line {
                 append.push(String::from(prefix));
             }
-            Ok(SMNode::NString(s))
+            Ok(SMNode::NRcString(Rc::new(s)))
         }
         SMNode::NSourceNode(mut sn) => {
             let mut new_children = Vec::<SMNode>::new();
@@ -27,11 +36,12 @@ fn clone_and_prefix(node: SMNode, prefix: &str, append: &mut Vec<String>) -> Res
             Ok(SMNode::NSourceNode(sn))
         }
         _ => {
-            Err("Invalid node type")
+            Ok(SMNode::NString(String::new()))
         }
     }
 }
 
+#[derive(Debug)]
 pub struct PrefixSource {
     pub source: Source,
     prefix: String,
@@ -57,6 +67,7 @@ impl SourceTrait for PrefixSource {
             Source::LineToLineMapped(s) => s.source(),
             Source::SString(s) => String::clone(&s),
         };
+
         if node.ends_with('\n') {
             node = self.prefix.clone() + &node;
             node.pop();
@@ -111,10 +122,10 @@ impl<'a> MappingFunction for PrefixMappingFunction<'a> {
         let mut mapped = String::from(self.prefix) + &code;
         if code.ends_with('\n') {
             mapped.pop();
-            mapped = mapped.replace('\n', &self.prefix);
+            mapped = mapped.replace('\n', &(String::from("\n") + &self.prefix));
             mapped.push('\n');
         } else {
-            mapped = mapped.replace('\n', &self.prefix);
+            mapped = mapped.replace('\n', &(String::from("\n") + &self.prefix));
         }
         mapped
     }

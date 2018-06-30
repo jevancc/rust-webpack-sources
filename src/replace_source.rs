@@ -4,9 +4,11 @@ use source::{Source, SourceTrait};
 use source_map::{SourceNode, StringPtr as SMStringPtr, Node as SMNode};
 use source_list_map::{SourceListMap, Node as SLMNode, MappingFunction};
 use std::rc::Rc;
+use wasm_api::clog;
 
+#[derive(Debug)]
 pub struct ReplaceSource {
-    pub source: Source,   // stored in JS
+    pub source: Source,
     // pub name: String,     // stored in JS
     pub replacements: Vec<(i64, i64, String, usize)>,
     is_sorted: bool,
@@ -306,7 +308,7 @@ fn split_sourcenode(node: SMNode, mut split_position: i32) -> Result<(SMNode, SM
         }
         SMNode::NRcString(n) => {
             let n_len = n.chars().count();
-            if n_len as i32 >= split_position {
+            if n_len as i32 <= split_position {
                 Err((split_position - n_len as i32, SMNode::NRcString(n)))
             } else {
                 let (left, right) = split_string(&n, split_position, Some(n_len));
