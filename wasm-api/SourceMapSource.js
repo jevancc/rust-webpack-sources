@@ -4,29 +4,31 @@
 */
 "use strict";
 
-var SourceNode = require("source-map").SourceNode;
-var SourceMapConsumer = require("source-map").SourceMapConsumer;
-var SourceMapGenerator = require("source-map").SourceMapGenerator;
+var SourceNode = require("./wasm-source-map").SourceNode;
 var SourceListMap = require("./wasm-source-list-map").SourceListMap;
 var fromStringWithSourceMap = require("./wasm-source-list-map")
     .fromStringWithSourceMap;
-var Source = require("./Source");
+var SourceMapConsumer = require("source-map").SourceMapConsumer;
+var StringVec = require("./wasm-source-list-map/utils").StringVec;
+var wasm = require("./build/webpack_sources");
 
-class SourceMapSource extends Source {
+class SourceMapSource extends wasm._SourceMapSource {
     constructor(value, name, sourceMap, originalSource, innerSourceMap) {
-        super();
+        super(0);
         this._value = value;
         this._name = name;
         this._sourceMap = sourceMap;
         this._originalSource = originalSource;
         this._innerSourceMap = innerSourceMap;
-    }
 
-    source() {
-        return this._value;
-    }
+        var sources = StringVec(sourceMap.sources || []);
+        var sourcesContent = StringVec(sourceMap.sourcesContent || []);
+        var mappings = sourceMap.mappings;
+        this.ptr = SourceMapSource._new_string_string_map(value, name,
+            StringVec(sources), StringVec(sourcesContent), mappings
+        ).ptr;
 
-    node(options) {
+
         var innerSourceMap = this._innerSourceMap;
         var sourceMap = this._sourceMap;
         if (innerSourceMap) {
@@ -39,22 +41,44 @@ class SourceMapSource extends Source {
             sourceMap.applySourceMap(innerSourceMap, this._name);
             sourceMap = sourceMap.toJSON();
         }
-        return SourceNode.fromStringWithSourceMap(
-            this._value,
-            new SourceMapConsumer(sourceMap)
-        );
+        let consumer = new SourceMapConsumer(sourceMap);
+        let parsed_mappings = [];
+        let parsed_sources = [];
+        consumer.eachMapping((mapping) => {
+            parsed_mappings.push([
+                [mapping.generatedLine, mapping.generatedColumn],
+                mapping.source,
+                mapping.name,
+                [mapping.originalLine, mapping.originalColumn]
+            ]);
+        });
+        consumer.sources.forEach((file) => {
+            let content = consumer.sourceContentFor(file);
+            parsed_sources.push([file, content]);
+        });
+        this._set_source_map_consumer_string(JSON.stringify({ mappings: parsed_mappings, sources: parsed_sources }));
+    }
+
+    source() {
+        return this._value;
+    }
+
+    size() {
+        return this._value.length;
+    }
+
+    node(options) {
+        var node = new SourceNode(-2);
+        options = options || {};
+        node.ptr = this._node_bool_bool(!(options.columns === false), !(options.module === false)).ptr;
+        return node;
     }
 
     listMap(options) {
+        var map = new SourceListMap(-2);
         options = options || {};
-        if (options.module === false)
-            return new SourceListMap(this._value, this._name, this._value);
-        return fromStringWithSourceMap(
-            this._value,
-            typeof this._sourceMap === "string"
-                ? JSON.parse(this._sourceMap)
-                : this._sourceMap
-        );
+        map.ptr = this._list_map_bool_bool(!(options.columns === false), !(options.module === false)).ptr;
+        return map;
     }
 
     updateHash(hash) {
@@ -65,4 +89,5 @@ class SourceMapSource extends Source {
 
 require("./SourceAndMapMixin")(SourceMapSource.prototype);
 
+SourceMapSource.prototype.type = "SourceMapSource";
 module.exports = SourceMapSource;

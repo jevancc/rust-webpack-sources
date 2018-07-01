@@ -1,7 +1,7 @@
 use replace_source::*;
 use wasm_bindgen::prelude::*;
 use wasm_api::{_SourceListMap, _MSourceNode};
-use wasm_api::{_RawSource, _OriginalSource, _PrefixSource, _ConcatSource, _LineToLineMappedSource};
+use wasm_api::{_RawSource, _OriginalSource, _PrefixSource, _ConcatSource, _LineToLineMappedSource, _SourceMapSource};
 use source::{SourceTrait, Source};
 
 #[wasm_bindgen]
@@ -45,6 +45,11 @@ impl _ReplaceSource {
     pub fn _new_line_to_line_mapped_source(source: _LineToLineMappedSource) -> _ReplaceSource {
         _ReplaceSource {
             val: Box::new(ReplaceSource::new(Source::LineToLineMapped(source.get_raw()))),
+        }
+    }
+    pub fn _new_source_map_source(source: _SourceMapSource) -> _ReplaceSource {
+        _ReplaceSource {
+            val: Box::new(ReplaceSource::new(Source::SourceMapSource(source.get_raw()))),
         }
     }
 

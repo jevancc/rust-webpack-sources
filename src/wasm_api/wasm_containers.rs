@@ -26,6 +26,10 @@ impl StringVec {
     pub fn get_mut(&mut self) -> &mut Vec<String> {
         &mut self.val
     }
+
+    pub fn get_raw(self) -> Vec<String> {
+        self.val
+    }
 }
 
 #[wasm_bindgen]

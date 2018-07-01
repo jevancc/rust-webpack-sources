@@ -4,6 +4,8 @@ use replace_source::ReplaceSource;
 use prefix_source::PrefixSource;
 use concat_source::ConcatSource;
 use line_to_line_mapped_source::LineToLineMappedSource;
+use source_map_source::SourceMapSource;
+
 // use std::rc::Rc;
 use source_map::SourceNode;
 use source_list_map::SourceListMap;
@@ -16,6 +18,7 @@ pub enum Source {
     Prefix(Box<PrefixSource>),
     Concat(Box<ConcatSource>),
     LineToLineMapped(Box<LineToLineMappedSource>),
+    SourceMapSource(Box<SourceMapSource>),
     SString(Box<String>),
 }
 
@@ -29,6 +32,7 @@ impl SourceTrait for Source {
             Source::Prefix(s) => s.source(),
             Source::Concat(s) => s.source(),
             Source::LineToLineMapped(s) => s.source(),
+            Source::SourceMapSource(s) => s.source(),
             Source::SString(s) => (**s).clone()
         }
     }
@@ -42,6 +46,7 @@ impl SourceTrait for Source {
             Source::Prefix(s) => s.size(),
             Source::Concat(s) => s.size(),
             Source::LineToLineMapped(s) => s.size(),
+            Source::SourceMapSource(s) => s.size(),
             Source::SString(s) => s.len()
         }
     }
@@ -55,6 +60,7 @@ impl SourceTrait for Source {
             Source::Prefix(s) => s.list_map(columns, module),
             Source::Concat(s) => s.list_map(columns, module),
             Source::LineToLineMapped(s) => s.list_map(columns, module),
+            Source::SourceMapSource(s) => s.list_map(columns, module),
             Source::SString(_) => panic!()
         }
     }
@@ -68,6 +74,7 @@ impl SourceTrait for Source {
             Source::Prefix(s) => s.node(columns, module),
             Source::Concat(s) => s.node(columns, module),
             Source::LineToLineMapped(s) => s.node(columns, module),
+            Source::SourceMapSource(s) => s.node(columns, module),
             Source::SString(_) => panic!()
         }
     }

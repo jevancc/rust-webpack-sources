@@ -1,7 +1,7 @@
 use concat_source::*;
 use wasm_bindgen::prelude::*;
 use wasm_api::{_MSourceNode, _SourceListMap};
-use wasm_api::{_RawSource, _OriginalSource, _ReplaceSource, _PrefixSource, _LineToLineMappedSource};
+use wasm_api::{_RawSource, _OriginalSource, _ReplaceSource, _PrefixSource, _LineToLineMappedSource, _SourceMapSource};
 use source::{SourceTrait, Source};
 use wasm_api::clog;
 
@@ -38,6 +38,9 @@ impl _ConcatSource {
     }
     pub fn _add_line_to_line_mapped_source(&mut self, item: _LineToLineMappedSource) {
         self.val.add(Source::LineToLineMapped(item.get_raw()))
+    }
+    pub fn _add_source_map_source(&mut self, item: _SourceMapSource) {
+        self.val.add(Source::SourceMapSource(item.get_raw()))
     }
 
     pub fn _source(&mut self) -> String {

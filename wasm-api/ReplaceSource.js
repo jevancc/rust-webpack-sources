@@ -33,6 +33,8 @@ class ReplaceSource extends wasm._ReplaceSource {
             this.ptr = ReplaceSource._new_concat_source(source).ptr;
         } else if (source.type === "LineToLineMappedSource") {
             this.ptr = ReplaceSource._new_line_to_line_mapped_source(source).ptr;
+        } else if (source.type === "SourceMapSource") {
+            this.ptr = ReplaceSource._new_source_map_source(source).ptr;
         } else {
             throw new Error("Invalid source");
         }

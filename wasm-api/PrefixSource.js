@@ -26,6 +26,8 @@ class PrefixSource extends wasm._PrefixSource {
             this.ptr = PrefixSource._new_string_concat_source(prefix, source).ptr;
         } else if (source.type === "LineToLineMappedSource") {
             this.ptr = PrefixSource._new_string_line_to_line_mapped_source(prefix, source).ptr;
+        } else if (source.type === "SourceMapSource") {
+            this.ptr = PrefixSource._new_string_source_map_source(prefix, source).ptr;
         } else {
             throw new Error("Invalid source");
         }

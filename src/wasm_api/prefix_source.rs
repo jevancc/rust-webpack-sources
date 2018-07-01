@@ -1,7 +1,7 @@
 use prefix_source::*;
 use wasm_bindgen::prelude::*;
 use wasm_api::{_MSourceNode, _SourceListMap};
-use wasm_api::{_RawSource, _OriginalSource, _ReplaceSource, _ConcatSource, _LineToLineMappedSource};
+use wasm_api::{_RawSource, _OriginalSource, _ReplaceSource, _ConcatSource, _LineToLineMappedSource, _SourceMapSource};
 use source::{Source, SourceTrait};
 
 #[wasm_bindgen]
@@ -44,6 +44,11 @@ impl _PrefixSource {
     pub fn _new_string_line_to_line_mapped_source(prefix: String, source: _LineToLineMappedSource) -> _PrefixSource {
         _PrefixSource {
             val: Box::new(PrefixSource::new(prefix, Source::LineToLineMapped(source.get_raw()))),
+        }
+    }
+    pub fn _new_string_source_map_source(prefix: String, source: _SourceMapSource) -> _PrefixSource {
+        _PrefixSource {
+            val: Box::new(PrefixSource::new(prefix, Source::SourceMapSource(source.get_raw()))),
         }
     }
 

@@ -4,6 +4,7 @@ mod replace_source;
 mod prefix_source;
 mod concat_source;
 mod line_to_line_mapped_source;
+mod source_map_source;
 
 mod source_list_map;
 mod source_map;
@@ -15,6 +16,7 @@ pub use wasm_api::replace_source::*;
 pub use wasm_api::prefix_source::*;
 pub use wasm_api::concat_source::*;
 pub use wasm_api::line_to_line_mapped_source::*;
+pub use wasm_api::source_map_source::*;
 
 pub use wasm_api::source_list_map::*;
 pub use wasm_api::source_map::*;

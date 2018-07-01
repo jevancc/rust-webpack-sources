@@ -15,8 +15,8 @@ pub fn _from_string_with_source_map(
 
     _SourceListMap::new(from_string_with_source_map(
         code,
-        sources.iter().map(|s| s.as_str()).collect(),
-        sources_content.iter().map(|s| s.as_str()).collect(),
+        &sources.iter().map(|s| s.as_str()).collect(),
+        &sources_content.iter().map(|s| s.as_str()).collect(),
         mappings,
     ))
 }

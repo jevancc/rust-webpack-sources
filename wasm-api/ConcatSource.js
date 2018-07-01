@@ -32,6 +32,8 @@ class ConcatSource extends wasm._ConcatSource {
             this._add_concat_source(item);
         } else if (item.type === "LineToLineMappedSource") {
             this._add_line_to_line_mapped_source(item);
+        } else if (item.type === "SourceMapSource") {
+            this._add_source_map_source(item);
         } else {
             throw new Error("Invalid source");
         }
