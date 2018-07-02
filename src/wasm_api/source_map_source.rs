@@ -2,6 +2,8 @@ use source_map_source::*;
 use wasm_bindgen::prelude::*;
 use wasm_api::{_MSourceNode, _SourceListMap, StringVec};
 use source::SourceTrait;
+use serde_json;
+use wasm_api::*;
 
 #[wasm_bindgen]
 #[derive(Debug)]
@@ -14,17 +16,18 @@ impl _SourceMapSource {
     pub fn _new_string_string_map(
             value: String,
             name: String,
-            sources: StringVec,
-            sources_content: StringVec,
+            sources: String,
+            sources_content: String,
             mappings: String
         ) -> _SourceMapSource {
-
+        let sources: Vec<String> = serde_json::from_str(&sources).unwrap();
+        let sources_content: Vec<String> = serde_json::from_str(&sources_content).unwrap();
         _SourceMapSource {
             val: Box::new(SourceMapSource::new(
                 value,
                 name,
-                sources.get_raw(),
-                sources_content.get_raw(),
+                sources,
+                sources_content,
                 mappings
             )),
         }

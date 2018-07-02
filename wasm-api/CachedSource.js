@@ -9,6 +9,7 @@ const Source = require("./Source");
 class CachedSource extends Source {
     constructor(source) {
         super();
+
         this._source = source;
         this._cachedSource = undefined;
         this._cachedSize = undefined;
@@ -24,8 +25,15 @@ class CachedSource extends Source {
                 return this._source.listMap(options);
             };
 
-        this.ptr = source.ptr;
         this.type = source.type;
+    }
+
+    get ptr() {
+        return this._source.ptr;
+    }
+
+    set ptr(p) {
+        this._source.ptr = p;
     }
 
     source() {

@@ -21,11 +21,11 @@ class SourceMapSource extends wasm._SourceMapSource {
         this._originalSource = originalSource;
         this._innerSourceMap = innerSourceMap;
 
-        var sources = StringVec(sourceMap.sources || []);
-        var sourcesContent = StringVec(sourceMap.sourcesContent || []);
+        var sources = JSON.stringify(sourceMap.sources || []);
+        var sourcesContent = JSON.stringify(sourceMap.sourcesContent || []);
         var mappings = sourceMap.mappings;
         this.ptr = SourceMapSource._new_string_string_map(value, name,
-            StringVec(sources), StringVec(sourcesContent), mappings
+            sources, sourcesContent, mappings
         ).ptr;
 
 
