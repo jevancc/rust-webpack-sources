@@ -2,6 +2,7 @@ use source::{Source, SourceTrait};
 use source_map::{SourceNode, Node as SMNode};
 use source_list_map::{SourceListMap, Node as SLMNode};
 use wasm_api::clog;
+use std::rc::Rc;
 
 #[derive(Debug)]
 pub struct ConcatSource {
@@ -16,8 +17,8 @@ impl ConcatSource {
     }
 
     pub fn add(&mut self, item: Source) {
-        if let Source::Concat(mut cs) = item {
-            self.children.append(&mut cs.children);
+        if let Source::Concat(cs) = item {
+            self.children.append(&mut cs.borrow_mut().children);
         } else {
             self.children.push(item);
         }
@@ -44,7 +45,7 @@ impl SourceTrait for ConcatSource {
         let mut map = SourceListMap::new(None, None, None);
         for child in &mut self.children {
             map.add(if let Source::SString(s) = child {
-                SLMNode::NString(*s.clone())
+                SLMNode::NString(String::clone(s))
             } else {
                 SLMNode::NSourceListMap(child.list_map(columns, module))
             }, None, None);
@@ -56,7 +57,7 @@ impl SourceTrait for ConcatSource {
         SourceNode::new(None, None, None, Some(SMNode::NNodeVec(
             self.children.iter_mut().map(|child| {
                 if let Source::SString(s) = child {
-                    SMNode::NString(*s.clone())
+                    SMNode::NString(String::clone(s))
                 } else {
                     SMNode::NSourceNode(child.node(columns, module))
                 }

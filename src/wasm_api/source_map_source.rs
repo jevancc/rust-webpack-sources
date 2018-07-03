@@ -1,3 +1,5 @@
+use std::rc::Rc;
+use std::cell::RefCell;
 use source_map_source::*;
 use wasm_bindgen::prelude::*;
 use wasm_api::{_MSourceNode, _SourceListMap, StringVec};
@@ -8,7 +10,7 @@ use wasm_api::*;
 #[wasm_bindgen]
 #[derive(Debug)]
 pub struct _SourceMapSource {
-    val: Box<SourceMapSource>,
+    val: Rc<RefCell<SourceMapSource>>,
 }
 
 #[wasm_bindgen]
@@ -23,39 +25,39 @@ impl _SourceMapSource {
         let sources: Vec<String> = serde_json::from_str(&sources).unwrap();
         let sources_content: Vec<String> = serde_json::from_str(&sources_content).unwrap();
         _SourceMapSource {
-            val: Box::new(SourceMapSource::new(
+            val: Rc::new(RefCell::new(SourceMapSource::new(
                 value,
                 name,
                 sources,
                 sources_content,
                 mappings
-            )),
+            ))),
         }
     }
 
     pub fn _source(&mut self) -> String {
-        self.val.source()
+        self.val.borrow_mut().source()
     }
 
     pub fn _size(&mut self) -> u32 {
-        self.val.size() as u32
+        self.val.borrow_mut().size() as u32
     }
 
     pub fn _set_source_map_consumer_string(&mut self, json: String) {
-        self.val.set_source_map_consumer(json);
+        self.val.borrow_mut().set_source_map_consumer(json);
     }
 
     pub fn _list_map_bool_bool(&mut self, columns: bool, module: bool) -> _SourceListMap {
-        _SourceListMap::new(self.val.list_map(columns, module))
+        _SourceListMap::new(self.val.borrow_mut().list_map(columns, module))
     }
 
     pub fn _node_bool_bool(&mut self, columns: bool, module: bool) -> _MSourceNode {
-        _MSourceNode::new(self.val.node(columns, module))
+        _MSourceNode::new(self.val.borrow_mut().node(columns, module))
     }
 }
 
 impl _SourceMapSource {
-    pub fn get_raw(self) -> Box<SourceMapSource> {
-        self.val
+    pub fn get_raw(&self) -> Rc<RefCell<SourceMapSource>> {
+        Rc::clone(&self.val)
     }
 }
