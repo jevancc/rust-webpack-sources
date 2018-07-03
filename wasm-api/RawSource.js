@@ -43,6 +43,13 @@ class RawSource extends wasm._RawSource {
     updateHash(hash) {
         hash.update(this._value);
     }
+
+    sourceAndMap(options) {
+        return {
+            source: this.source(),
+            map: this.map()
+        };
+    }
 }
 
 RawSource.prototype.type = "RawSource";
