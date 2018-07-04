@@ -55,7 +55,7 @@ class SourceNode extends wasm._MSourceNode {
                 names: parsed.map.names,
                 sources: parsed.map.sources,
                 sourcesContent: parsed.map.sources_content,
-                version: parsed.map.version,
+                version: parsed.map.version || 3,
             }
         }
     }

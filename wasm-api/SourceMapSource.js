@@ -9,6 +9,7 @@ var SourceListMap = require("./wasm-source-list-map").SourceListMap;
 var fromStringWithSourceMap = require("./wasm-source-list-map")
     .fromStringWithSourceMap;
 var SourceMapConsumer = require("source-map").SourceMapConsumer;
+var SourceMapGenerator = require("source-map").SourceMapGenerator;
 var StringVec = require("./wasm-source-list-map/utils").StringVec;
 var wasm = require("./build/webpack_sources");
 
@@ -49,7 +50,7 @@ class SourceMapSource extends wasm._SourceMapSource {
                 [mapping.generatedLine, mapping.generatedColumn],
                 mapping.source,
                 mapping.name,
-                [mapping.originalLine, mapping.originalColumn]
+                mapping.originalLine ? [mapping.originalLine, mapping.originalColumn] : null
             ]);
         });
         consumer.sources.forEach((file) => {

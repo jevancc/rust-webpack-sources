@@ -45,7 +45,8 @@ impl SourceTrait for ConcatSource {
         let mut map = SourceListMap::new(None, None, None);
         for child in &mut self.children {
             map.add(if let Source::SString(s) = child {
-                SLMNode::NString(String::clone(s))
+                // TODO: Check why error occurs when returning SLMNode::NString
+                SLMNode::NRcString(s.clone())
             } else {
                 SLMNode::NSourceListMap(child.list_map(columns, module))
             }, None, None);
@@ -57,7 +58,8 @@ impl SourceTrait for ConcatSource {
         SourceNode::new(None, None, None, Some(SMNode::NNodeVec(
             self.children.iter_mut().map(|child| {
                 if let Source::SString(s) = child {
-                    SMNode::NString(String::clone(s))
+                    // TODO: Check why error occurs when returning SMNode::NString
+                    SMNode::NRcString(s.clone())
                 } else {
                     SMNode::NSourceNode(child.node(columns, module))
                 }

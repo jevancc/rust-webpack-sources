@@ -11,7 +11,7 @@ var wasm = require("./build/webpack_sources");
 class LineToLineMappedSource extends wasm._LineToLineMappedSource {
     constructor(value, name, originalSource) {
         super(0);
-        this.ptr = LineToLineMappedSource._new().ptr;
+        this.ptr = LineToLineMappedSource._new_string_string_string(value, name, originalSource).ptr;
         this._value = value;
         this._name = name;
         this._originalSource = originalSource;
