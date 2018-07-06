@@ -235,11 +235,13 @@ fn split_sourcenode(node: SmNode, mut split_position: i32) -> Result<(SmNode, Sm
             let mut is_splitted = false;
             let mut left_children = Vec::<SmNode>::new();
             let mut right_children = Vec::<SmNode>::new();
+            left_children.reserve(n.children.len());
+            right_children.reserve(n.children.len());
             let c_position = n.position;
             let c_source = n.source.map(|sp| StringPtr::Ptr(sp));
             let c_name = n.name.map(|sp| StringPtr::Ptr(sp));
             let c_source_contents = n.source_contents;
-            for child in n.children {
+            for child in n.children.into_iter() {
                 if !is_splitted {
                     match split_sourcenode(child, split_position) {
                         Ok((l, r)) => {
