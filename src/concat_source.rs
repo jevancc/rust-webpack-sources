@@ -1,6 +1,6 @@
 use source::{Source, SourceTrait};
-use source_map::{SourceNode, types::Node as SmNode};
-use source_list_map::{SourceListMap, types::Node as SlmNode};
+use source_list_map::{types::Node as SlmNode, SourceListMap};
+use source_map::{types::Node as SmNode, SourceNode};
 
 #[derive(Debug)]
 pub struct ConcatSource {
@@ -10,7 +10,7 @@ pub struct ConcatSource {
 impl ConcatSource {
     pub fn new() -> ConcatSource {
         ConcatSource {
-            children: Vec::new()
+            children: Vec::new(),
         }
     }
 
@@ -25,9 +25,11 @@ impl ConcatSource {
 
 impl SourceTrait for ConcatSource {
     fn source(&mut self) -> String {
-        let sources: Vec<String> = self.children.iter_mut().map(|child| {
-            child.source()
-        }).collect();
+        let sources: Vec<String> = self
+            .children
+            .iter_mut()
+            .map(|child| child.source())
+            .collect();
         sources.join("")
     }
 
@@ -42,26 +44,38 @@ impl SourceTrait for ConcatSource {
     fn list_map(&mut self, columns: bool, module: bool) -> SourceListMap {
         let mut map = SourceListMap::new(None, None, None);
         for child in &mut self.children {
-            map.add(if let Source::SString(s) = child {
-                // TODO: Check why error occurs when returning SlmNode::NString
-                SlmNode::NRcString(s.clone())
-            } else {
-                SlmNode::NSourceListMap(child.list_map(columns, module))
-            }, None, None);
+            map.add(
+                if let Source::SString(s) = child {
+                    // TODO: Check why error occurs when returning SlmNode::NString
+                    SlmNode::NRcString(s.clone())
+                } else {
+                    SlmNode::NSourceListMap(child.list_map(columns, module))
+                },
+                None,
+                None,
+            );
         }
         map
     }
 
     fn node(&mut self, columns: bool, module: bool) -> SourceNode {
-        SourceNode::new(None, None, None, Some(SmNode::NNodeVec(
-            self.children.iter_mut().map(|child| {
-                if let Source::SString(s) = child {
-                    // TODO: Check why error occurs when returning SmNode::NString
-                    SmNode::NRcString(s.clone())
-                } else {
-                    SmNode::NSourceNode(child.node(columns, module))
-                }
-            }).collect()
-        )))
+        SourceNode::new(
+            None,
+            None,
+            None,
+            Some(SmNode::NNodeVec(
+                self.children
+                    .iter_mut()
+                    .map(|child| {
+                        if let Source::SString(s) = child {
+                            // TODO: Check why error occurs when returning SmNode::NString
+                            SmNode::NRcString(s.clone())
+                        } else {
+                            SmNode::NSourceNode(child.node(columns, module))
+                        }
+                    })
+                    .collect(),
+            )),
+        )
     }
 }

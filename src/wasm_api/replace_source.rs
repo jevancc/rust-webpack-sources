@@ -1,10 +1,13 @@
-use std::rc::Rc;
-use std::cell::RefCell;
 use replace_source::*;
+use source::{Source, SourceTrait};
+use std::cell::RefCell;
+use std::rc::Rc;
+use wasm_api::{
+    _ConcatSource, _LineToLineMappedSource, _OriginalSource, _PrefixSource, _RawSource,
+    _SourceMapSource,
+};
+use wasm_api::{_MSourceNode, _SourceListMap};
 use wasm_bindgen::prelude::*;
-use wasm_api::{_SourceListMap, _MSourceNode};
-use wasm_api::{_RawSource, _OriginalSource, _PrefixSource, _ConcatSource, _LineToLineMappedSource, _SourceMapSource};
-use source::{SourceTrait, Source};
 
 #[wasm_bindgen]
 pub struct _ReplaceSource {
@@ -16,42 +19,58 @@ impl _ReplaceSource {
     // TODO: use macro
     pub fn _new_string(source: String) -> _ReplaceSource {
         _ReplaceSource {
-            val: Rc::new(RefCell::new(ReplaceSource::new(Source::SString(Rc::new(source))))),
+            val: Rc::new(RefCell::new(ReplaceSource::new(Source::SString(Rc::new(
+                source,
+            ))))),
         }
     }
     pub fn _new_raw_source(source: &_RawSource) -> _ReplaceSource {
         _ReplaceSource {
-            val: Rc::new(RefCell::new(ReplaceSource::new(Source::Raw(source.get_raw())))),
+            val: Rc::new(RefCell::new(ReplaceSource::new(Source::Raw(
+                source.get_raw(),
+            )))),
         }
     }
     pub fn _new_original_source(source: &_OriginalSource) -> _ReplaceSource {
         _ReplaceSource {
-            val: Rc::new(RefCell::new(ReplaceSource::new(Source::Original(source.get_raw())))),
+            val: Rc::new(RefCell::new(ReplaceSource::new(Source::Original(
+                source.get_raw(),
+            )))),
         }
     }
     pub fn _new_replace_source(source: &_ReplaceSource) -> _ReplaceSource {
         _ReplaceSource {
-            val: Rc::new(RefCell::new(ReplaceSource::new(Source::Replace(source.get_raw())))),
+            val: Rc::new(RefCell::new(ReplaceSource::new(Source::Replace(
+                source.get_raw(),
+            )))),
         }
     }
     pub fn _new_prefix_source(source: &_PrefixSource) -> _ReplaceSource {
         _ReplaceSource {
-            val:Rc::new(RefCell::new(ReplaceSource::new(Source::Prefix(source.get_raw())))),
+            val: Rc::new(RefCell::new(ReplaceSource::new(Source::Prefix(
+                source.get_raw(),
+            )))),
         }
     }
     pub fn _new_concat_source(source: &_ConcatSource) -> _ReplaceSource {
         _ReplaceSource {
-            val: Rc::new(RefCell::new(ReplaceSource::new(Source::Concat(source.get_raw())))),
+            val: Rc::new(RefCell::new(ReplaceSource::new(Source::Concat(
+                source.get_raw(),
+            )))),
         }
     }
     pub fn _new_line_to_line_mapped_source(source: &_LineToLineMappedSource) -> _ReplaceSource {
         _ReplaceSource {
-            val: Rc::new(RefCell::new(ReplaceSource::new(Source::LineToLineMapped(source.get_raw())))),
+            val: Rc::new(RefCell::new(ReplaceSource::new(Source::LineToLineMapped(
+                source.get_raw(),
+            )))),
         }
     }
     pub fn _new_source_map_source(source: &_SourceMapSource) -> _ReplaceSource {
         _ReplaceSource {
-            val: Rc::new(RefCell::new(ReplaceSource::new(Source::SourceMapSource(source.get_raw())))),
+            val: Rc::new(RefCell::new(ReplaceSource::new(Source::SourceMapSource(
+                source.get_raw(),
+            )))),
         }
     }
 
@@ -63,7 +82,9 @@ impl _ReplaceSource {
         ord_s: i32,
         ord_e: i32,
     ) {
-        self.val.borrow_mut().replace(start, end, new_value, ord_s, ord_e);
+        self.val
+            .borrow_mut()
+            .replace(start, end, new_value, ord_s, ord_e);
     }
 
     pub fn _insert_number_string_number(&mut self, pos: i32, new_value: String, ord: i32) {

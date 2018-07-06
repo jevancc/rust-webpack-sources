@@ -1,6 +1,6 @@
-use source_map::{SourceNode, types::Node as SmNode};
-use source_list_map::{SourceListMap, types::GenCode, types::Node as SlmNode};
-use source::{SourceTrait};
+use source::SourceTrait;
+use source_list_map::{types::GenCode, types::Node as SlmNode, SourceListMap};
+use source_map::{types::Node as SmNode, SourceNode};
 use types::StringPtr;
 
 #[inline]
@@ -58,16 +58,12 @@ impl SourceTrait for OriginalSource {
         while let Some((idx, line)) = lines.next() {
             let content = String::from(line) + if lines.peek().is_some() { "\n" } else { "" };
             if !columns {
-                sn.add(
-                    SmNode::NSourceNode(
-                        SourceNode::new(
-                            Some((idx + 1, 0)),
-                            Some(StringPtr::Str(self.name.clone())),
-                            None,
-                            Some(SmNode::NString(content))
-                        )
-                    )
-                );
+                sn.add(SmNode::NSourceNode(SourceNode::new(
+                    Some((idx + 1, 0)),
+                    Some(StringPtr::Str(self.name.clone())),
+                    None,
+                    Some(SmNode::NString(content)),
+                )));
             } else {
                 let mut sn2 = SourceNode::new(None, None, None, None);
                 let mut pos: usize = 0;
@@ -80,7 +76,7 @@ impl SourceTrait for OriginalSource {
                             Some((idx + 1, pos)),
                             Some(StringPtr::Str(self.name.clone())),
                             None,
-                            Some(SmNode::NString(String::from(*item)))
+                            Some(SmNode::NString(String::from(*item))),
                         )));
                         pos += item.len();
                     }
@@ -88,7 +84,10 @@ impl SourceTrait for OriginalSource {
                 sn.add(SmNode::NSourceNode(sn2))
             }
         }
-        sn.set_source_content(StringPtr::Str(self.name.clone()), StringPtr::Str(self.value.clone()));
+        sn.set_source_content(
+            StringPtr::Str(self.name.clone()),
+            StringPtr::Str(self.value.clone()),
+        );
         sn
     }
 
@@ -96,7 +95,7 @@ impl SourceTrait for OriginalSource {
         SourceListMap::new(
             Some(GenCode::Code(SlmNode::NString(self.value.clone()))),
             Some(StringPtr::Str(self.name.clone())),
-            Some(StringPtr::Str(self.value.clone()))
+            Some(StringPtr::Str(self.value.clone())),
         )
     }
 }

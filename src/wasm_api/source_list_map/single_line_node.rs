@@ -1,6 +1,6 @@
 use source_list_map::*;
-use wasm_bindgen::prelude::*;
 use types::StringPtr;
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub struct _SingleLineNode {

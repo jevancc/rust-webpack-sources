@@ -29,14 +29,20 @@ class RawSource extends wasm._RawSource {
     node(options) {
         var node = new SourceNode(-2);
         options = options || {};
-        node.ptr = this._node_bool_bool(!(options.columns === false), !(options.module === false)).ptr;
+        node.ptr = this._node_bool_bool(
+            !(options.columns === false),
+            !(options.module === false)
+        ).ptr;
         return node;
     }
 
     listMap(options) {
         var map = new SourceListMap(-2);
         options = options || {};
-        map.ptr = this._list_map_bool_bool(!(options.columns === false), !(options.module === false)).ptr;
+        map.ptr = this._list_map_bool_bool(
+            !(options.columns === false),
+            !(options.module === false)
+        ).ptr;
         return map;
     }
 

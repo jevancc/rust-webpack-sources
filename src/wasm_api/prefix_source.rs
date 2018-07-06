@@ -1,10 +1,13 @@
-use std::rc::Rc;
-use std::cell::RefCell;
 use prefix_source::*;
-use wasm_bindgen::prelude::*;
-use wasm_api::{_MSourceNode, _SourceListMap};
-use wasm_api::{_RawSource, _OriginalSource, _ReplaceSource, _ConcatSource, _LineToLineMappedSource, _SourceMapSource};
 use source::{Source, SourceTrait};
+use std::cell::RefCell;
+use std::rc::Rc;
+use wasm_api::{
+    _ConcatSource, _LineToLineMappedSource, _OriginalSource, _RawSource, _ReplaceSource,
+    _SourceMapSource,
+};
+use wasm_api::{_MSourceNode, _SourceListMap};
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub struct _PrefixSource {
@@ -15,42 +18,72 @@ pub struct _PrefixSource {
 impl _PrefixSource {
     pub fn _new_string_string(prefix: String, source: String) -> _PrefixSource {
         _PrefixSource {
-            val: Rc::new(RefCell::new(PrefixSource::new(prefix, Source::SString(Rc::new(source))))),
+            val: Rc::new(RefCell::new(PrefixSource::new(
+                prefix,
+                Source::SString(Rc::new(source)),
+            ))),
         }
     }
     pub fn _new_string_raw_source(prefix: String, source: &_RawSource) -> _PrefixSource {
         _PrefixSource {
-            val: Rc::new(RefCell::new(PrefixSource::new(prefix, Source::Raw(source.get_raw())))),
+            val: Rc::new(RefCell::new(PrefixSource::new(
+                prefix,
+                Source::Raw(source.get_raw()),
+            ))),
         }
     }
     pub fn _new_string_original_source(prefix: String, source: &_OriginalSource) -> _PrefixSource {
         _PrefixSource {
-            val: Rc::new(RefCell::new(PrefixSource::new(prefix, Source::Original(source.get_raw())))),
+            val: Rc::new(RefCell::new(PrefixSource::new(
+                prefix,
+                Source::Original(source.get_raw()),
+            ))),
         }
     }
     pub fn _new_string_replace_source(prefix: String, source: &_ReplaceSource) -> _PrefixSource {
         _PrefixSource {
-            val: Rc::new(RefCell::new(PrefixSource::new(prefix, Source::Replace(source.get_raw())))),
+            val: Rc::new(RefCell::new(PrefixSource::new(
+                prefix,
+                Source::Replace(source.get_raw()),
+            ))),
         }
     }
     pub fn _new_string_prefix_source(prefix: String, source: &_PrefixSource) -> _PrefixSource {
         _PrefixSource {
-            val: Rc::new(RefCell::new(PrefixSource::new(prefix, Source::Prefix(source.get_raw())))),
+            val: Rc::new(RefCell::new(PrefixSource::new(
+                prefix,
+                Source::Prefix(source.get_raw()),
+            ))),
         }
     }
     pub fn _new_string_concat_source(prefix: String, source: &_ConcatSource) -> _PrefixSource {
         _PrefixSource {
-            val: Rc::new(RefCell::new(PrefixSource::new(prefix, Source::Concat(source.get_raw())))),
+            val: Rc::new(RefCell::new(PrefixSource::new(
+                prefix,
+                Source::Concat(source.get_raw()),
+            ))),
         }
     }
-    pub fn _new_string_line_to_line_mapped_source(prefix: String, source: &_LineToLineMappedSource) -> _PrefixSource {
+    pub fn _new_string_line_to_line_mapped_source(
+        prefix: String,
+        source: &_LineToLineMappedSource,
+    ) -> _PrefixSource {
         _PrefixSource {
-            val: Rc::new(RefCell::new(PrefixSource::new(prefix, Source::LineToLineMapped(source.get_raw())))),
+            val: Rc::new(RefCell::new(PrefixSource::new(
+                prefix,
+                Source::LineToLineMapped(source.get_raw()),
+            ))),
         }
     }
-    pub fn _new_string_source_map_source(prefix: String, source: &_SourceMapSource) -> _PrefixSource {
+    pub fn _new_string_source_map_source(
+        prefix: String,
+        source: &_SourceMapSource,
+    ) -> _PrefixSource {
         _PrefixSource {
-            val: Rc::new(RefCell::new(PrefixSource::new(prefix, Source::SourceMapSource(source.get_raw())))),
+            val: Rc::new(RefCell::new(PrefixSource::new(
+                prefix,
+                Source::SourceMapSource(source.get_raw()),
+            ))),
         }
     }
 

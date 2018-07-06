@@ -1,8 +1,8 @@
-use wasm_bindgen::prelude::*;
 use serde_json;
-use source_map::*;
 use source_map::types::*;
+use source_map::*;
 use types::StringPtr;
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub struct _MSourceNode {
@@ -13,7 +13,12 @@ pub struct _MSourceNode {
 impl _MSourceNode {
     pub fn _new_number_number_string_null(line: u32, column: u32, source: String) -> _MSourceNode {
         _MSourceNode {
-            val: SourceNode::new(Some((line as usize, column as usize)), Some(StringPtr::Str(source)), None, None),
+            val: SourceNode::new(
+                Some((line as usize, column as usize)),
+                Some(StringPtr::Str(source)),
+                None,
+                None,
+            ),
         }
     }
 
@@ -32,7 +37,11 @@ impl _MSourceNode {
     }
 
     pub fn _to_string_with_source_map_string(&mut self, file: String) -> String {
-        serde_json::to_string(&self.val.to_string_with_source_map(Some(StringPtr::Str(file)), None)).unwrap()
+        serde_json::to_string(
+            &self
+                .val
+                .to_string_with_source_map(Some(StringPtr::Str(file)), None),
+        ).unwrap()
     }
 
     pub fn _to_string_with_source_map_null(&mut self) -> String {
@@ -42,9 +51,7 @@ impl _MSourceNode {
 
 impl _MSourceNode {
     pub fn new(msn: SourceNode) -> _MSourceNode {
-        _MSourceNode {
-            val: msn
-        }
+        _MSourceNode { val: msn }
     }
 
     pub fn get(&self) -> &SourceNode {

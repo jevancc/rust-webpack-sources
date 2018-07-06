@@ -1,6 +1,6 @@
-use super::{CodeNode, SourceNode, MappingsContext, MappingFunction};
-use super::types::{Node, GenCode};
-use types::{StringPtr, SourceMap, StringWithSourceMap};
+use super::types::{GenCode, Node};
+use super::{CodeNode, MappingFunction, MappingsContext, SourceNode};
+use types::{SourceMap, StringPtr, StringWithSourceMap};
 
 #[derive(Clone, Debug)]
 pub struct SourceListMap {
@@ -231,13 +231,17 @@ impl SourceListMap {
             map: SourceMap {
                 version: 3,
                 file: Some(file),
-                sources: arrays.sources.iter().map(|sp| {
-                    if let Some(ref sp) = sp {
-                        (**sp).clone()
-                    } else {
-                        String::new()
-                    }
-                }).collect(),
+                sources: arrays
+                    .sources
+                    .iter()
+                    .map(|sp| {
+                        if let Some(ref sp) = sp {
+                            (**sp).clone()
+                        } else {
+                            String::new()
+                        }
+                    })
+                    .collect(),
                 sources_content: if mc.has_source_content {
                     let mut vec = Vec::<String>::new();
                     for sc in arrays.sources_content {

@@ -1,9 +1,9 @@
-use std::rc::Rc;
-use std::cmp;
 use serde_json;
 use source::{Source, SourceTrait};
-use source_map::{SourceNode, types::Node as SmNode};
-use source_list_map::{SourceListMap, types::Node as SlmNode, MappingFunction};
+use source_list_map::{types::Node as SlmNode, MappingFunction, SourceListMap};
+use source_map::{types::Node as SmNode, SourceNode};
+use std::cmp;
+use std::rc::Rc;
 use types::StringPtr;
 
 #[derive(Debug)]
@@ -94,32 +94,28 @@ impl SourceTrait for ReplaceSource {
         for repl in &self.replacements {
             let rem_source = result.pop().unwrap();
             match split_sourcenode(rem_source, (repl.1 >> 4) as i32 + 1) {
-                Ok((l1, r1)) => {
-                    match split_sourcenode(l1, (repl.0 >> 4) as i32) {
-                        Ok((l2, r2)) => {
-                            result.push(r1);
-                            result.push(replacement_to_sourcenode(r2, &repl.2));
-                            result.push(l2);
-                        }
-                        Err((_, l1)) => {
-                            result.push(r1.clone());
-                            result.push(replacement_to_sourcenode(r1, &repl.2));
-                            result.push(l1);
-                        }
+                Ok((l1, r1)) => match split_sourcenode(l1, (repl.0 >> 4) as i32) {
+                    Ok((l2, r2)) => {
+                        result.push(r1);
+                        result.push(replacement_to_sourcenode(r2, &repl.2));
+                        result.push(l2);
                     }
-                }
-                Err((_, rem_source)) => {
-                    match split_sourcenode(rem_source, (repl.0 >> 4) as i32) {
-                        Ok((l2, r2)) => {
-                            result.push(replacement_to_sourcenode(r2, &repl.2));
-                            result.push(l2);
-                        }
-                        Err((_, rem_source)) => {
-                            result.push(SmNode::NRcString(Rc::new(repl.2.clone())));
-                            result.push(rem_source);
-                        }
+                    Err((_, l1)) => {
+                        result.push(r1.clone());
+                        result.push(replacement_to_sourcenode(r1, &repl.2));
+                        result.push(l1);
                     }
-                }
+                },
+                Err((_, rem_source)) => match split_sourcenode(rem_source, (repl.0 >> 4) as i32) {
+                    Ok((l2, r2)) => {
+                        result.push(replacement_to_sourcenode(r2, &repl.2));
+                        result.push(l2);
+                    }
+                    Err((_, rem_source)) => {
+                        result.push(SmNode::NRcString(Rc::new(repl.2.clone())));
+                        result.push(rem_source);
+                    }
+                },
             }
         }
         result.reverse();
@@ -229,7 +225,10 @@ impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
 }
 
 // TODO: This function is fucking slow.
-fn split_sourcenode(node: SmNode, mut split_position: i32) -> Result<(SmNode, SmNode), (i32, SmNode)> {
+fn split_sourcenode(
+    node: SmNode,
+    mut split_position: i32,
+) -> Result<(SmNode, SmNode), (i32, SmNode)> {
     match node {
         SmNode::NSourceNode(n) => {
             let mut is_splitted = false;
@@ -263,13 +262,13 @@ fn split_sourcenode(node: SmNode, mut split_position: i32) -> Result<(SmNode, Sm
                     c_position.clone(),
                     c_source.clone(),
                     c_name.clone(),
-                    Some(SmNode::NNodeVec(left_children))
+                    Some(SmNode::NNodeVec(left_children)),
                 );
                 let right = SourceNode::new(
                     c_position,
                     c_source,
                     c_name,
-                    Some(SmNode::NNodeVec(right_children))
+                    Some(SmNode::NNodeVec(right_children)),
                 );
                 left.source_contents = c_source_contents;
                 Ok((SmNode::NSourceNode(left), SmNode::NSourceNode(right)))
@@ -278,7 +277,7 @@ fn split_sourcenode(node: SmNode, mut split_position: i32) -> Result<(SmNode, Sm
                     c_position,
                     c_source,
                     c_name,
-                    Some(SmNode::NNodeVec(left_children))
+                    Some(SmNode::NNodeVec(left_children)),
                 );
                 node.source_contents = c_source_contents;
                 Err((split_position, SmNode::NSourceNode(node)))
@@ -296,7 +295,7 @@ fn split_sourcenode(node: SmNode, mut split_position: i32) -> Result<(SmNode, Sm
             }
         }
         SmNode::NString(n) => split_sourcenode(SmNode::NRcString(Rc::new(n)), split_position),
-        _ => panic!()
+        _ => panic!(),
     }
 }
 

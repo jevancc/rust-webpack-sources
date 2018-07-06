@@ -11,7 +11,11 @@ var wasm = require("./build/webpack_sources");
 class LineToLineMappedSource extends wasm._LineToLineMappedSource {
     constructor(value, name, originalSource) {
         super(0);
-        this.ptr = LineToLineMappedSource._new_string_string_string(value, name, originalSource).ptr;
+        this.ptr = LineToLineMappedSource._new_string_string_string(
+            value,
+            name,
+            originalSource
+        ).ptr;
         this._value = value;
         this._name = name;
         this._originalSource = originalSource;
@@ -28,14 +32,20 @@ class LineToLineMappedSource extends wasm._LineToLineMappedSource {
     node(options) {
         var node = new SourceNode(-2);
         options = options || {};
-        node.ptr = this._node_bool_bool(!(options.columns === false), !(options.module === false)).ptr;
+        node.ptr = this._node_bool_bool(
+            !(options.columns === false),
+            !(options.module === false)
+        ).ptr;
         return node;
     }
 
     listMap(options) {
         var map = new SourceListMap(-2);
         options = options || {};
-        map.ptr = this._list_map_bool_bool(!(options.columns === false), !(options.module === false)).ptr;
+        map.ptr = this._list_map_bool_bool(
+            !(options.columns === false),
+            !(options.module === false)
+        ).ptr;
         return map;
     }
 

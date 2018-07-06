@@ -1,6 +1,6 @@
+use super::types::Node;
+use super::{utils, MappingFunction, MappingsContext};
 use std::str;
-use super::{utils, MappingsContext, MappingFunction};
-use super::types::{Node};
 
 #[derive(Clone, Debug)]
 pub struct CodeNode {

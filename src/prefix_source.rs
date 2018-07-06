@@ -1,7 +1,7 @@
-use std::rc::Rc;
-use source_map::{SourceNode, types::Node as SmNode};
-use source_list_map::{SourceListMap, MappingFunction};
 use source::{Source, SourceTrait};
+use source_list_map::{MappingFunction, SourceListMap};
+use source_map::{types::Node as SmNode, SourceNode};
+use std::rc::Rc;
 
 fn clone_and_prefix(node: SmNode, prefix: &str, append: &mut i32) -> Result<SmNode, &'static str> {
     match node {
@@ -35,9 +35,7 @@ fn clone_and_prefix(node: SmNode, prefix: &str, append: &mut i32) -> Result<SmNo
             sn.children = new_children;
             Ok(SmNode::NSourceNode(sn))
         }
-        _ => {
-            Ok(SmNode::NString(String::new()))
-        }
+        _ => Ok(SmNode::NString(String::new())),
     }
 }
 
@@ -49,10 +47,7 @@ pub struct PrefixSource {
 
 impl PrefixSource {
     pub fn new(prefix: String, source: Source) -> PrefixSource {
-        PrefixSource {
-            source,
-            prefix,
-        }
+        PrefixSource { source, prefix }
     }
 }
 
@@ -76,13 +71,18 @@ impl SourceTrait for PrefixSource {
         let node = self.source.node(columns, module);
 
         let mut append = 1;
-        SourceNode::new(None, None, None, Some(
-            clone_and_prefix(SmNode::NSourceNode(node), &self.prefix, &mut append).unwrap()
-        ))
+        SourceNode::new(
+            None,
+            None,
+            None,
+            Some(clone_and_prefix(SmNode::NSourceNode(node), &self.prefix, &mut append).unwrap()),
+        )
     }
 
     fn list_map(&mut self, columns: bool, module: bool) -> SourceListMap {
-        let mut mapping_fn = PrefixMappingFunction { prefix: &self.prefix };
+        let mut mapping_fn = PrefixMappingFunction {
+            prefix: &self.prefix,
+        };
         let map = self.source.list_map(columns, module);
         map.map_generated_code(&mut mapping_fn)
     }

@@ -1,5 +1,5 @@
-use super::{CodeNode, SourceNode, SourceListMap};
 use super::types::{GenCode, Node};
+use super::{CodeNode, SourceListMap, SourceNode};
 use types::StringPtr;
 use vlq;
 

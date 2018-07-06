@@ -1,9 +1,9 @@
-use std::rc::Rc;
-use std::cell::RefCell;
 use line_to_line_mapped_source::*;
-use wasm_bindgen::prelude::*;
-use wasm_api::{_MSourceNode, _SourceListMap};
 use source::SourceTrait;
+use std::cell::RefCell;
+use std::rc::Rc;
+use wasm_api::{_MSourceNode, _SourceListMap};
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub struct _LineToLineMappedSource {
@@ -12,9 +12,17 @@ pub struct _LineToLineMappedSource {
 
 #[wasm_bindgen]
 impl _LineToLineMappedSource {
-    pub fn _new_string_string_string(value: String, name: String, original_source: String) -> _LineToLineMappedSource {
+    pub fn _new_string_string_string(
+        value: String,
+        name: String,
+        original_source: String,
+    ) -> _LineToLineMappedSource {
         _LineToLineMappedSource {
-            val: Rc::new(RefCell::new(LineToLineMappedSource::new(value, name, original_source))),
+            val: Rc::new(RefCell::new(LineToLineMappedSource::new(
+                value,
+                name,
+                original_source,
+            ))),
         }
     }
 

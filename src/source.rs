@@ -1,15 +1,15 @@
-use raw_source::RawSource;
-use original_source::OriginalSource;
-use replace_source::ReplaceSource;
-use prefix_source::PrefixSource;
 use concat_source::ConcatSource;
 use line_to_line_mapped_source::LineToLineMappedSource;
+use original_source::OriginalSource;
+use prefix_source::PrefixSource;
+use raw_source::RawSource;
+use replace_source::ReplaceSource;
 use source_map_source::SourceMapSource;
 
-use std::rc::Rc;
-use std::cell::RefCell;
-use source_map::SourceNode;
 use source_list_map::SourceListMap;
+use source_map::SourceNode;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 #[derive(Debug, Clone)]
 pub enum Source {
@@ -34,7 +34,7 @@ impl SourceTrait for Source {
             Source::Concat(s) => s.borrow_mut().source(),
             Source::LineToLineMapped(s) => s.borrow_mut().source(),
             Source::SourceMapSource(s) => s.borrow_mut().source(),
-            Source::SString(s) => (**s).clone()
+            Source::SString(s) => (**s).clone(),
         }
     }
 
@@ -48,7 +48,7 @@ impl SourceTrait for Source {
             Source::Concat(s) => s.borrow_mut().size(),
             Source::LineToLineMapped(s) => s.borrow_mut().size(),
             Source::SourceMapSource(s) => s.borrow_mut().size(),
-            Source::SString(s) => s.len()
+            Source::SString(s) => s.len(),
         }
     }
 
@@ -62,7 +62,7 @@ impl SourceTrait for Source {
             Source::Concat(s) => s.borrow_mut().list_map(columns, module),
             Source::LineToLineMapped(s) => s.borrow_mut().list_map(columns, module),
             Source::SourceMapSource(s) => s.borrow_mut().list_map(columns, module),
-            Source::SString(_) => panic!()
+            Source::SString(_) => panic!(),
         }
     }
 
@@ -76,7 +76,7 @@ impl SourceTrait for Source {
             Source::Concat(s) => s.borrow_mut().node(columns, module),
             Source::LineToLineMapped(s) => s.borrow_mut().node(columns, module),
             Source::SourceMapSource(s) => s.borrow_mut().node(columns, module),
-            Source::SString(_) => panic!()
+            Source::SString(_) => panic!(),
         }
     }
 }

@@ -32,7 +32,9 @@ class ReplaceSource extends wasm._ReplaceSource {
         } else if (source.type === "ConcatSource") {
             this.ptr = ReplaceSource._new_concat_source(source).ptr;
         } else if (source.type === "LineToLineMappedSource") {
-            this.ptr = ReplaceSource._new_line_to_line_mapped_source(source).ptr;
+            this.ptr = ReplaceSource._new_line_to_line_mapped_source(
+                source
+            ).ptr;
         } else if (source.type === "SourceMapSource") {
             this.ptr = ReplaceSource._new_source_map_source(source).ptr;
         } else {
@@ -95,14 +97,20 @@ class ReplaceSource extends wasm._ReplaceSource {
     node(options) {
         var node = new SourceNode(-2);
         options = options || {};
-        node.ptr = this._node_bool_bool(!(options.columns === false), !(options.module === false)).ptr;
+        node.ptr = this._node_bool_bool(
+            !(options.columns === false),
+            !(options.module === false)
+        ).ptr;
         return node;
     }
 
     listMap(options) {
         var map = new SourceListMap(-2);
         options = options || {};
-        map.ptr = this._list_map_bool_bool(!(options.columns === false), !(options.module === false)).ptr;
+        map.ptr = this._list_map_bool_bool(
+            !(options.columns === false),
+            !(options.module === false)
+        ).ptr;
         return map;
     }
 

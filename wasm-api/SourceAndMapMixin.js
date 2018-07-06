@@ -17,7 +17,7 @@ module.exports = function mixinSourceAndMap(proto) {
             }
             return ret;
         }
-        
+
         var node = this.node(options);
         var StringWithSourceMap = this.node(options).toStringWithSourceMap({
             file: "x"

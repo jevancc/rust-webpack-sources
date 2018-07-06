@@ -1,6 +1,6 @@
-use super::{SourceNode, SourceMapGenerator};
-use super::types::{Node, Mapping};
+use super::types::{Mapping, Node};
 use super::utils::split_string;
+use super::{SourceMapGenerator, SourceNode};
 use types::StringPtr;
 
 pub fn from_string_with_source_map(
@@ -19,7 +19,7 @@ pub fn from_string_with_source_map(
         names,
         file,
         source_root,
-        true
+        true,
     );
     let mut node = SourceNode::new(None, None, None, None);
 
@@ -51,7 +51,7 @@ pub fn from_string_with_source_map(
                 let splitted = split_string(
                     next_line.0,
                     generated_position.1 as i32 - last_generated_position.1 as i32,
-                    None
+                    None,
                 );
                 let code = splitted.0;
                 next_line.0 = splitted.1;
@@ -69,11 +69,7 @@ pub fn from_string_with_source_map(
             last_generated_position.0 += 1;
         }
         if last_generated_position.1 < generated_position.1 {
-            let splitted = split_string(
-                next_line.0,
-                generated_position.1 as i32,
-                None
-            );
+            let splitted = split_string(next_line.0, generated_position.1 as i32, None);
             node.add(Node::NString(splitted.0));
             next_line.0 = splitted.1;
             last_generated_position.1 = generated_position.1;

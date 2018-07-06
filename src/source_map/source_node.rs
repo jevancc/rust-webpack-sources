@@ -1,8 +1,8 @@
-use std::rc::Rc;
-use std::collections::HashMap;
+use super::types::{Mapping, Node};
 use super::SourceMapGenerator;
-use super::types::{Node, Mapping};
-use types::{StringWithSourceMap, StringPtr};
+use std::collections::HashMap;
+use std::rc::Rc;
+use types::{StringPtr, StringWithSourceMap};
 
 #[derive(Clone, Debug)]
 pub struct SourceNode {
@@ -76,8 +76,11 @@ impl SourceNode {
         }
     }
 
-    pub fn to_source_map_generator(&self, file: Option<StringPtr>, source_root: Option<StringPtr>)
-        -> SourceMapGenerator {
+    pub fn to_source_map_generator(
+        &self,
+        file: Option<StringPtr>,
+        source_root: Option<StringPtr>,
+    ) -> SourceMapGenerator {
         let file = file.map(|sp| sp.to_ptr());
         let source_root = source_root.map(|sp| sp.to_ptr());
         let skip_validation = true;
@@ -105,19 +108,19 @@ impl SourceNode {
     }
 
     pub fn add_mapping_with_code(&mut self, mapping: Option<Mapping>, code: String) {
-        let is_original = mapping.as_ref().map_or(false, |mapping| mapping.source.is_some());
+        let is_original = mapping
+            .as_ref()
+            .map_or(false, |mapping| mapping.source.is_some());
         if !is_original {
             self.add(Node::NString(code));
         } else {
             let mapping = mapping.unwrap();
-            self.add(Node::NSourceNode(
-                SourceNode::new(
-                    mapping.original,
-                    mapping.source.map(|sp| StringPtr::Ptr(sp)),
-                    mapping.name.map(|sp| StringPtr::Ptr(sp)),
-                    Some(Node::NString(code))
-                )
-            ));
+            self.add(Node::NSourceNode(SourceNode::new(
+                mapping.original,
+                mapping.source.map(|sp| StringPtr::Ptr(sp)),
+                mapping.name.map(|sp| StringPtr::Ptr(sp)),
+                Some(Node::NString(code)),
+            )));
         }
     }
 }

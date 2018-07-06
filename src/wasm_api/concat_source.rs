@@ -1,10 +1,13 @@
-use std::rc::Rc;
-use std::cell::RefCell;
 use concat_source::*;
-use wasm_bindgen::prelude::*;
+use source::{Source, SourceTrait};
+use std::cell::RefCell;
+use std::rc::Rc;
+use wasm_api::{
+    _LineToLineMappedSource, _OriginalSource, _PrefixSource, _RawSource, _ReplaceSource,
+    _SourceMapSource,
+};
 use wasm_api::{_MSourceNode, _SourceListMap};
-use wasm_api::{_RawSource, _OriginalSource, _ReplaceSource, _PrefixSource, _LineToLineMappedSource, _SourceMapSource};
-use source::{SourceTrait, Source};
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub struct _ConcatSource {
@@ -38,10 +41,14 @@ impl _ConcatSource {
         self.val.borrow_mut().add(Source::Concat(item.get_raw()))
     }
     pub fn _add_line_to_line_mapped_source(&mut self, item: &_LineToLineMappedSource) {
-        self.val.borrow_mut().add(Source::LineToLineMapped(item.get_raw()))
+        self.val
+            .borrow_mut()
+            .add(Source::LineToLineMapped(item.get_raw()))
     }
     pub fn _add_source_map_source(&mut self, item: &_SourceMapSource) {
-        self.val.borrow_mut().add(Source::SourceMapSource(item.get_raw()))
+        self.val
+            .borrow_mut()
+            .add(Source::SourceMapSource(item.get_raw()))
     }
 
     pub fn _source(&mut self) -> String {

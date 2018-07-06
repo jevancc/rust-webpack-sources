@@ -1,6 +1,6 @@
-use source_map::{SourceNode, types::Node as SmNode};
-use source_list_map::{SourceListMap, types::GenCode, types::Node as SlmNode};
-use source::{SourceTrait};
+use source::SourceTrait;
+use source_list_map::{types::GenCode, types::Node as SlmNode, SourceListMap};
+use source_map::{types::Node as SmNode, SourceNode};
 
 #[derive(Debug)]
 pub struct RawSource {
@@ -9,9 +9,7 @@ pub struct RawSource {
 
 impl RawSource {
     pub fn new(value: String) -> RawSource {
-        RawSource {
-            value
-        }
+        RawSource { value }
     }
 }
 
@@ -31,6 +29,8 @@ impl SourceTrait for RawSource {
     fn list_map(&mut self, _columns: bool, _module: bool) -> SourceListMap {
         SourceListMap::new(
             Some(GenCode::Code(SlmNode::NString(self.value.clone()))),
-        None, None)
+            None,
+            None,
+        )
     }
 }

@@ -1,9 +1,9 @@
-use std::str;
-use std::rc::Rc;
-use vlq;
-use super::{utils, SingleLineNode, MappingsContext};
 use super::types::Node;
+use super::{utils, MappingsContext, SingleLineNode};
+use std::rc::Rc;
+use std::str;
 use types::StringPtr;
+use vlq;
 
 #[derive(Clone, Debug)]
 pub struct SourceNode {
