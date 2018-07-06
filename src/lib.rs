@@ -2,11 +2,12 @@
 extern crate wasm_bindgen;
 extern crate regex;
 extern crate serde;
+extern crate serde_json;
 extern crate linked_hash_map;
 extern crate vlq;
+extern crate source_map_mappings;
 #[macro_use]
 extern crate lazy_static;
-extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 

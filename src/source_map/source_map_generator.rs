@@ -1,7 +1,8 @@
 use std::str;
 use std::rc::Rc;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use linked_hash_map::LinkedHashMap;
+use source_map_mappings::{parse_mappings, Mappings as _Mappings};
 use types::{StringPtr, SourceMap};
 use super::types::{Mapping, MappingList};
 use super::{utils};
@@ -14,8 +15,8 @@ pub struct SourceMapGenerator {
     skip_validation: bool,
     sources: LinkedHashMap<Rc<String>, usize>,
     names: LinkedHashMap<Rc<String>, usize>,
-    mappings: MappingList,
-    sources_contents: HashMap<Rc<String>, Rc<String>>,
+    pub mappings: MappingList,
+    pub sources_contents: HashMap<Rc<String>, Rc<String>>,
 }
 
 impl SourceMapGenerator {
@@ -200,5 +201,61 @@ impl SourceMapGenerator {
             name: None,
             original: None
         }
+    }
+
+    pub fn from_source_map(
+        sources: Vec<StringPtr>,
+        sources_content: Vec<StringPtr>,
+        mappings: StringPtr,
+        names: Vec<StringPtr>,
+        file: Option<StringPtr>,
+        source_root: Option<StringPtr>,
+        check_dup: bool
+    ) -> SourceMapGenerator {
+        let mut generator = SourceMapGenerator::new(file, source_root, true);
+
+        let mut contents = sources_content.into_iter();
+        let sources: Vec<Rc<String>> = if check_dup {
+            let mut set: HashSet<Rc<String>> = HashSet::new();
+            sources.into_iter().map(|sp| sp.to_ptr()).filter(|sp| {
+                generator.set_source_content(StringPtr::Ptr(sp.clone()), contents.next());
+                set.insert(sp.clone())
+            }).collect()
+        } else {
+            sources.into_iter().map(|sp| {
+                let sp = sp.to_ptr();
+                generator.set_source_content(StringPtr::Ptr(sp.clone()), contents.next());
+                sp
+            }).collect()
+        };
+        let names: Vec<Rc<String>> = if check_dup {
+            let mut set: HashSet<Rc<String>> = HashSet::new();
+            names.into_iter().map(|sp| sp.to_ptr()).filter(|sp|
+                set.insert(sp.clone())
+            ).collect()
+        } else {
+            names.into_iter().map(|sp| sp.to_ptr()).collect()
+        };
+
+        let mappings: _Mappings<()> = parse_mappings(mappings.get().as_bytes()).unwrap();
+        let mappings = mappings.by_generated_location();
+
+        for mapping in mappings {
+            let generated = (mapping.generated_line as usize, mapping.generated_column as usize);
+            let (original, source, name) = if let Some(original) = mapping.original.clone() {
+                let name = original.name.map(|idx| names[idx as usize].clone());
+                let source = sources[original.source as usize].clone();
+                (Some((original.original_line as usize, original.original_column as usize)), Some(source), name)
+            } else {
+                (None, None, None)
+            };
+            generator.add_mapping(Mapping {
+                generated,
+                original,
+                source,
+                name,
+            })
+        }
+        generator
     }
 }

@@ -1,17 +1,16 @@
 use super::{CodeNode, SourceNode, SourceListMap};
 use super::types::{GenCode, Node};
 use types::StringPtr;
-use std::rc::Rc;
 use vlq;
 
 pub fn from_string_with_source_map(
-    code: &str,
-    sources: &Vec<&str>,
-    sources_content: &Vec<&str>,
-    mappings: &str,
+    code: StringPtr,
+    sources: Vec<StringPtr>,
+    sources_content: Vec<StringPtr>,
+    mappings: StringPtr,
 ) -> SourceListMap {
-    let mappings = mappings.split(';').enumerate();
-    let mut lines = code.split('\n').enumerate();
+    let mappings = mappings.get().split(';').enumerate();
+    let mut lines = code.get().split('\n').enumerate();
     let lines_count = lines.clone().count();
     let mut nodes: Vec<Node> = vec![];
 
@@ -75,8 +74,8 @@ pub fn from_string_with_source_map(
                                             &mut nodes,
                                             &mut current_source_node_line,
                                             line.clone(),
-                                            sources.get(source_index),
-                                            sources_content.get(source_index),
+                                            sources.get(source_index).map(|rs| rs.clone()),
+                                            sources_content.get(source_index).map(|rs| rs.clone()),
                                             line_position as usize,
                                         );
                                         true
@@ -137,18 +136,15 @@ fn add_source(
     nodes: &mut Vec<Node>,
     current_source_node_line: &mut usize,
     generated_code: String,
-    source: Option<&&str>,
-    original_source: Option<&&str>,
+    source: Option<StringPtr>,
+    original_source: Option<StringPtr>,
     line: usize,
 ) {
-    let source = source.map(|s| String::from(*s));
-    let original_source = original_source.map(|s| String::from(*s));
-
     if let Some(Node::NSourceNode(ref mut n)) = nodes.last_mut() {
         if ((n.source.is_none() && source.is_none()) || {
-            let ns = Rc::into_raw(n.source.clone().unwrap());
-            let s = source.clone().unwrap();
-            unsafe { *ns == s }
+            let ns = n.source.clone().unwrap();
+            let s = source.clone().unwrap().to_ptr();
+            ns == s
         }) && *current_source_node_line == line
         {
             n.add_generated_code(&generated_code);
@@ -158,8 +154,8 @@ fn add_source(
     }
     nodes.push(Node::NSourceNode(SourceNode::new(
         generated_code,
-        source.map(|s| StringPtr::Str(s)),
-        original_source.map(|s| StringPtr::Str(s)),
+        source,
+        original_source,
         line,
     )));
     *current_source_node_line = line + 1;
