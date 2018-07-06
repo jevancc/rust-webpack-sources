@@ -1,6 +1,7 @@
-use source_map::{SourceNode, StringPtr as SMStringPtr, Node as SMNode};
-use source_list_map::{SourceListMap, GenCode, StringPtr as SLMStringPtr, Node as SLMNode};
+use source_map::{SourceNode, types::Node as SmNode};
+use source_list_map::{SourceListMap, types::GenCode, types::Node as SlmNode};
 use source::{SourceTrait};
+use types::StringPtr;
 
 #[inline]
 fn is_splitter(c: char) -> bool {
@@ -58,12 +59,12 @@ impl SourceTrait for OriginalSource {
             let content = String::from(line) + if lines.peek().is_some() { "\n" } else { "" };
             if !columns {
                 sn.add(
-                    SMNode::NSourceNode(
+                    SmNode::NSourceNode(
                         SourceNode::new(
                             Some((idx + 1, 0)),
-                            Some(SMStringPtr::Str(self.name.clone())),
+                            Some(StringPtr::Str(self.name.clone())),
                             None,
-                            Some(SMNode::NString(content))
+                            Some(SmNode::NString(content))
                         )
                     )
                 );
@@ -73,29 +74,29 @@ impl SourceTrait for OriginalSource {
                 let splitted_codes = split_code(&content);
                 for item in &splitted_codes {
                     if item.trim().is_empty() {
-                        sn2.add(SMNode::NString(String::from(*item)));
+                        sn2.add(SmNode::NString(String::from(*item)));
                     } else {
-                        sn2.add(SMNode::NSourceNode(SourceNode::new(
+                        sn2.add(SmNode::NSourceNode(SourceNode::new(
                             Some((idx + 1, pos)),
-                            Some(SMStringPtr::Str(self.name.clone())),
+                            Some(StringPtr::Str(self.name.clone())),
                             None,
-                            Some(SMNode::NString(String::from(*item)))
+                            Some(SmNode::NString(String::from(*item)))
                         )));
                         pos += item.len();
                     }
                 }
-                sn.add(SMNode::NSourceNode(sn2))
+                sn.add(SmNode::NSourceNode(sn2))
             }
         }
-        sn.set_source_content(SMStringPtr::Str(self.name.clone()), SMStringPtr::Str(self.value.clone()));
+        sn.set_source_content(StringPtr::Str(self.name.clone()), StringPtr::Str(self.value.clone()));
         sn
     }
 
     fn list_map(&mut self, _columns: bool, _module: bool) -> SourceListMap {
         SourceListMap::new(
-            Some(GenCode::Code(SLMNode::NString(self.value.clone()))),
-            Some(SLMStringPtr::Str(self.name.clone())),
-            Some(SLMStringPtr::Str(self.value.clone()))
+            Some(GenCode::Code(SlmNode::NString(self.value.clone()))),
+            Some(StringPtr::Str(self.name.clone())),
+            Some(StringPtr::Str(self.value.clone()))
         )
     }
 }

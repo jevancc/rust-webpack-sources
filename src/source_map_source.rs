@@ -1,7 +1,7 @@
-use source_map::{SourceNode, StringPtr as SMStringPtr, Node as SMNode};
-use source_list_map::{SourceListMap, GenCode, StringPtr as SLMStringPtr,
-    Node as SLMNode, SrcMap, from_string_with_source_map};
 use source::{SourceTrait};
+use source_map::{SourceNode};
+use source_list_map::{SourceListMap, types::GenCode, from_string_with_source_map, types::Node as SlmNode};
+use types::{StringPtr};
 
 #[derive(Debug)]
 pub struct SourceMapSource {
@@ -52,9 +52,9 @@ impl SourceTrait for SourceMapSource {
     fn list_map(&mut self, _columns: bool, module: bool) -> SourceListMap {
         if !module {
             SourceListMap::new(
-                Some(GenCode::Code(SLMNode::NString(self.value.clone()))),
-                Some(SLMStringPtr::Str(self.name.clone())),
-                Some(SLMStringPtr::Str(self.value.clone()))
+                Some(GenCode::Code(SlmNode::NString(self.value.clone()))),
+                Some(StringPtr::Str(self.name.clone())),
+                Some(StringPtr::Str(self.value.clone()))
             )
         } else {
             from_string_with_source_map(

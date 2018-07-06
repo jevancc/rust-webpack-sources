@@ -1,4 +1,4 @@
-use source_list_map::*;
+use source_list_map::types::*;
 use wasm_api::{_CodeNode, _SingleLineNode, _SourceListMap, _SourceNode};
 use wasm_bindgen::prelude::*;
 

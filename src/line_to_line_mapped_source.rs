@@ -1,6 +1,7 @@
-use source_map::{SourceNode, StringPtr as SMStringPtr, Node as SMNode};
-use source_list_map::{SourceListMap, GenCode, StringPtr as SLMStringPtr, Node as SLMNode};
+use source_map::{SourceNode, types::Node as SmNode};
+use source_list_map::{SourceListMap, types::GenCode, types::Node as SlmNode};
 use source::{SourceTrait};
+use types::StringPtr;
 
 #[derive(Debug)]
 pub struct LineToLineMappedSource {
@@ -30,29 +31,29 @@ impl SourceTrait for LineToLineMappedSource {
 
     fn node(&mut self, _columns: bool, _module: bool) -> SourceNode {
         let mut lines = self.value.split('\n').enumerate().peekable();
-        let mut chunks = Vec::<SMNode>::new();
+        let mut chunks = Vec::<SmNode>::new();
         while let Some((idx, line)) = lines.next() {
             let line = String::from(line) + if lines.peek().is_none() { "\n" } else { "" };
-            chunks.push(SMNode::NSourceNode(SourceNode::new(
+            chunks.push(SmNode::NSourceNode(SourceNode::new(
                 Some((idx + 1, 0)),
-                Some(SMStringPtr::Str(self.name.clone())),
+                Some(StringPtr::Str(self.name.clone())),
                 None,
-                Some(SMNode::NString(line))
+                Some(SmNode::NString(line))
             )));
         }
-        let mut node = SourceNode::new(None, None, None, Some(SMNode::NNodeVec(chunks)));
+        let mut node = SourceNode::new(None, None, None, Some(SmNode::NNodeVec(chunks)));
         node.set_source_content(
-            SMStringPtr::Str(self.name.clone()),
-            SMStringPtr::Str(self.original_source.clone())
+            StringPtr::Str(self.name.clone()),
+            StringPtr::Str(self.original_source.clone())
         );
         node
     }
 
     fn list_map(&mut self, _columns: bool, _module: bool) -> SourceListMap {
         SourceListMap::new(
-            Some(GenCode::Code(SLMNode::NString(self.value.clone()))),
-            Some(SLMStringPtr::Str(self.name.clone())),
-            Some(SLMStringPtr::Str(self.original_source.clone()))
+            Some(GenCode::Code(SlmNode::NString(self.value.clone()))),
+            Some(StringPtr::Str(self.name.clone())),
+            Some(StringPtr::Str(self.original_source.clone()))
         )
     }
 }

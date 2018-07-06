@@ -1,8 +1,6 @@
 use source::{Source, SourceTrait};
-use source_map::{SourceNode, Node as SMNode};
-use source_list_map::{SourceListMap, Node as SLMNode};
-use wasm_api::clog;
-use std::rc::Rc;
+use source_map::{SourceNode, types::Node as SmNode};
+use source_list_map::{SourceListMap, types::Node as SlmNode};
 
 #[derive(Debug)]
 pub struct ConcatSource {
@@ -45,23 +43,23 @@ impl SourceTrait for ConcatSource {
         let mut map = SourceListMap::new(None, None, None);
         for child in &mut self.children {
             map.add(if let Source::SString(s) = child {
-                // TODO: Check why error occurs when returning SLMNode::NString
-                SLMNode::NRcString(s.clone())
+                // TODO: Check why error occurs when returning SlmNode::NString
+                SlmNode::NRcString(s.clone())
             } else {
-                SLMNode::NSourceListMap(child.list_map(columns, module))
+                SlmNode::NSourceListMap(child.list_map(columns, module))
             }, None, None);
         }
         map
     }
 
     fn node(&mut self, columns: bool, module: bool) -> SourceNode {
-        SourceNode::new(None, None, None, Some(SMNode::NNodeVec(
+        SourceNode::new(None, None, None, Some(SmNode::NNodeVec(
             self.children.iter_mut().map(|child| {
                 if let Source::SString(s) = child {
-                    // TODO: Check why error occurs when returning SMNode::NString
-                    SMNode::NRcString(s.clone())
+                    // TODO: Check why error occurs when returning SmNode::NString
+                    SmNode::NRcString(s.clone())
                 } else {
-                    SMNode::NSourceNode(child.node(columns, module))
+                    SmNode::NSourceNode(child.node(columns, module))
                 }
             }).collect()
         )))

@@ -1,15 +1,15 @@
-use source_map::{SourceNode, Node as SMNode};
+use std::rc::Rc;
+use source_map::{SourceNode, types::Node as SmNode};
 use source_list_map::{SourceListMap, MappingFunction};
 use source::{Source, SourceTrait};
-use std::rc::Rc;
 
 // TODO: `append` to be a counter
-fn clone_and_prefix(node: SMNode, prefix: &str, append: &mut Vec<String>) -> Result<SMNode, &'static str> {
+fn clone_and_prefix(node: SmNode, prefix: &str, append: &mut Vec<String>) -> Result<SmNode, &'static str> {
     match node {
-        SMNode::NRcString(s) => {
-            Ok(clone_and_prefix(SMNode::NString((*s).clone()), prefix, append).unwrap())
+        SmNode::NRcString(s) => {
+            Ok(clone_and_prefix(SmNode::NString((*s).clone()), prefix, append).unwrap())
         }
-        SMNode::NString(mut s) => {
+        SmNode::NString(mut s) => {
             let end_with_new_line = s.ends_with('\n');
             if end_with_new_line {
                 s.pop();
@@ -25,18 +25,18 @@ fn clone_and_prefix(node: SMNode, prefix: &str, append: &mut Vec<String>) -> Res
             if end_with_new_line {
                 append.push(String::from(prefix));
             }
-            Ok(SMNode::NRcString(Rc::new(s)))
+            Ok(SmNode::NRcString(Rc::new(s)))
         }
-        SMNode::NSourceNode(mut sn) => {
-            let mut new_children = Vec::<SMNode>::new();
+        SmNode::NSourceNode(mut sn) => {
+            let mut new_children = Vec::<SmNode>::new();
             for child in sn.children.into_iter() {
                 new_children.push(clone_and_prefix(child, prefix, append).unwrap());
             }
             sn.children = new_children;
-            Ok(SMNode::NSourceNode(sn))
+            Ok(SmNode::NSourceNode(sn))
         }
         _ => {
-            Ok(SMNode::NString(String::new()))
+            Ok(SmNode::NString(String::new()))
         }
     }
 }
@@ -78,7 +78,7 @@ impl SourceTrait for PrefixSource {
         let mut append = Vec::<String>::new();
         append.push(self.prefix.clone());
         SourceNode::new(None, None, None, Some(
-            clone_and_prefix(SMNode::NSourceNode(node), &self.prefix, &mut append).unwrap()
+            clone_and_prefix(SmNode::NSourceNode(node), &self.prefix, &mut append).unwrap()
         ))
     }
 

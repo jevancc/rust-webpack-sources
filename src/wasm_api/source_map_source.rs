@@ -2,10 +2,9 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use source_map_source::*;
 use wasm_bindgen::prelude::*;
-use wasm_api::{_MSourceNode, _SourceListMap, StringVec};
+use wasm_api::{_MSourceNode, _SourceListMap};
 use source::SourceTrait;
 use serde_json;
-use wasm_api::*;
 
 #[wasm_bindgen]
 #[derive(Debug)]

@@ -1,6 +1,8 @@
-use source_map::*;
 use wasm_bindgen::prelude::*;
 use serde_json;
+use source_map::*;
+use source_map::types::*;
+use types::StringPtr;
 
 #[wasm_bindgen]
 pub struct _MSourceNode {

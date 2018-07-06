@@ -1,10 +1,10 @@
-use serde_json;
-use std::cmp;
-use source::{Source, SourceTrait};
-use source_map::{SourceNode, StringPtr as SMStringPtr, Node as SMNode};
-use source_list_map::{SourceListMap, Node as SLMNode, MappingFunction};
 use std::rc::Rc;
-use wasm_api::clog;
+use std::cmp;
+use serde_json;
+use source::{Source, SourceTrait};
+use source_map::{SourceNode, types::Node as SmNode};
+use source_list_map::{SourceListMap, types::Node as SlmNode, MappingFunction};
+use types::StringPtr;
 
 #[derive(Debug)]
 pub struct ReplaceSource {
@@ -89,8 +89,8 @@ impl SourceTrait for ReplaceSource {
 
     fn node(&mut self, columns: bool, module: bool) -> SourceNode {
         self.sort_replacements();
-        let mut result = Vec::<SMNode>::new();
-        result.push(SMNode::NSourceNode(self.source.node(columns, module)));
+        let mut result = Vec::<SmNode>::new();
+        result.push(SmNode::NSourceNode(self.source.node(columns, module)));
         for repl in &self.replacements {
             let rem_source = result.pop().unwrap();
             match split_sourcenode(rem_source, (repl.1 >> 4) as i32 + 1) {
@@ -115,7 +115,7 @@ impl SourceTrait for ReplaceSource {
                             result.push(l2);
                         }
                         Err((_, rem_source)) => {
-                            result.push(SMNode::NRcString(Rc::new(repl.2.clone())));
+                            result.push(SmNode::NRcString(Rc::new(repl.2.clone())));
                             result.push(rem_source);
                         }
                     }
@@ -123,7 +123,7 @@ impl SourceTrait for ReplaceSource {
             }
         }
         result.reverse();
-        SourceNode::new(None, None, None, Some(SMNode::NNodeVec(result)))
+        SourceNode::new(None, None, None, Some(SmNode::NNodeVec(result)))
     }
 
     fn list_map(&mut self, columns: bool, module: bool) -> SourceListMap {
@@ -139,7 +139,7 @@ impl SourceTrait for ReplaceSource {
         }
 
         if !extra_code.is_empty() {
-            map.add(SLMNode::NString(extra_code), None, None);
+            map.add(SlmNode::NString(extra_code), None, None);
         }
         map
     }
@@ -229,15 +229,15 @@ impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
 }
 
 // TODO: This function is fucking slow.
-fn split_sourcenode(node: SMNode, mut split_position: i32) -> Result<(SMNode, SMNode), (i32, SMNode)> {
+fn split_sourcenode(node: SmNode, mut split_position: i32) -> Result<(SmNode, SmNode), (i32, SmNode)> {
     match node {
-        SMNode::NSourceNode(n) => {
+        SmNode::NSourceNode(n) => {
             let mut is_splitted = false;
-            let mut left_children = Vec::<SMNode>::new();
-            let mut right_children = Vec::<SMNode>::new();
+            let mut left_children = Vec::<SmNode>::new();
+            let mut right_children = Vec::<SmNode>::new();
             let c_position = n.position;
-            let c_source = n.source.map(|sp| SMStringPtr::Ptr(sp));
-            let c_name = n.name.map(|sp| SMStringPtr::Ptr(sp));
+            let c_source = n.source.map(|sp| StringPtr::Ptr(sp));
+            let c_name = n.name.map(|sp| StringPtr::Ptr(sp));
             let c_source_contents = n.source_contents;
             for child in n.children {
                 if !is_splitted {
@@ -261,52 +261,52 @@ fn split_sourcenode(node: SMNode, mut split_position: i32) -> Result<(SMNode, SM
                     c_position.clone(),
                     c_source.clone(),
                     c_name.clone(),
-                    Some(SMNode::NNodeVec(left_children))
+                    Some(SmNode::NNodeVec(left_children))
                 );
                 let right = SourceNode::new(
                     c_position,
                     c_source,
                     c_name,
-                    Some(SMNode::NNodeVec(right_children))
+                    Some(SmNode::NNodeVec(right_children))
                 );
                 left.source_contents = c_source_contents;
-                Ok((SMNode::NSourceNode(left), SMNode::NSourceNode(right)))
+                Ok((SmNode::NSourceNode(left), SmNode::NSourceNode(right)))
             } else {
                 let mut node = SourceNode::new(
                     c_position,
                     c_source,
                     c_name,
-                    Some(SMNode::NNodeVec(left_children))
+                    Some(SmNode::NNodeVec(left_children))
                 );
                 node.source_contents = c_source_contents;
-                Err((split_position, SMNode::NSourceNode(node)))
+                Err((split_position, SmNode::NSourceNode(node)))
             }
         }
-        SMNode::NRcString(n) => {
+        SmNode::NRcString(n) => {
             let n_len = n.chars().count();
             if n_len as i32 <= split_position {
-                Err((split_position - n_len as i32, SMNode::NRcString(n)))
+                Err((split_position - n_len as i32, SmNode::NRcString(n)))
             } else {
                 let (left, right) = split_string(&n, split_position, Some(n_len));
                 let left = Rc::new(String::from(left));
                 let right = Rc::new(String::from(right));
-                Ok((SMNode::NRcString(left), SMNode::NRcString(right)))
+                Ok((SmNode::NRcString(left), SmNode::NRcString(right)))
             }
         }
-        SMNode::NString(n) => split_sourcenode(SMNode::NRcString(Rc::new(n)), split_position),
+        SmNode::NString(n) => split_sourcenode(SmNode::NRcString(Rc::new(n)), split_position),
         _ => panic!()
     }
 }
 
 #[inline]
-fn replacement_to_sourcenode(old_node: SMNode, new_string: &str) -> SMNode {
-    if let SMNode::NSourceNode(node) = old_node {
+fn replacement_to_sourcenode(old_node: SmNode, new_string: &str) -> SmNode {
+    if let SmNode::NSourceNode(node) = old_node {
         let mut map = node.to_source_map_generator(None, None);
         let original_mapping = map.original_position_for(1, 0);
         let position = original_mapping.original;
-        let file = original_mapping.source.map(|sp| SMStringPtr::Ptr(sp));
-        let chunks = Some(SMNode::NRcString(Rc::new(String::from(new_string))));
-        SMNode::NSourceNode(SourceNode::new(position, file, None, chunks))
+        let file = original_mapping.source.map(|sp| StringPtr::Ptr(sp));
+        let chunks = Some(SmNode::NRcString(Rc::new(String::from(new_string))));
+        SmNode::NSourceNode(SourceNode::new(position, file, None, chunks))
     } else {
         panic!()
     }
