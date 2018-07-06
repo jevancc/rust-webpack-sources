@@ -3,8 +3,7 @@ use source_map::{SourceNode, types::Node as SmNode};
 use source_list_map::{SourceListMap, MappingFunction};
 use source::{Source, SourceTrait};
 
-// TODO: `append` to be a counter
-fn clone_and_prefix(node: SmNode, prefix: &str, append: &mut Vec<String>) -> Result<SmNode, &'static str> {
+fn clone_and_prefix(node: SmNode, prefix: &str, append: &mut i32) -> Result<SmNode, &'static str> {
     match node {
         SmNode::NRcString(s) => {
             Ok(clone_and_prefix(SmNode::NString((*s).clone()), prefix, append).unwrap())
@@ -19,11 +18,12 @@ fn clone_and_prefix(node: SmNode, prefix: &str, append: &mut Vec<String>) -> Res
                 s = s.replace('\n', &(String::from("\n") + prefix));
             }
 
-            if !append.is_empty() {
-                s = append.pop().unwrap() + &s;
+            if *append > 0 {
+                *append -= 1;
+                s = String::from(prefix) + &s;
             }
             if end_with_new_line {
-                append.push(String::from(prefix));
+                *append += 1;
             }
             Ok(SmNode::NRcString(Rc::new(s)))
         }
@@ -75,8 +75,7 @@ impl SourceTrait for PrefixSource {
     fn node(&mut self, columns: bool, module: bool) -> SourceNode {
         let node = self.source.node(columns, module);
 
-        let mut append = Vec::<String>::new();
-        append.push(self.prefix.clone());
+        let mut append = 1;
         SourceNode::new(None, None, None, Some(
             clone_and_prefix(SmNode::NSourceNode(node), &self.prefix, &mut append).unwrap()
         ))
