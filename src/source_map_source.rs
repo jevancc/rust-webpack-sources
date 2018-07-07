@@ -40,8 +40,8 @@ impl SourceMapSource {
 }
 
 impl SourceTrait for SourceMapSource {
-    fn source(&mut self) -> String {
-        (*self.value).clone()
+    fn source(&mut self) -> Rc<String> {
+        self.value.clone()
     }
 
     fn size(&mut self) -> usize {

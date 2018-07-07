@@ -25,7 +25,7 @@ pub enum Source {
 
 impl SourceTrait for Source {
     #[inline]
-    fn source(&mut self) -> String {
+    fn source(&mut self) -> Rc<String> {
         match self {
             Source::Raw(s) => (*s).borrow_mut().source(),
             Source::Original(s) => s.borrow_mut().source(),
@@ -34,7 +34,7 @@ impl SourceTrait for Source {
             Source::Concat(s) => s.borrow_mut().source(),
             Source::LineToLineMapped(s) => s.borrow_mut().source(),
             Source::SourceMapSource(s) => s.borrow_mut().source(),
-            Source::SString(s) => (**s).clone(),
+            Source::SString(s) => s.clone(),
         }
     }
 
@@ -82,7 +82,7 @@ impl SourceTrait for Source {
 }
 
 pub trait SourceTrait {
-    fn source(&mut self) -> String;
+    fn source(&mut self) -> Rc<String>;
     fn size(&mut self) -> usize {
         self.source().len()
     }

@@ -1,6 +1,7 @@
 use source::{Source, SourceTrait};
 use source_list_map::{types::Node as SlmNode, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
+use std::rc::Rc;
 
 #[derive(Debug)]
 pub struct ConcatSource {
@@ -24,13 +25,12 @@ impl ConcatSource {
 }
 
 impl SourceTrait for ConcatSource {
-    fn source(&mut self) -> String {
-        let sources: Vec<String> = self
-            .children
-            .iter_mut()
-            .map(|child| child.source())
-            .collect();
-        sources.join("")
+    fn source(&mut self) -> Rc<String> {
+        let mut new = String::new();
+        for child in &mut self.children {
+            new += child.source().as_str();
+        }
+        Rc::new(new)
     }
 
     fn size(&mut self) -> usize {

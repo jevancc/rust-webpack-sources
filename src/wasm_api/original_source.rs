@@ -20,7 +20,7 @@ impl _OriginalSource {
     }
 
     pub fn _source(&mut self) -> String {
-        self.val.borrow_mut().source()
+        (*self.val.borrow_mut().source()).clone()
     }
 
     pub fn _size(&mut self) -> u32 {
@@ -28,7 +28,7 @@ impl _OriginalSource {
     }
 
     pub fn _name(&mut self) -> String {
-        self.val.borrow_mut().name.clone()
+        (*self.val.borrow_mut().name).clone()
     }
 
     pub fn _list_map_bool_bool(&mut self, columns: bool, module: bool) -> _SourceListMap {

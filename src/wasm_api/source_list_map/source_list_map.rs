@@ -1,6 +1,4 @@
 use super::mapping_functions::{IdenticalFunction, PrefixMappingFunction, TestMappingFunction};
-use replace_source::ReplaceMappingFunction;
-use serde_json;
 use source_list_map::types::*;
 use source_list_map::*;
 use types::StringPtr;
@@ -105,27 +103,27 @@ pub fn _sourcelistmap_map_generated_code_prefix(
     }
 }
 
-#[wasm_bindgen]
-pub fn _sourcelistmap_map_generated_code_replace(
-    slp: _SourceListMap,
-    replacements: String,
-) -> _SourceListMap {
-    let replacements: Vec<(i64, i64, String, usize)> = serde_json::from_str(&replacements).unwrap();
-    let mut mf = ReplaceMappingFunction::new(&replacements);
-
-    let mut map = slp.val.map_generated_code(&mut mf);
-    let mut extra_code = String::new();
-    while mf.replacement_idx >= 0 {
-        extra_code += &replacements[mf.replacement_idx as usize].2;
-        mf.replacement_idx -= 1;
-    }
-
-    if !extra_code.is_empty() {
-        map.add(Node::NString(extra_code), None, None);
-    }
-
-    _SourceListMap { val: map }
-}
+// #[wasm_bindgen]
+// pub fn _sourcelistmap_map_generated_code_replace(
+//     slp: _SourceListMap,
+//     replacements: String,
+// ) -> _SourceListMap {
+//     let replacements: Vec<(i64, i64, Rc<String>, usize)> = serde_json::from_str(&replacements).unwrap();
+//     let mut mf = ReplaceMappingFunction::new(&replacements);
+//
+//     let mut map = slp.val.map_generated_code(&mut mf);
+//     let mut extra_code = String::new();
+//     while mf.replacement_idx >= 0 {
+//         extra_code += &replacements[mf.replacement_idx as usize].2;
+//         mf.replacement_idx -= 1;
+//     }
+//
+//     if !extra_code.is_empty() {
+//         map.add(Node::NString(extra_code), None, None);
+//     }
+//
+//     _SourceListMap { val: map }
+// }
 
 impl _SourceListMap {
     pub fn new(slp: SourceListMap) -> _SourceListMap {

@@ -2,6 +2,7 @@ use source::SourceTrait;
 use source_list_map::{types::GenCode, types::Node as SlmNode, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
 use types::StringPtr;
+use std::rc::Rc;
 
 #[inline]
 fn is_splitter(c: char) -> bool {
@@ -32,13 +33,16 @@ fn split_code(mut code: &str) -> Vec<&str> {
 
 #[derive(Debug)]
 pub struct OriginalSource {
-    pub value: String,
-    pub name: String,
+    pub value: Rc<String>,
+    pub name: Rc<String>,
 }
 
 impl OriginalSource {
     pub fn new(value: String, name: String) -> OriginalSource {
-        OriginalSource { value, name }
+        OriginalSource {
+            value: Rc::new(value),
+            name: Rc::new(name),
+        }
     }
 }
 
@@ -47,7 +51,7 @@ impl SourceTrait for OriginalSource {
         self.value.len()
     }
 
-    fn source(&mut self) -> String {
+    fn source(&mut self) -> Rc<String> {
         self.value.clone()
     }
 
@@ -60,7 +64,7 @@ impl SourceTrait for OriginalSource {
             if !columns {
                 sn.add(SmNode::NSourceNode(SourceNode::new(
                     Some((idx + 1, 0)),
-                    Some(StringPtr::Str(self.name.clone())),
+                    Some(StringPtr::Ptr(self.name.clone())),
                     None,
                     Some(SmNode::NString(content)),
                 )));
@@ -74,7 +78,7 @@ impl SourceTrait for OriginalSource {
                     } else {
                         sn2.add(SmNode::NSourceNode(SourceNode::new(
                             Some((idx + 1, pos)),
-                            Some(StringPtr::Str(self.name.clone())),
+                            Some(StringPtr::Ptr(self.name.clone())),
                             None,
                             Some(SmNode::NString(String::from(*item))),
                         )));
@@ -85,17 +89,17 @@ impl SourceTrait for OriginalSource {
             }
         }
         sn.set_source_content(
-            StringPtr::Str(self.name.clone()),
-            StringPtr::Str(self.value.clone()),
+            StringPtr::Ptr(self.name.clone()),
+            StringPtr::Ptr(self.value.clone()),
         );
         sn
     }
 
     fn list_map(&mut self, _columns: bool, _module: bool) -> SourceListMap {
         SourceListMap::new(
-            Some(GenCode::Code(SlmNode::NString(self.value.clone()))),
-            Some(StringPtr::Str(self.name.clone())),
-            Some(StringPtr::Str(self.value.clone())),
+            Some(GenCode::Code(SlmNode::NRcString(self.value.clone()))),
+            Some(StringPtr::Ptr(self.name.clone())),
+            Some(StringPtr::Ptr(self.value.clone())),
         )
     }
 }

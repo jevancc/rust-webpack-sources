@@ -27,7 +27,7 @@ impl _LineToLineMappedSource {
     }
 
     pub fn _source(&mut self) -> String {
-        self.val.borrow_mut().source()
+        (*self.val.borrow_mut().source()).clone()
     }
 
     pub fn _size(&mut self) -> u32 {

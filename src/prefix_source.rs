@@ -52,19 +52,16 @@ impl PrefixSource {
 }
 
 impl SourceTrait for PrefixSource {
-    fn source(&mut self) -> String {
-        let mut s = self.source.source();
-
+    fn source(&mut self) -> Rc<String> {
+        let mut s = self.prefix.clone() + self.source.source().as_str();
         if s.ends_with('\n') {
-            s = self.prefix.clone() + &s;
             s.pop();
             s = s.replace('\n', &(String::from("\n") + &self.prefix));
             s.push('\n');
         } else {
-            s = self.prefix.clone() + &s;
             s = s.replace('\n', &(String::from("\n") + &self.prefix));
         }
-        s
+        Rc::new(s)
     }
 
     fn node(&mut self, columns: bool, module: bool) -> SourceNode {

@@ -1,4 +1,3 @@
-use serde_json;
 use source::{Source, SourceTrait};
 use source_list_map::{types::Node as SlmNode, MappingFunction, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
@@ -10,7 +9,7 @@ use types::StringPtr;
 pub struct ReplaceSource {
     pub source: Source,
     // pub name: String,     // stored in JS
-    pub replacements: Vec<(i64, i64, String, usize)>,
+    replacements: Vec<(i64, i64, Rc<String>, usize)>,
     is_sorted: bool,
 }
 
@@ -27,7 +26,7 @@ impl ReplaceSource {
         let len = self.replacements.len();
         let start = ((start as i64) << 4) + ord_s as i64;
         let end = ((end as i64) << 4) + ord_e as i64;
-        self.replacements.push((start, end, new_value, len));
+        self.replacements.push((start, end, Rc::new(new_value), len));
         self.is_sorted = false;
     }
 
@@ -35,7 +34,7 @@ impl ReplaceSource {
         let len = self.replacements.len();
         let pos_s = ((pos as i64) << 4) + ord as i64;
         let pos_e = (((pos - 1) as i64) << 4) + ord as i64;
-        self.replacements.push((pos_s, pos_e, new_value, len));
+        self.replacements.push((pos_s, pos_e, Rc::new(new_value), len));
         self.is_sorted = false;
     }
 
@@ -70,21 +69,21 @@ impl ReplaceSource {
         results.join("")
     }
 
-    pub fn replacements_to_string(&mut self) -> String {
-        self.sort_replacements();
-        let repls: Vec<(i64, i64, &str, usize)> = self
-            .replacements
-            .iter()
-            .map(|x| (x.0 >> 4, x.1 >> 4, x.2.as_str(), x.3))
-            .collect();
-        serde_json::to_string(&repls).unwrap()
-    }
+    // pub fn replacements_to_string(&mut self) -> String {
+    //     self.sort_replacements();
+    //     let repls: Vec<(i64, i64, &str, usize)> = self
+    //         .replacements
+    //         .iter()
+    //         .map(|x| (x.0 >> 4, x.1 >> 4, x.2.as_str(), x.3))
+    //         .collect();
+    //     serde_json::to_string(&repls).unwrap()
+    // }
 }
 
 impl SourceTrait for ReplaceSource {
-    fn source(&mut self) -> String {
+    fn source(&mut self) -> Rc<String> {
         let s = self.source.source();
-        self.replace_string(&s)
+        Rc::new(self.replace_string(&s))
     }
 
     fn node(&mut self, columns: bool, module: bool) -> SourceNode {
@@ -97,22 +96,22 @@ impl SourceTrait for ReplaceSource {
                 Ok((l1, r1)) => match split_sourcenode(l1, (repl.0 >> 4) as i32) {
                     Ok((l2, r2)) => {
                         result.push(r1);
-                        result.push(replacement_to_sourcenode(r2, &repl.2));
+                        result.push(replacement_to_sourcenode(r2, repl.2.clone()));
                         result.push(l2);
                     }
                     Err((_, l1)) => {
                         result.push(r1.clone());
-                        result.push(replacement_to_sourcenode(r1, &repl.2));
+                        result.push(replacement_to_sourcenode(r1, repl.2.clone()));
                         result.push(l1);
                     }
                 },
                 Err((_, rem_source)) => match split_sourcenode(rem_source, (repl.0 >> 4) as i32) {
                     Ok((l2, r2)) => {
-                        result.push(replacement_to_sourcenode(r2, &repl.2));
+                        result.push(replacement_to_sourcenode(r2, repl.2.clone()));
                         result.push(l2);
                     }
                     Err((_, rem_source)) => {
-                        result.push(SmNode::NRcString(Rc::new(repl.2.clone())));
+                        result.push(SmNode::NRcString(repl.2.clone()));
                         result.push(rem_source);
                     }
                 },
@@ -145,11 +144,11 @@ pub struct ReplaceMappingFunction<'a> {
     pub current_idx: i32,
     pub replacement_idx: i32,
     pub remove_chars: i32,
-    pub replacements: &'a Vec<(i64, i64, String, usize)>,
+    pub replacements: &'a Vec<(i64, i64, Rc<String>, usize)>,
 }
 
 impl<'a> ReplaceMappingFunction<'a> {
-    pub fn new(replacements: &'a Vec<(i64, i64, String, usize)>) -> ReplaceMappingFunction {
+    pub fn new(replacements: &'a Vec<(i64, i64, Rc<String>, usize)>) -> ReplaceMappingFunction {
         ReplaceMappingFunction {
             current_idx: 0,
             replacement_idx: replacements.len() as i32 - 1,
@@ -300,13 +299,13 @@ fn split_sourcenode(
 }
 
 #[inline]
-fn replacement_to_sourcenode(old_node: SmNode, new_string: &str) -> SmNode {
+fn replacement_to_sourcenode(old_node: SmNode, new_string: Rc<String>) -> SmNode {
     if let SmNode::NSourceNode(node) = old_node {
         let mut map = node.to_source_map_generator(None, None);
         let original_mapping = map.original_position_for(1, 0);
         let position = original_mapping.original;
         let file = original_mapping.source.map(|sp| StringPtr::Ptr(sp));
-        let chunks = Some(SmNode::NRcString(Rc::new(String::from(new_string))));
+        let chunks = Some(SmNode::NRcString(new_string.clone()));
         SmNode::NSourceNode(SourceNode::new(position, file, None, chunks))
     } else {
         panic!()

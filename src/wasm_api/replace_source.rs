@@ -14,7 +14,7 @@ pub struct _ReplaceSource {
     val: Rc<RefCell<ReplaceSource>>,
 }
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 impl _ReplaceSource {
     // TODO: use macro
     pub fn _new_string(source: String) -> _ReplaceSource {
@@ -91,12 +91,8 @@ impl _ReplaceSource {
         self.val.borrow_mut().insert(pos, new_value, ord);
     }
 
-    pub fn _replacements_to_string(&mut self) -> String {
-        self.val.borrow_mut().replacements_to_string()
-    }
-
     pub fn _source(&mut self) -> String {
-        self.val.borrow_mut().source()
+        (*self.val.borrow_mut().source()).clone()
     }
 
     pub fn _size(&mut self) -> u32 {
