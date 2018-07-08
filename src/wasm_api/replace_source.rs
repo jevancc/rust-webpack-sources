@@ -14,7 +14,7 @@ pub struct _ReplaceSource {
     val: Rc<RefCell<ReplaceSource>>,
 }
 
-// #[wasm_bindgen]
+#[wasm_bindgen]
 impl _ReplaceSource {
     // TODO: use macro
     pub fn _new_string(source: String) -> _ReplaceSource {

@@ -22,6 +22,7 @@ mod source_list_map;
 mod source_map;
 mod source_map_source;
 mod types;
+mod utils;
 
 mod wasm_api;
 

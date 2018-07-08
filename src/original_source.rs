@@ -1,35 +1,8 @@
 use source::SourceTrait;
 use source_list_map::{types::GenCode, types::Node as SlmNode, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
-use types::StringPtr;
 use std::rc::Rc;
-
-#[inline]
-fn is_splitter(c: char) -> bool {
-    match c {
-        '\n' | '\r' | ';' | '{' | '}' => true,
-        _ => false,
-    }
-}
-
-fn split_code(mut code: &str) -> Vec<&str> {
-    let mut result: Vec<&str> = Vec::new();
-    while !code.is_empty() {
-        let chars = code.char_indices();
-        let mut chars = chars
-            .skip_while(|c| !is_splitter(c.1))
-            .skip_while(|c| is_splitter(c.1));
-        if let Some((pos, _)) = chars.next() {
-            let splitted = code.split_at(pos);
-            result.push(splitted.0);
-            code = splitted.1;
-        } else {
-            result.push(code);
-            code = "";
-        }
-    }
-    result
-}
+use types::StringPtr;
 
 #[derive(Debug)]
 pub struct OriginalSource {
@@ -102,4 +75,32 @@ impl SourceTrait for OriginalSource {
             Some(StringPtr::Ptr(self.value.clone())),
         )
     }
+}
+
+#[inline]
+fn is_splitter(c: char) -> bool {
+    match c {
+        '\n' | '\r' | ';' | '{' | '}' => true,
+        _ => false,
+    }
+}
+
+#[inline]
+fn split_code(mut code: &str) -> Vec<&str> {
+    let mut result: Vec<&str> = Vec::new();
+    while !code.is_empty() {
+        let chars = code.char_indices();
+        let mut chars = chars
+            .skip_while(|c| !is_splitter(c.1))
+            .skip_while(|c| is_splitter(c.1));
+        if let Some((pos, _)) = chars.next() {
+            let splitted = code.split_at(pos);
+            result.push(splitted.0);
+            code = splitted.1;
+        } else {
+            result.push(code);
+            code = "";
+        }
+    }
+    result
 }

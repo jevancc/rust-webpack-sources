@@ -107,19 +107,19 @@ impl SourceNode {
         }
     }
 
-    pub fn add_mapping_with_code(&mut self, mapping: Option<Mapping>, code: String) {
+    pub fn add_mapping_with_code(&mut self, mapping: Option<Mapping>, code: &str) {
         let is_original = mapping
             .as_ref()
             .map_or(false, |mapping| mapping.source.is_some());
         if !is_original {
-            self.add(Node::NString(code));
+            self.add(Node::NString(String::from(code)));
         } else {
             let mapping = mapping.unwrap();
             self.add(Node::NSourceNode(SourceNode::new(
                 mapping.original,
                 mapping.source.map(|sp| StringPtr::Ptr(sp)),
                 mapping.name.map(|sp| StringPtr::Ptr(sp)),
-                Some(Node::NString(code)),
+                Some(Node::NString(String::from(code))),
             )));
         }
     }

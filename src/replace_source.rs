@@ -4,6 +4,7 @@ use source_map::{types::Node as SmNode, SourceNode};
 use std::cmp;
 use std::rc::Rc;
 use types::StringPtr;
+use utils;
 
 #[derive(Debug)]
 pub struct ReplaceSource {
@@ -26,7 +27,8 @@ impl ReplaceSource {
         let len = self.replacements.len();
         let start = ((start as i64) << 4) + ord_s as i64;
         let end = ((end as i64) << 4) + ord_e as i64;
-        self.replacements.push((start, end, Rc::new(new_value), len));
+        self.replacements
+            .push((start, end, Rc::new(new_value), len));
         self.is_sorted = false;
     }
 
@@ -34,7 +36,8 @@ impl ReplaceSource {
         let len = self.replacements.len();
         let pos_s = ((pos as i64) << 4) + ord as i64;
         let pos_e = (((pos - 1) as i64) << 4) + ord as i64;
-        self.replacements.push((pos_s, pos_e, Rc::new(new_value), len));
+        self.replacements
+            .push((pos_s, pos_e, Rc::new(new_value), len));
         self.is_sorted = false;
     }
 
@@ -59,8 +62,8 @@ impl ReplaceSource {
         self.sort_replacements();
         for repl in &self.replacements {
             let rem_source = results.pop().unwrap();
-            let splitted1 = split_string(rem_source, (repl.1 >> 4) as i32 + 1, None);
-            let splitted2 = split_string(splitted1.0, (repl.0 >> 4) as i32, None);
+            let splitted1 = utils::split_str(rem_source, (repl.1 >> 4) as i32 + 1, None);
+            let splitted2 = utils::split_str(splitted1.0, (repl.0 >> 4) as i32, None);
             results.push(splitted1.1);
             results.push(&repl.2);
             results.push(splitted2.0);
@@ -287,7 +290,7 @@ fn split_sourcenode(
             if n_len as i32 <= split_position {
                 Err((split_position - n_len as i32, SmNode::NRcString(n)))
             } else {
-                let (left, right) = split_string(&n, split_position, Some(n_len));
+                let (left, right, _, _) = utils::split_str(&n, split_position, Some(n_len));
                 let left = Rc::new(String::from(left));
                 let right = Rc::new(String::from(right));
                 Ok((SmNode::NRcString(left), SmNode::NRcString(right)))
@@ -309,19 +312,5 @@ fn replacement_to_sourcenode(old_node: SmNode, new_string: Rc<String>) -> SmNode
         SmNode::NSourceNode(SourceNode::new(position, file, None, chunks))
     } else {
         panic!()
-    }
-}
-
-#[inline]
-fn split_string(s: &str, pos: i32, s_len: Option<usize>) -> (&str, &str) {
-    let s_len = s_len.map_or(s.chars().count(), |l| l);
-
-    if pos <= 0 {
-        ("", s)
-    } else if pos >= s_len as i32 {
-        (s, "")
-    } else {
-        let pos = s.char_indices().skip(pos as usize).next().unwrap().0;
-        s.split_at(pos)
     }
 }
