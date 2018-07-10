@@ -1,8 +1,6 @@
 use super::types::Node;
 use super::{utils, MappingFunction, MappingsContext, SourceNode};
-use std::rc::Rc;
 use std::str;
-use types::StringPtr;
 use vlq;
 
 #[derive(Clone, Debug)]

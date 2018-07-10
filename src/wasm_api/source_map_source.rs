@@ -2,7 +2,7 @@ use source::SourceTrait;
 use source_map_source::*;
 use std::cell::RefCell;
 use std::rc::Rc;
-use wasm_api::{StringVec, _MSourceNode, _SourceListMap};
+use wasm_api::{_MSourceNode, _SourceListMap};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]

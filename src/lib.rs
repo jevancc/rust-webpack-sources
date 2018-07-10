@@ -1,13 +1,10 @@
 #![feature(proc_macro, wasm_custom_section, wasm_import_module)]
 extern crate linked_hash_map;
-extern crate regex;
 extern crate serde;
 extern crate serde_json;
 extern crate source_map_mappings;
 extern crate vlq;
 extern crate wasm_bindgen;
-#[macro_use]
-extern crate lazy_static;
 #[macro_use]
 extern crate serde_derive;
 

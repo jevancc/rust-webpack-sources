@@ -1,5 +1,4 @@
 use super::types::{Mapping, MappingList};
-use super::utils;
 use linked_hash_map::LinkedHashMap;
 use source_map_mappings::{parse_mappings, Mappings as _Mappings};
 use std::collections::{HashMap, HashSet};
@@ -56,12 +55,6 @@ impl SourceMapGenerator {
     }
 
     pub fn set_source_content(&mut self, source: i32, source_content: Option<i32>) {
-        // let source = if let Some(root) = self.source_root.clone() {
-        //     Rc::new(utils::relative(&root, &source))
-        // } else {
-        //     source
-        // };
-
         if let Some(content) = source_content {
             self.sources_contents.entry(source).or_insert(content);
         } else {

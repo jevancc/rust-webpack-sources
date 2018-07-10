@@ -2,7 +2,6 @@ use source::SourceTrait;
 use source_list_map::{types::GenCode, types::Node as SlmNode, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
 use std::rc::Rc;
-use types::StringPtr;
 
 #[derive(Debug)]
 pub struct OriginalSource {

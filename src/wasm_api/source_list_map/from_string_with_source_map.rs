@@ -1,7 +1,6 @@
 use source_list_map::*;
 use types::StringPtr;
 use wasm_api::_SourceListMap;
-use wasm_api::wasm_containers::StringVec;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]

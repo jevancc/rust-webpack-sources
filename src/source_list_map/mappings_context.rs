@@ -1,6 +1,5 @@
 use super::types::Node;
 use linked_hash_map::LinkedHashMap;
-use std::rc::Rc;
 
 #[derive(Clone, Debug)]
 pub struct MappingsContext {

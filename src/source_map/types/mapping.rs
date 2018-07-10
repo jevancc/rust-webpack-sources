@@ -1,5 +1,4 @@
 use std::cmp::Ordering;
-use std::rc::Rc;
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct Mapping {
@@ -48,12 +47,12 @@ impl PartialOrd for Mapping {
     }
 }
 
-fn strcmp(s1: &Option<Rc<String>>, s2: &Option<Rc<String>>) -> Ordering {
-    if s1.is_none() && s2.is_some() {
-        Ordering::Greater
-    } else if s2.is_none() && s1.is_some() {
-        Ordering::Less
-    } else {
-        s1.cmp(s2)
-    }
-}
+// fn strcmp(s1: &Option<Rc<String>>, s2: &Option<Rc<String>>) -> Ordering {
+//     if s1.is_none() && s2.is_some() {
+//         Ordering::Greater
+//     } else if s2.is_none() && s1.is_some() {
+//         Ordering::Less
+//     } else {
+//         s1.cmp(s2)
+//     }
+// }

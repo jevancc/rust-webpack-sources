@@ -1,5 +1,4 @@
 use source_list_map::*;
-use types::StringPtr;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]

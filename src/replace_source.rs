@@ -3,7 +3,6 @@ use source_list_map::{types::Node as SlmNode, MappingFunction, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
 use std::cmp;
 use std::rc::Rc;
-use types::StringPtr;
 use utils;
 
 #[derive(Debug)]
@@ -162,7 +161,7 @@ impl<'a> ReplaceMappingFunction<'a> {
 }
 
 impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
-    fn map(&mut self, mut code: String) -> String {
+    fn map(&mut self, code: String) -> String {
         let code_len = code.chars().count();
         let code_byte_len = code.len();
         let new_current_idx = self.current_idx + code_len as i32;

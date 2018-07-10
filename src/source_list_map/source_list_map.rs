@@ -1,6 +1,6 @@
 use super::types::{GenCode, Node};
 use super::{CodeNode, MappingFunction, MappingsContext, SourceNode};
-use types::{SourceMap, StringPtr, StringWithSourceMap};
+use types::{SourceMap, StringWithSourceMap};
 
 #[derive(Clone, Debug)]
 pub struct SourceListMap {
@@ -77,7 +77,7 @@ impl SourceListMap {
                     self.children.push(child);
                 }
             }
-            Node::NStringIdx(sidx) => {
+            Node::NStringIdx(_) => {
                 panic!("Generated code can not be an index");
             }
         }
@@ -117,7 +117,7 @@ impl SourceListMap {
                 new_childern.append(&mut self.children);
                 self.children = new_childern;
             }
-            Node::NStringIdx(sidx) => {
+            Node::NStringIdx(_) => {
                 panic!("Generated code can not be an index");
             }
         }

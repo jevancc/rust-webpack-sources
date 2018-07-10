@@ -1,7 +1,6 @@
 use serde_json;
 use source_map::types::*;
 use source_map::*;
-use types::StringPtr;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
