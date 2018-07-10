@@ -162,26 +162,36 @@ impl<'a> ReplaceMappingFunction<'a> {
 }
 
 impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
-    // TODO: Enhance performance
     fn map(&mut self, mut code: String) -> String {
-        let code_len = code.chars().count() as i32;
+        let code_len = code.chars().count();
+        let code_byte_len = code.len();
         let new_current_idx = self.current_idx + code_len as i32;
 
-        if self.remove_chars > code_len {
-            self.remove_chars -= code_len;
+        if self.remove_chars > code_len as i32 {
+            self.remove_chars -= code_len as i32;
             self.current_idx = new_current_idx;
             String::new()
         } else {
+            let mut code_iter = code.char_indices();
+            code_iter.next();
+            let mut code_iter_bound = 0;
+            let mut code_step_n_chars = |n: usize| {
+                if n > 0 {
+                    code_iter_bound = code_iter
+                    .nth(n - 1)
+                    .map_or(code_byte_len, |(bs, _)| bs);
+                }
+                code_iter_bound
+            };
+
+            let mut start_bound = 0;
             if self.remove_chars > 0 {
-                if self.remove_chars >= code_len {
-                    code = String::new()
-                } else {
-                    code = code.chars().skip(self.remove_chars as usize).collect()
-                };
+                start_bound = code_step_n_chars(self.remove_chars as usize);
                 self.current_idx += self.remove_chars;
                 self.remove_chars = 0;
             }
-            let mut final_str = String::new();
+
+            let mut final_str = String::with_capacity(code_byte_len);
             while self.replacement_idx >= 0
                 && self.replacements[self.replacement_idx as usize].0
                     < ((new_current_idx as i64) << 4)
@@ -189,39 +199,30 @@ impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
                 let repl = &self.replacements[self.replacement_idx as usize];
                 let start = (repl.0 >> 4) as i32;
                 let end = (repl.1 >> 4) as i32 + 1;
-                let before: String;
-                if start - self.current_idx <= 0 {
-                    before = String::new();
-                } else if start - self.current_idx >= code_len {
-                    before = code.clone();
-                } else {
-                    before = code
-                        .chars()
-                        .take((start - self.current_idx) as usize)
-                        .collect();
+
+                if start > self.current_idx {
+                    let end_bound = code_step_n_chars((start - self.current_idx) as usize);
+                    final_str.push_str(&code[start_bound as usize..end_bound as usize]);
+                    self.current_idx = start;
+                    start_bound = end_bound;
                 }
+                final_str.push_str(&repl.2);
 
-                final_str += &(before + &repl.2);
                 if end <= new_current_idx {
-                    if end - self.current_idx >= code_len {
-                        code = String::new()
-                    } else if end - self.current_idx > 0 {
-                        code = code
-                            .chars()
-                            .skip((end - self.current_idx) as usize)
-                            .collect();
-                    };
-
+                    if end > self.current_idx {
+                        start_bound = code_step_n_chars((end - self.current_idx) as usize);
+                    }
                     self.current_idx = cmp::max(self.current_idx, end);
                 } else {
-                    code = String::new();
+                    start_bound = code_step_n_chars((new_current_idx - start) as usize);
                     self.remove_chars = end - new_current_idx;
                 }
 
                 self.replacement_idx -= 1;
             }
             self.current_idx = new_current_idx;
-            final_str + &code
+            final_str.push_str(&code[start_bound as usize ..]);
+            final_str
         }
     }
 }
@@ -234,10 +235,8 @@ fn split_sourcenode(
     match node {
         SmNode::NSourceNode(n) => {
             let mut is_splitted = false;
-            let mut left_children = Vec::<SmNode>::new();
-            let mut right_children = Vec::<SmNode>::new();
-            left_children.reserve(n.children.len());
-            right_children.reserve(n.children.len());
+            let mut left_children = Vec::<SmNode>::with_capacity(n.children.len());
+            let mut right_children = Vec::<SmNode>::with_capacity(n.children.len());
             let c_position = n.position;
             let c_source = n.source;
             let c_name = n.name;
