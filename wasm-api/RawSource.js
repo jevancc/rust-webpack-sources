@@ -3,14 +3,21 @@
 	Author Tobias Koppers @sokra
 */
 "use strict";
-var SourceNode = require("./wasm-source-map").SourceNode;
-var SourceListMap = require("./wasm-source-list-map").SourceListMap;
-var wasm = require("./build/webpack_sources");
+let SourceNode = require("./wasm-source-map").SourceNode;
+let SourceListMap = require("./wasm-source-list-map").SourceListMap;
+let wasm = require("./build/webpack_sources");
 
+let ptrCache = new Map();
 class RawSource extends wasm._RawSource {
     constructor(value) {
         super(0);
-        this.ptr = RawSource._new_string(value).ptr;
+        let cachedPtr = ptrCache.get(value);
+        if (cachedPtr) {
+            this.ptr = cachedPtr;
+        } else {
+            this.ptr = RawSource._new_string(value).ptr;
+            ptrCache.set(value, this.ptr);
+        }
         this._value = value;
     }
 
@@ -24,26 +31,6 @@ class RawSource extends wasm._RawSource {
 
     map(options) {
         return null;
-    }
-
-    node(options) {
-        var node = new SourceNode(-2);
-        options = options || {};
-        node.ptr = this._node_bool_bool(
-            !(options.columns === false),
-            !(options.module === false)
-        ).ptr;
-        return node;
-    }
-
-    listMap(options) {
-        var map = new SourceListMap(-2);
-        options = options || {};
-        map.ptr = this._list_map_bool_bool(
-            !(options.columns === false),
-            !(options.module === false)
-        ).ptr;
-        return map;
     }
 
     updateHash(hash) {

@@ -9,31 +9,31 @@ use types::StringPtr;
 #[derive(Debug)]
 pub struct SourceMapSource {
     value: Rc<String>,
-    name: Rc<String>,
-    map_sources: Vec<Rc<String>>,
-    map_sources_content: Vec<Rc<String>>,
-    map_names: Vec<Rc<String>>,
+    value_idx: i32,
+    name: i32,
+    map_sources: Vec<i32>,
+    map_sources_content: Vec<i32>,
+    map_names: Vec<i32>,
     map_mappings: Rc<String>,
 }
 
 impl SourceMapSource {
     pub fn new(
         value: String,
-        name: String,
-        map_sources: Vec<String>,
-        map_sources_content: Vec<String>,
+        value_idx: i32,
+        name: i32,
+        map_sources: Vec<i32>,
+        map_sources_content: Vec<i32>,
         map_mappings: String,
-        map_names: Vec<String>,
+        map_names: Vec<i32>,
     ) -> SourceMapSource {
         SourceMapSource {
             value: Rc::new(value),
-            name: Rc::new(name),
-            map_sources: map_sources.into_iter().map(|s| Rc::new(s)).collect(),
-            map_sources_content: map_sources_content
-                .into_iter()
-                .map(|s| Rc::new(s))
-                .collect(),
-            map_names: map_names.into_iter().map(|s| Rc::new(s)).collect(),
+            value_idx,
+            name,
+            map_sources: map_sources,
+            map_sources_content: map_sources_content,
+            map_names: map_names,
             map_mappings: Rc::new(map_mappings),
         }
     }
@@ -51,22 +51,10 @@ impl SourceTrait for SourceMapSource {
     fn node(&mut self, _columns: bool, _module: bool) -> SourceNode {
         source_map::from_string_with_source_map(
             StringPtr::Ptr(self.value.clone()),
-            self.map_sources
-                .iter()
-                .cloned()
-                .map(|sp| StringPtr::Ptr(sp))
-                .collect(),
-            self.map_sources_content
-                .iter()
-                .cloned()
-                .map(|sp| StringPtr::Ptr(sp))
-                .collect(),
+            self.map_sources.clone(),
+            self.map_sources_content.clone(),
             StringPtr::Ptr(self.map_mappings.clone()),
-            self.map_names
-                .iter()
-                .cloned()
-                .map(|sp| StringPtr::Ptr(sp))
-                .collect(),
+            self.map_names.clone(),
             None,
             None,
         )
@@ -76,22 +64,14 @@ impl SourceTrait for SourceMapSource {
         if !module {
             SourceListMap::new(
                 Some(GenCode::Code(SlmNode::NRcString(self.value.clone()))),
-                Some(StringPtr::Ptr(self.name.clone())),
-                Some(StringPtr::Ptr(self.value.clone())),
+                Some(self.name.clone()),
+                Some(self.value_idx.clone()),
             )
         } else {
             source_list_map::from_string_with_source_map(
                 StringPtr::Ptr(self.value.clone()),
-                self.map_sources
-                    .iter()
-                    .cloned()
-                    .map(|sp| StringPtr::Ptr(sp))
-                    .collect(),
-                self.map_sources_content
-                    .iter()
-                    .cloned()
-                    .map(|sp| StringPtr::Ptr(sp))
-                    .collect(),
+                self.map_sources.clone(),
+                self.map_sources_content.clone(),
                 StringPtr::Ptr(self.map_mappings.clone()),
             )
         }

@@ -1,6 +1,7 @@
 "use strict";
 
-var wasm = require("../build/webpack_sources");
+let StringCache = require("../StringCache");
+let wasm = require("../build/webpack_sources");
 
 class SingleLineNode extends wasm._SingleLineNode {
     constructor(generatedCode, source, originalSource, startingLine) {
@@ -8,10 +9,12 @@ class SingleLineNode extends wasm._SingleLineNode {
         if (generatedCode) {
             startingLine = startingLine || 1;
             if (source) {
-                this.ptr = SingleLineNode._new_string_string_string_number(
+                let source_idx = StringCache.add(source);
+                let originalSource_idx = StringCache.add(originalSource);
+                this.ptr = SingleLineNode._new_string_sidx_sidx_number(
                     generatedCode,
-                    source,
-                    originalSource,
+                    source_idx,
+                    originalSource_idx,
                     startingLine
                 ).ptr;
             } else {
@@ -24,7 +27,7 @@ class SingleLineNode extends wasm._SingleLineNode {
     }
 
     clone() {
-        var ret = new SingleLineNode();
+        let ret = new SingleLineNode();
         ret.ptr = wasm._singlelinenode__clone(this.ptr);
         return ret;
     }

@@ -10,8 +10,8 @@ pub struct SourceListMap {
 impl SourceListMap {
     pub fn new(
         generated_code: Option<GenCode>,
-        source: Option<StringPtr>,
-        original_source: Option<StringPtr>,
+        source: Option<i32>,
+        original_source: Option<i32>,
     ) -> Self {
         match generated_code {
             Some(GenCode::Code(c)) => {
@@ -31,8 +31,8 @@ impl SourceListMap {
     pub fn add(
         &mut self,
         generated_code: Node,
-        source: Option<StringPtr>,
-        original_source: Option<StringPtr>,
+        source: Option<i32>,
+        original_source: Option<i32>,
     ) -> &mut SourceListMap {
         match generated_code {
             Node::NRcString(sp) => {
@@ -77,6 +77,9 @@ impl SourceListMap {
                     self.children.push(child);
                 }
             }
+            Node::NStringIdx(sidx) => {
+                panic!("Generated code can not be an index");
+            }
         }
         self
     }
@@ -84,8 +87,8 @@ impl SourceListMap {
     pub fn prepend(
         &mut self,
         generated_code: Node,
-        source: Option<StringPtr>,
-        original_source: Option<StringPtr>,
+        source: Option<i32>,
+        original_source: Option<i32>,
     ) -> &mut SourceListMap {
         match generated_code {
             Node::NRcString(sp) => {
@@ -113,6 +116,9 @@ impl SourceListMap {
                 new_childern.append(&mut slm.children);
                 new_childern.append(&mut self.children);
                 self.children = new_childern;
+            }
+            Node::NStringIdx(sidx) => {
+                panic!("Generated code can not be an index");
             }
         }
         self
@@ -200,7 +206,7 @@ impl SourceListMap {
         output
     }
 
-    pub fn to_string_with_source_map(&self, options_file: Option<String>) -> StringWithSourceMap {
+    pub fn to_string_with_source_map(&self, options_file: Option<i32>) -> StringWithSourceMap {
         let mut mc: MappingsContext = MappingsContext::new();
 
         let mut src: String = String::new();
@@ -224,30 +230,19 @@ impl SourceListMap {
             };
         }
 
-        let file = options_file.map_or(String::new(), |s| s);
+        let file = options_file.map_or(-1, |s| s);
         let arrays = mc.get_arrays();
         StringWithSourceMap {
             source: src,
             map: SourceMap {
                 version: 3,
                 file: Some(file),
-                sources: arrays
-                    .sources
-                    .iter()
-                    .map(|sp| {
-                        if let Some(ref sp) = sp {
-                            (**sp).clone()
-                        } else {
-                            String::new()
-                        }
-                    })
-                    .collect(),
+                sources: arrays.sources.iter().map(|idx| idx.unwrap_or(-1)).collect(),
                 sources_content: if mc.has_source_content {
-                    let mut vec = Vec::<String>::new();
+                    let mut vec = Vec::<i32>::new();
                     for sc in arrays.sources_content {
                         match sc {
-                            Node::NString(s) => vec.push(s),
-                            Node::NRcString(sp) => vec.push((*sp).clone()),
+                            Node::NStringIdx(idx) => vec.push(idx),
                             _ => {}
                         }
                     }

@@ -4,33 +4,38 @@
 */
 "use strict";
 
-var SourceNode = require("./wasm-source-map").SourceNode;
-var SourceListMap = require("./wasm-source-list-map").SourceListMap;
-var fromStringWithSourceMap = require("./wasm-source-list-map")
+let SourceNode = require("./wasm-source-map").SourceNode;
+let SourceListMap = require("./wasm-source-list-map").SourceListMap;
+let fromStringWithSourceMap = require("./wasm-source-list-map")
     .fromStringWithSourceMap;
-var SourceMapConsumer = require("source-map").SourceMapConsumer;
-var SourceMapGenerator = require("source-map").SourceMapGenerator;
-var StringVec = require("./wasm-source-list-map/utils").StringVec;
-var wasm = require("./build/webpack_sources");
+let SourceMapConsumer = require("source-map").SourceMapConsumer;
+let SourceMapGenerator = require("source-map").SourceMapGenerator;
+let StringCache = require("./StringCache");
+let wasm = require("./build/webpack_sources");
 
 class SourceMapSource extends wasm._SourceMapSource {
     constructor(value, name, sourceMap) {
         super(0);
         this._value = value;
+        this._value_index = StringCache.add(value);
         this._name = name;
         this._sourceMap = sourceMap;
 
-        var sources = sourceMap.sources || [];
-        var sourcesContent = sourceMap.sourcesContent || [];
-        var mappings = sourceMap.mappings;
-        var names = sourceMap.names || [];
-        this.ptr = SourceMapSource._new_string_string_map(
+        let sources = (sourceMap.sources || []).map(StringCache.add);
+        let sourcesContent = (sourceMap.sourcesContent || []).map(
+            StringCache.add
+        );
+        let mappings = sourceMap.mappings;
+        let names = (sourceMap.names || []).map(StringCache.add);
+
+        this.ptr = SourceMapSource._new_string_sidx_string_map(
             value,
+            this._value_index,
             name,
-            StringVec(sources),
-            StringVec(sourcesContent),
+            sources,
+            sourcesContent,
             mappings,
-            StringVec(names)
+            names
         ).ptr;
     }
 
@@ -42,29 +47,9 @@ class SourceMapSource extends wasm._SourceMapSource {
         return this._value.length;
     }
 
-    node(options) {
-        var node = new SourceNode(-2);
-        options = options || {};
-        node.ptr = this._node_bool_bool(
-            !(options.columns === false),
-            !(options.module === false)
-        ).ptr;
-        return node;
-    }
-
-    listMap(options) {
-        var map = new SourceListMap(-2);
-        options = options || {};
-        map.ptr = this._list_map_bool_bool(
-            !(options.columns === false),
-            !(options.module === false)
-        ).ptr;
-        return map;
-    }
-
     updateHash(hash) {
         hash.update(this._value);
-        if (this._originalSource) hash.update(this._originalSource);
+        // if (this._originalSource) hash.update(this._originalSource);
     }
 }
 

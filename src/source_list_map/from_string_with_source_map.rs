@@ -5,8 +5,8 @@ use vlq;
 
 pub fn from_string_with_source_map(
     code: StringPtr,
-    sources: Vec<StringPtr>,
-    sources_content: Vec<StringPtr>,
+    sources: Vec<i32>,
+    sources_content: Vec<i32>,
     mappings: StringPtr,
 ) -> SourceListMap {
     let mappings = mappings.get().split(';').enumerate();
@@ -74,8 +74,8 @@ pub fn from_string_with_source_map(
                                             &mut nodes,
                                             &mut current_source_node_line,
                                             line.clone(),
-                                            sources.get(source_index).map(|rs| rs.clone()),
-                                            sources_content.get(source_index).map(|rs| rs.clone()),
+                                            sources.get(source_index).map(|idx| *idx),
+                                            sources_content.get(source_index).map(|idx| *idx),
                                             line_position as usize,
                                         );
                                         true
@@ -114,6 +114,7 @@ pub fn from_string_with_source_map(
     SourceListMap::new(Some(GenCode::CodeVec(nodes)), None, None)
 }
 
+#[inline]
 fn add_code(nodes: &mut Vec<Node>, current_source_node_line: &mut usize, generated_code: String) {
     match nodes.last_mut() {
         Some(Node::NCodeNode(ref mut n)) => {
@@ -132,21 +133,17 @@ fn add_code(nodes: &mut Vec<Node>, current_source_node_line: &mut usize, generat
     nodes.push(Node::NCodeNode(CodeNode::new(generated_code)));
 }
 
+#[inline]
 fn add_source(
     nodes: &mut Vec<Node>,
     current_source_node_line: &mut usize,
     generated_code: String,
-    source: Option<StringPtr>,
-    original_source: Option<StringPtr>,
+    source: Option<i32>,
+    original_source: Option<i32>,
     line: usize,
 ) {
     if let Some(Node::NSourceNode(ref mut n)) = nodes.last_mut() {
-        if ((n.source.is_none() && source.is_none()) || {
-            let ns = n.source.clone().unwrap();
-            let s = source.clone().unwrap().to_ptr();
-            ns == s
-        }) && *current_source_node_line == line
-        {
+        if n.source == source && *current_source_node_line == line {
             n.add_generated_code(&generated_code);
             *current_source_node_line += 1;
             return;

@@ -5,17 +5,17 @@ use std::rc::Rc;
 pub struct Mapping {
     // (line, column)
     pub generated: (usize, usize),
-    pub source: Option<Rc<String>>,
-    pub name: Option<Rc<String>>,
+    pub source: Option<i32>,
+    pub name: Option<i32>,
     pub original: Option<(usize, usize)>,
 }
 
 impl Mapping {
-    pub fn from_tuple(input: (String, usize, usize, usize, usize, Option<String>)) -> Mapping {
+    pub fn from_tuple(input: (i32, usize, usize, usize, usize, Option<i32>)) -> Mapping {
         Mapping {
             generated: (input.1, input.2),
-            source: Some(Rc::new(input.0)),
-            name: input.5.map(|s| Rc::new(s)),
+            source: Some(input.0),
+            name: input.5,
             original: Some((input.3, input.4)),
         }
     }
@@ -28,7 +28,7 @@ impl Ord for Mapping {
             return cmp;
         }
 
-        let cmp = strcmp(&self.source, &other.source);
+        let cmp = self.source.cmp(&other.source);
         if cmp != Ordering::Equal {
             return cmp;
         }
@@ -38,7 +38,7 @@ impl Ord for Mapping {
             return cmp;
         }
 
-        return strcmp(&self.name, &other.name);
+        return self.name.cmp(&other.name);
     }
 }
 

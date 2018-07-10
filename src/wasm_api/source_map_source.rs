@@ -13,22 +13,24 @@ pub struct _SourceMapSource {
 
 #[wasm_bindgen]
 impl _SourceMapSource {
-    pub fn _new_string_string_map(
+    pub fn _new_string_sidx_string_map(
         value: String,
-        name: String,
-        map_sources: StringVec,
-        map_sources_content: StringVec,
+        value_idx: i32,
+        name: i32,
+        map_sources: &[i32],
+        map_sources_content: &[i32],
         map_mappings: String,
-        map_names: StringVec,
+        map_names: &[i32],
     ) -> _SourceMapSource {
         _SourceMapSource {
             val: Rc::new(RefCell::new(SourceMapSource::new(
                 value,
+                value_idx,
                 name,
-                map_sources.get_raw(),
-                map_sources_content.get_raw(),
+                map_sources.to_vec(),
+                map_sources_content.to_vec(),
                 map_mappings,
-                map_names.get_raw(),
+                map_names.to_vec(),
             ))),
         }
     }

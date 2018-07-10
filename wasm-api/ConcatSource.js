@@ -3,16 +3,16 @@
 	Author Tobias Koppers @sokra
 */
 "use strict";
-var SourceNode = require("./wasm-source-map").SourceNode;
-var SourceListMap = require("./wasm-source-list-map").SourceListMap;
-var wasm = require("./build/webpack_sources");
+let SourceNode = require("./wasm-source-map").SourceNode;
+let SourceListMap = require("./wasm-source-list-map").SourceListMap;
+let wasm = require("./build/webpack_sources");
 
 class ConcatSource extends wasm._ConcatSource {
     constructor() {
         super(0);
         this.ptr = ConcatSource._new().ptr;
         this.children = [];
-        for (var i = 0; i < arguments.length; i++) {
+        for (let i = 0; i < arguments.length; i++) {
             this.add(arguments[i]);
         }
     }
@@ -39,8 +39,8 @@ class ConcatSource extends wasm._ConcatSource {
         }
 
         if (item.isConcatSource) {
-            var children = item.children;
-            for (var j = 0; j < children.length; j++)
+            let children = item.children;
+            for (let j = 0; j < children.length; j++)
                 this.children.push(children[j]);
         } else {
             this.children.push(item);
@@ -55,30 +55,10 @@ class ConcatSource extends wasm._ConcatSource {
         return this._size();
     }
 
-    node(options) {
-        var node = new SourceNode(-2);
-        options = options || {};
-        node.ptr = this._node_bool_bool(
-            !(options.columns === false),
-            !(options.module === false)
-        ).ptr;
-        return node;
-    }
-
-    listMap(options) {
-        var map = new SourceListMap(-2);
-        options = options || {};
-        map.ptr = this._list_map_bool_bool(
-            !(options.columns === false),
-            !(options.module === false)
-        ).ptr;
-        return map;
-    }
-
     updateHash(hash) {
-        var children = this.children;
-        for (var i = 0; i < children.length; i++) {
-            var item = children[i];
+        let children = this.children;
+        for (let i = 0; i < children.length; i++) {
+            let item = children[i];
             if (typeof item === "string") hash.update(item);
             else item.updateHash(hash);
         }

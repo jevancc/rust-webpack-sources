@@ -5,11 +5,11 @@ use utils;
 
 pub fn from_string_with_source_map(
     code: StringPtr,
-    sources: Vec<StringPtr>,
-    sources_content: Vec<StringPtr>,
+    sources: Vec<i32>,
+    sources_content: Vec<i32>,
     mappings: StringPtr,
-    names: Vec<StringPtr>,
-    file: Option<StringPtr>,
+    names: Vec<i32>,
+    file: Option<i32>,
     source_root: Option<StringPtr>,
 ) -> SourceNode {
     let generator = SourceMapGenerator::from_source_map(

@@ -11,11 +11,11 @@ pub struct _MSourceNode {
 
 #[wasm_bindgen]
 impl _MSourceNode {
-    pub fn _new_number_number_string_null(line: u32, column: u32, source: String) -> _MSourceNode {
+    pub fn _new_number_number_sidx_null(line: u32, column: u32, source: i32) -> _MSourceNode {
         _MSourceNode {
             val: SourceNode::new(
                 Some((line as usize, column as usize)),
-                Some(StringPtr::Str(source)),
+                Some(source),
                 None,
                 None,
             ),
@@ -36,12 +36,8 @@ impl _MSourceNode {
         self.val.add(Node::NSourceNode(chunk.val));
     }
 
-    pub fn _to_string_with_source_map_string(&mut self, file: String) -> String {
-        serde_json::to_string(
-            &self
-                .val
-                .to_string_with_source_map(Some(StringPtr::Str(file)), None),
-        ).unwrap()
+    pub fn _to_string_with_source_map_sidx(&mut self, file: i32) -> String {
+        serde_json::to_string(&self.val.to_string_with_source_map(Some(file), None)).unwrap()
     }
 
     pub fn _to_string_with_source_map_null(&mut self) -> String {

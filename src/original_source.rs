@@ -7,14 +7,16 @@ use types::StringPtr;
 #[derive(Debug)]
 pub struct OriginalSource {
     pub value: Rc<String>,
-    pub name: Rc<String>,
+    pub name: i32,
+    pub value_idx: i32,
 }
 
 impl OriginalSource {
-    pub fn new(value: String, name: String) -> OriginalSource {
+    pub fn new(value: String, value_idx: i32, name: i32) -> OriginalSource {
         OriginalSource {
             value: Rc::new(value),
-            name: Rc::new(name),
+            value_idx,
+            name,
         }
     }
 }
@@ -37,7 +39,7 @@ impl SourceTrait for OriginalSource {
             if !columns {
                 sn.add(SmNode::NSourceNode(SourceNode::new(
                     Some((idx + 1, 0)),
-                    Some(StringPtr::Ptr(self.name.clone())),
+                    Some(self.name.clone()),
                     None,
                     Some(SmNode::NString(content)),
                 )));
@@ -51,7 +53,7 @@ impl SourceTrait for OriginalSource {
                     } else {
                         sn2.add(SmNode::NSourceNode(SourceNode::new(
                             Some((idx + 1, pos)),
-                            Some(StringPtr::Ptr(self.name.clone())),
+                            Some(self.name.clone()),
                             None,
                             Some(SmNode::NString(String::from(*item))),
                         )));
@@ -61,18 +63,15 @@ impl SourceTrait for OriginalSource {
                 sn.add(SmNode::NSourceNode(sn2))
             }
         }
-        sn.set_source_content(
-            StringPtr::Ptr(self.name.clone()),
-            StringPtr::Ptr(self.value.clone()),
-        );
+        sn.set_source_content(self.name.clone(), self.value_idx.clone());
         sn
     }
 
     fn list_map(&mut self, _columns: bool, _module: bool) -> SourceListMap {
         SourceListMap::new(
             Some(GenCode::Code(SlmNode::NRcString(self.value.clone()))),
-            Some(StringPtr::Ptr(self.name.clone())),
-            Some(StringPtr::Ptr(self.value.clone())),
+            Some(self.name.clone()),
+            Some(self.value_idx.clone()),
         )
     }
 }

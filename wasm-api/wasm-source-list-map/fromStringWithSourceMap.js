@@ -1,15 +1,15 @@
 "use strict";
 
-var wasm = require("../build/webpack_sources");
-var SourceListMap = require("./SourceListMap");
-var StringVec = require("./utils").StringVec;
+let wasm = require("../build/webpack_sources");
+let SourceListMap = require("./SourceListMap");
+let StringCache = require("../StringCache");
 
 module.exports = function fromStringWithSourceMap(code, map) {
-    var sources = StringVec(map.sources || []);
-    var sourcesContent = StringVec(map.sourcesContent || []);
-    var mappings = map.mappings;
+    let sources = (map.sources || []).map(StringCache.add);
+    let sourcesContent = (map.sourcesContent || []).map(StringCache.add);
+    let mappings = map.mappings;
 
-    var slp = new SourceListMap(-2);
+    let slp = new SourceListMap(-2);
     slp.ptr = wasm._from_string_with_source_map(
         code,
         sources,

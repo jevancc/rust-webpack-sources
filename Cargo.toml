@@ -1,6 +1,6 @@
 [package]
 name = "webpack-sources"
-version = "0.1.2"
+version = "0.2.0"
 authors = ["Jevan Chan <jevan.cnchan@gmail.com>"]
 
 [lib]

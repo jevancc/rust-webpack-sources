@@ -1,16 +1,18 @@
 "use strict";
 
-var wasm = require("../build/webpack_sources");
+let StringCache = require("../StringCache");
+let wasm = require("../build/webpack_sources");
 
 class SourceNode extends wasm._MSourceNode {
     constructor(line, column, source, chunks) {
         super(0);
         if (line !== -2) {
             if (source) {
-                this.ptr = SourceNode._new_number_number_string_null(
+                let source_idx = StringCache.add(source);
+                this.ptr = SourceNode._new_number_number_sidx_null(
                     line,
                     column,
-                    source
+                    source_idx
                 ).ptr;
             } else {
                 this.ptr = SourceNode._new_null_null_null_null().ptr;
@@ -39,22 +41,18 @@ class SourceNode extends wasm._MSourceNode {
     }
 
     toStringWithSourceMap(args) {
-        var json;
-        if (typeof args.file === "string") {
-            json = this._to_string_with_source_map_string(args.file);
-        } else {
-            json = this._to_string_with_source_map_null();
-        }
-
-        var parsed = JSON.parse(json);
+        let parsed = JSON.parse(this._to_string_with_source_map_null());
         return {
             source: parsed.source,
             map: {
-                file: parsed.map.file,
+                file: args.file,
                 mappings: parsed.map.mappings,
-                names: parsed.map.names,
-                sources: parsed.map.sources,
-                sourcesContent: parsed.map.sources_content,
+                names: (parsed.map.names || []).map(StringCache.at),
+                sources: (parsed.map.sources || []).map(StringCache.at),
+                sourcesContent:
+                    (parsed.map.sources_content || []).length > 0
+                        ? (parsed.map.sources_content || []).map(StringCache.at)
+                        : undefined,
                 version: parsed.map.version || 3
             }
         };

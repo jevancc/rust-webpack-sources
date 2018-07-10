@@ -8,8 +8,8 @@ use vlq;
 #[derive(Clone, Debug)]
 pub struct SingleLineNode {
     pub generated_code: String,
-    pub original_source: Option<Rc<String>>,
-    pub source: Option<Rc<String>>,
+    pub original_source: Option<i32>,
+    pub source: Option<i32>,
     pub line: usize,
     pub number_of_lines: usize,
     pub ends_with_new_line: bool,
@@ -18,13 +18,10 @@ pub struct SingleLineNode {
 impl SingleLineNode {
     pub fn new(
         generated_code: String,
-        source: Option<StringPtr>,
-        original_source: Option<StringPtr>,
+        source: Option<i32>,
+        original_source: Option<i32>,
         line: usize,
     ) -> Self {
-        let source = source.map(|sp| sp.to_ptr());
-        let original_source = original_source.map(|sp| sp.to_ptr());
-
         SingleLineNode {
             original_source,
             source,
@@ -37,12 +34,7 @@ impl SingleLineNode {
 
     pub fn map_generated_code<T: MappingFunction>(self, mf: &mut T) -> SingleLineNode {
         let generated_code = mf.map(self.generated_code);
-        SingleLineNode::new(
-            generated_code,
-            self.source.clone().map(|p| StringPtr::Ptr(p)),
-            self.original_source.clone().map(|p| StringPtr::Ptr(p)),
-            self.line,
-        )
+        SingleLineNode::new(generated_code, self.source, self.original_source, self.line)
     }
 
     pub fn merge(self, other_node: &Node) -> Result<Node, Node> {
@@ -66,8 +58,8 @@ impl SingleLineNode {
             {
                 Ok(Node::NSourceNode(SourceNode::new(
                     self.generated_code + &other_node.generated_code,
-                    self.source.map(|p| StringPtr::Ptr(Rc::clone(&p))),
-                    self.original_source.map(|p| StringPtr::Ptr(Rc::clone(&p))),
+                    self.source,
+                    self.original_source,
                     self.line,
                 )))
             } else {
@@ -98,7 +90,7 @@ impl SingleLineNode {
             let lines = self.number_of_lines;
             let source_index = mappings_context.ensure_source(
                 self.source.clone(),
-                self.original_source.clone().map(|p| Node::NRcString(p)),
+                self.original_source.clone().map(|n| Node::NStringIdx(n)),
             );
 
             let mut mappings = String::from("A");

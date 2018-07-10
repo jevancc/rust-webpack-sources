@@ -1,18 +1,19 @@
 "use strict";
 
-var wasm = require("../build/webpack_sources");
-var CodeNode = require("./CodeNode");
-var SourceNode = require("./SourceNode");
-var SingleLineNode = require("./SingleLineNode");
-var StringVec = require("./utils").StringVec;
-var NodeVec = require("./utils").NodeVec;
+let wasm = require("../build/webpack_sources");
+let CodeNode = require("./CodeNode");
+let SourceNode = require("./SourceNode");
+let SingleLineNode = require("./SingleLineNode");
+let StringVec = require("./utils").StringVec;
+let NodeVec = require("./utils").NodeVec;
+let StringCache = require("../StringCache");
 
 class SourceListMap extends wasm._SourceListMap {
     constructor(generatedCode, source, originalSource) {
         super(0);
         if (generatedCode !== -2) {
             if (Array.isArray(generatedCode)) {
-                var nodes = NodeVec(generatedCode);
+                let nodes = NodeVec(generatedCode);
                 this.ptr = SourceListMap._new_nodes(nodes);
             } else {
                 this.ptr = SourceListMap._new().ptr;
@@ -25,9 +26,11 @@ class SourceListMap extends wasm._SourceListMap {
     }
 
     add(generatedCode, source, originalSource) {
-        var nodes = NodeVec([generatedCode]);
+        let nodes = NodeVec([generatedCode]);
         if (source) {
-            this._add_node_string_string(nodes, source, originalSource);
+            let source_idx = StringCache.add(source);
+            let originalSource_idx = StringCache.add(originalSource);
+            this._add_node_sidx_sidx(nodes, source_idx, originalSource_idx);
         } else {
             this._add_node(nodes);
         }
@@ -35,9 +38,15 @@ class SourceListMap extends wasm._SourceListMap {
     }
 
     prepend(generatedCode, source, originalSource) {
-        var nodes = NodeVec([generatedCode]);
+        let nodes = NodeVec([generatedCode]);
         if (source) {
-            this._prepend_node_string_string(nodes, source, originalSource);
+            let source_idx = StringCache.add(source);
+            let originalSource_idx = StringCache.add(originalSource);
+            this._prepend_node_sidx_sidx(
+                nodes,
+                originalSource_idx,
+                originalSource_idx
+            );
         } else {
             this._prepend_node(nodes);
         }
@@ -45,7 +54,7 @@ class SourceListMap extends wasm._SourceListMap {
     }
 
     mapGeneratedCode(fnIdx) {
-        var newSlp = new SourceListMap(-2);
+        let newSlp = new SourceListMap(-2);
         switch (fnIdx) {
             case this.MappingFunction.Test:
                 newSlp.ptr = wasm._sourcelistmap_map_generated_code_test(
@@ -65,8 +74,8 @@ class SourceListMap extends wasm._SourceListMap {
                 break;
             case this.MappingFunction.Replace:
                 let replacements = [];
-                for (var i in arguments[1]) {
-                    var repl = arguments[1][i];
+                for (let i in arguments[1]) {
+                    let repl = arguments[1][i];
                     replacements.push([
                         Math.floor(repl[0] * 16),
                         Math.floor(repl[1] * 16),
@@ -89,36 +98,22 @@ class SourceListMap extends wasm._SourceListMap {
         return this._to_string();
     }
 
-    toStringWithSourceMap(options) {
-        var srcMap = this._to_string_with_source_map();
+    toStringWithSourceMap(args) {
+        let parsed = JSON.parse(this._to_string_with_source_map());
 
-        var mapSources = [];
-        var sourcesLen = srcMap.get_map_sources_len();
-        for (var i = 0; i < sourcesLen; i++) {
-            mapSources.push(srcMap.get_map_sources_nth(i) || null);
-        }
-
-        var mapSourcesContent = [];
-        var contentsLen = srcMap.get_map_contents_len();
-        for (var i = 0; i < contentsLen; i++) {
-            mapSourcesContent.push(srcMap.get_map_contents_nth(i));
-        }
-
-        var ret = {
-            source: srcMap.get_source(),
+        return {
+            source: parsed.source,
             map: {
-                file: options && options.file,
-                version: 3,
-                sources: mapSources,
+                file: args.file,
+                mappings: parsed.map.mappings,
+                sources: (parsed.map.sources || []).map(StringCache.at),
                 sourcesContent:
-                    mapSourcesContent.length != 0
-                        ? mapSourcesContent
+                    (parsed.map.sources_content || []).length > 0
+                        ? (parsed.map.sources_content || []).map(StringCache.at)
                         : undefined,
-                mappings: srcMap.get_mappings()
+                version: parsed.map.version || 3
             }
         };
-        srcMap.free();
-        return ret;
     }
 
     static isSourceListMap(obj) {

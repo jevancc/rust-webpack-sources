@@ -27,6 +27,7 @@ pub mod types {
         NSourceNode(SourceNode),
         NSingleLineNode(SingleLineNode),
         NSourceListMap(SourceListMap),
+        NStringIdx(i32),
     }
 
     #[derive(Clone, Debug)]

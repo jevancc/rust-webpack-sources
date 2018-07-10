@@ -3,13 +3,35 @@
 	Author Tobias Koppers @sokra
 */
 "use strict";
+const SourceNode = require("./wasm-source-map").SourceNode;
+const SourceListMap = require("./wasm-source-list-map").SourceListMap;
 
 module.exports = function mixinSourceAndMap(proto) {
+    proto.node = function(options) {
+        let node = new SourceNode(-2);
+        options = options || {};
+        node.ptr = this._node_bool_bool(
+            !(options.columns === false),
+            !(options.module === false)
+        ).ptr;
+        return node;
+    };
+
+    proto.listMap = function(options) {
+        let map = new SourceListMap(-2);
+        options = options || {};
+        map.ptr = this._list_map_bool_bool(
+            !(options.columns === false),
+            !(options.module === false)
+        ).ptr;
+        return map;
+    };
+
     proto.map = function(options) {
         options = options || {};
         if (options.columns === false) {
-            var listMap = this.listMap(options);
-            var ret = listMap.toStringWithSourceMap({
+            let listMap = this.listMap(options);
+            let ret = listMap.toStringWithSourceMap({
                 file: "x"
             }).map;
             if (listMap.free) {
@@ -18,26 +40,21 @@ module.exports = function mixinSourceAndMap(proto) {
             return ret;
         }
 
-        var node = this.node(options);
-        var StringWithSourceMap = this.node(options).toStringWithSourceMap({
+        let node = this.node(options);
+        let StringWithSourceMap = this.node(options).toStringWithSourceMap({
             file: "x"
         });
         if (node.free) {
             node.free();
         }
         return StringWithSourceMap.map;
-        // if (typeof StringWithSourceMap === "string") {
-        //     return JSON.parse(StringWithSourceMap).map;
-        // } else {
-        //     return map.toJSON();
-        // }
     };
 
     proto.sourceAndMap = function(options) {
         options = options || {};
         if (options.columns === false) {
-            var listMap = this.listMap(options);
-            var ret = listMap.toStringWithSourceMap({
+            let listMap = this.listMap(options);
+            let ret = listMap.toStringWithSourceMap({
                 file: "x"
             });
             if (listMap.free) {
@@ -46,22 +63,13 @@ module.exports = function mixinSourceAndMap(proto) {
             return ret;
         }
 
-        var node = this.node(options);
-        var StringWithSourceMap = this.node(options).toStringWithSourceMap({
+        let node = this.node(options);
+        let StringWithSourceMap = this.node(options).toStringWithSourceMap({
             file: "x"
         });
         if (node.free) {
             node.free();
         }
         return StringWithSourceMap;
-
-        // if (typeof StringWithSourceMap === "string") {
-        //     return JSON.parse(StringWithSourceMap);
-        // } else {
-        //     return {
-        //         source: res.code,
-        //         map: res.map.toJSON()
-        //     };
-        // }
     };
 };

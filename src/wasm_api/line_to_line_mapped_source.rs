@@ -12,10 +12,10 @@ pub struct _LineToLineMappedSource {
 
 #[wasm_bindgen]
 impl _LineToLineMappedSource {
-    pub fn _new_string_string_string(
+    pub fn _new_string_sidx_sidx(
         value: String,
-        name: String,
-        original_source: String,
+        name: i32,
+        original_source: i32,
     ) -> _LineToLineMappedSource {
         _LineToLineMappedSource {
             val: Rc::new(RefCell::new(LineToLineMappedSource::new(

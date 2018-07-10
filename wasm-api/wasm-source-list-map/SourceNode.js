@@ -1,6 +1,7 @@
 "use strict";
 
-var wasm = require("../build/webpack_sources");
+let StringCache = require("../StringCache");
+let wasm = require("../build/webpack_sources");
 
 class SourceNode extends wasm._SourceNode {
     constructor(generatedCode, source, originalSource, startingLine) {
@@ -8,10 +9,12 @@ class SourceNode extends wasm._SourceNode {
         if (generatedCode) {
             startingLine = startingLine || 1;
             if (source) {
-                this.ptr = SourceNode._new_string_string_string_number(
+                let source_idx = StringCache.add(source);
+                let originalSource_idx = StringCache.add(originalSource);
+                this.ptr = SourceNode._new_string_sidx_sidx_number(
                     generatedCode,
-                    source,
-                    originalSource,
+                    source_idx,
+                    originalSource_idx,
                     startingLine
                 ).ptr;
             } else {
@@ -24,7 +27,7 @@ class SourceNode extends wasm._SourceNode {
     }
 
     clone() {
-        var ret = new SourceNode();
+        let ret = new SourceNode();
         ret.ptr = wasm._sourcenode__clone(this.ptr);
         return ret;
     }

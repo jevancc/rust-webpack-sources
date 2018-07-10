@@ -7,10 +7,10 @@ pub struct StringWithSourceMap {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SourceMap {
     pub version: i32,
-    pub file: Option<String>,
+    pub file: Option<i32>,
     pub source_root: Option<String>,
-    pub sources: Vec<String>,
-    pub sources_content: Vec<String>,
-    pub names: Vec<String>,
+    pub sources: Vec<i32>,
+    pub sources_content: Vec<i32>,
+    pub names: Vec<i32>,
     pub mappings: String,
 }

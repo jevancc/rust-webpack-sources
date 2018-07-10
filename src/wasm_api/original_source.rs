@@ -13,9 +13,17 @@ pub struct _OriginalSource {
 
 #[wasm_bindgen]
 impl _OriginalSource {
-    pub fn _new_string_string(source_code: String, name: String) -> _OriginalSource {
+    pub fn _new_string_sidx_sidx(
+        source_code: String,
+        source_code_idx: i32,
+        name: i32,
+    ) -> _OriginalSource {
         _OriginalSource {
-            val: Rc::new(RefCell::new(OriginalSource::new(source_code, name))),
+            val: Rc::new(RefCell::new(OriginalSource::new(
+                source_code,
+                source_code_idx,
+                name,
+            ))),
         }
     }
 
@@ -27,8 +35,8 @@ impl _OriginalSource {
         self.val.borrow_mut().size() as u32
     }
 
-    pub fn _name(&mut self) -> String {
-        (*self.val.borrow_mut().name).clone()
+    pub fn _name(&mut self) -> i32 {
+        self.val.borrow_mut().name
     }
 
     pub fn _list_map_bool_bool(&mut self, columns: bool, module: bool) -> _SourceListMap {

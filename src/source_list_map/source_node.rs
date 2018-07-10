@@ -8,8 +8,8 @@ use vlq;
 #[derive(Clone, Debug)]
 pub struct SourceNode {
     pub generated_code: String,
-    pub original_source: Option<Rc<String>>,
-    pub source: Option<Rc<String>>,
+    pub original_source: Option<i32>,
+    pub source: Option<i32>,
     pub starting_line: usize,
     pub number_of_lines: usize,
     pub ends_with_new_line: bool,
@@ -18,13 +18,10 @@ pub struct SourceNode {
 impl SourceNode {
     pub fn new(
         generated_code: String,
-        source: Option<StringPtr>,
-        original_source: Option<StringPtr>,
+        source: Option<i32>,
+        original_source: Option<i32>,
         starting_line: usize,
     ) -> Self {
-        let source = source.map(|sp| sp.to_ptr());
-        let original_source = original_source.map(|sp| sp.to_ptr());
-
         SourceNode {
             ends_with_new_line: generated_code.ends_with('\n'),
             number_of_lines: utils::number_of_lines(&generated_code),
@@ -99,7 +96,7 @@ impl SourceNode {
             let lines = self.number_of_lines;
             let source_index = mappings_context.ensure_source(
                 self.source.clone(),
-                self.original_source.clone().map(|p| Node::NRcString(p)),
+                self.original_source.clone().map(|n| Node::NStringIdx(n)),
             );
             let mut mappings = String::from("A");
             if mappings_context.unfinished_generated_line != 0 {
@@ -158,8 +155,8 @@ impl SourceNode {
 
             results.push(SingleLineNode::new(
                 line_code,
-                self.source.clone().map(|p| StringPtr::Ptr(p)),
-                self.original_source.clone().map(|p| StringPtr::Ptr(p)),
+                self.source.clone(),
+                self.original_source.clone(),
                 current_line,
             ));
             current_line += 1;

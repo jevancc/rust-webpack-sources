@@ -4,9 +4,9 @@
 */
 "use strict";
 
-var SourceNode = require("./wasm-source-map").SourceNode;
-var SourceListMap = require("./wasm-source-list-map").SourceListMap;
-var wasm = require("./build/webpack_sources");
+let SourceNode = require("./wasm-source-map").SourceNode;
+let SourceListMap = require("./wasm-source-list-map").SourceListMap;
+let wasm = require("./build/webpack_sources");
 
 class PrefixSource extends wasm._PrefixSource {
     constructor(prefix, source) {
@@ -59,26 +59,6 @@ class PrefixSource extends wasm._PrefixSource {
 
     size() {
         return this._size();
-    }
-
-    node(options) {
-        var node = new SourceNode(-2);
-        options = options || {};
-        node.ptr = this._node_bool_bool(
-            !(options.columns === false),
-            !(options.module === false)
-        ).ptr;
-        return node;
-    }
-
-    listMap(options) {
-        var map = new SourceListMap(-2);
-        options = options || {};
-        map.ptr = this._list_map_bool_bool(
-            !(options.columns === false),
-            !(options.module === false)
-        ).ptr;
-        return map;
     }
 
     updateHash(hash) {

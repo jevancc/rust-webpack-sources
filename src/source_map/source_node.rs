@@ -7,22 +7,20 @@ use types::{StringPtr, StringWithSourceMap};
 #[derive(Clone, Debug)]
 pub struct SourceNode {
     pub children: Vec<Node>,
-    pub source_contents: HashMap<Rc<String>, Rc<String>>,
+    pub source_contents: HashMap<i32, i32>,
     // (line, column)
     pub position: Option<(usize, usize)>,
-    pub source: Option<Rc<String>>,
-    pub name: Option<Rc<String>>,
+    pub source: Option<i32>,
+    pub name: Option<i32>,
 }
 
 impl SourceNode {
     pub fn new(
         position: Option<(usize, usize)>,
-        source: Option<StringPtr>,
-        name: Option<StringPtr>,
+        source: Option<i32>,
+        name: Option<i32>,
         chunks: Option<Node>,
     ) -> SourceNode {
-        let source = source.map(|sp| sp.to_ptr());
-        let name = name.map(|sp| sp.to_ptr());
         let mut sn = SourceNode {
             position,
             source,
@@ -53,18 +51,15 @@ impl SourceNode {
         }
     }
 
-    pub fn set_source_content(&mut self, source: StringPtr, source_content: StringPtr) {
-        let source = source.to_ptr();
-        let source_content = source_content.to_ptr();
+    pub fn set_source_content(&mut self, source: i32, source_content: i32) {
         self.source_contents.insert(source, source_content);
     }
 
     pub fn to_string_with_source_map(
         &self,
-        file: Option<StringPtr>,
+        file: Option<i32>,
         source_root: Option<StringPtr>,
     ) -> StringWithSourceMap {
-        let file = file.map(|sp| sp.to_ptr());
         let source_root = source_root.map(|sp| sp.to_ptr());
         let skip_validation = true;
         let mut context = ToSourceMapContext::new(file, source_root, skip_validation);
@@ -78,10 +73,9 @@ impl SourceNode {
 
     pub fn to_source_map_generator(
         &self,
-        file: Option<StringPtr>,
+        file: Option<i32>,
         source_root: Option<StringPtr>,
     ) -> SourceMapGenerator {
-        let file = file.map(|sp| sp.to_ptr());
         let source_root = source_root.map(|sp| sp.to_ptr());
         let skip_validation = true;
         let mut context = ToSourceMapContext::new(file, source_root, skip_validation);
@@ -103,7 +97,7 @@ impl SourceNode {
             }
         }
         for (source, source_content) in &self.source_contents {
-            context.process_source_content(source, source_content);
+            context.process_source_content(*source, *source_content);
         }
     }
 
@@ -117,8 +111,8 @@ impl SourceNode {
             let mapping = mapping.unwrap();
             self.add(Node::NSourceNode(SourceNode::new(
                 mapping.original,
-                mapping.source.map(|sp| StringPtr::Ptr(sp)),
-                mapping.name.map(|sp| StringPtr::Ptr(sp)),
+                mapping.source,
+                mapping.name,
                 Some(Node::NString(String::from(code))),
             )));
         }
@@ -128,20 +122,19 @@ impl SourceNode {
 struct ToSourceMapContext {
     pub map: SourceMapGenerator,
     source_mapping_active: bool,
-    last_original_source: Option<Rc<String>>,
+    last_original_source: Option<i32>,
     last_original_position: Option<(usize, usize)>,
-    last_original_name: Option<Rc<String>>,
+    last_original_name: Option<i32>,
     generated_code: String,
     generated_position: (usize, usize),
 }
 
 impl ToSourceMapContext {
     pub fn new(
-        file: Option<Rc<String>>,
+        file: Option<i32>,
         source_root: Option<Rc<String>>,
         skip_validation: bool,
     ) -> ToSourceMapContext {
-        let file = file.map(|sp| StringPtr::Ptr(sp));
         let source_root = source_root.map(|sp| StringPtr::Ptr(sp));
         ToSourceMapContext {
             map: SourceMapGenerator::new(file, source_root, skip_validation),
@@ -159,9 +152,9 @@ impl WalkFunction for ToSourceMapContext {
     fn process_chunk(
         &mut self,
         chunk: &Rc<String>,
-        original_source: &Option<Rc<String>>,
+        original_source: &Option<i32>,
         original_position: &Option<(usize, usize)>,
-        original_name: &Option<Rc<String>>,
+        original_name: &Option<i32>,
     ) {
         self.generated_code += chunk;
         if original_source.is_some() && original_position.is_some() {
@@ -213,11 +206,8 @@ impl WalkFunction for ToSourceMapContext {
         }
     }
 
-    fn process_source_content(&mut self, source: &Rc<String>, source_content: &Rc<String>) {
-        self.map.set_source_content(
-            StringPtr::Ptr(source.clone()),
-            Some(StringPtr::Ptr(source_content.clone())),
-        );
+    fn process_source_content(&mut self, source: i32, source_content: i32) {
+        self.map.set_source_content(source, Some(source_content));
     }
 }
 
@@ -225,9 +215,9 @@ trait WalkFunction {
     fn process_chunk(
         &mut self,
         chunk: &Rc<String>,
-        original_source: &Option<Rc<String>>,
+        original_source: &Option<i32>,
         original_position: &Option<(usize, usize)>,
-        original_name: &Option<Rc<String>>,
+        original_name: &Option<i32>,
     );
-    fn process_source_content(&mut self, source: &Rc<String>, source_content: &Rc<String>);
+    fn process_source_content(&mut self, source: i32, source_content: i32);
 }

@@ -10,22 +10,21 @@ use vlq;
 
 #[derive(Debug)]
 pub struct SourceMapGenerator {
-    file: Option<Rc<String>>,
+    file: Option<i32>,
     source_root: Option<Rc<String>>,
     skip_validation: bool,
-    sources: LinkedHashMap<Rc<String>, usize>,
-    names: LinkedHashMap<Rc<String>, usize>,
+    sources: LinkedHashMap<i32, usize>,
+    names: LinkedHashMap<i32, usize>,
     pub mappings: MappingList,
-    pub sources_contents: HashMap<Rc<String>, Rc<String>>,
+    pub sources_contents: HashMap<i32, i32>,
 }
 
 impl SourceMapGenerator {
     pub fn new(
-        file: Option<StringPtr>,
+        file: Option<i32>,
         source_root: Option<StringPtr>,
         skip_validation: bool,
     ) -> SourceMapGenerator {
-        let file = file.map(|sp| sp.to_ptr());
         let source_root = source_root.map(|sp| sp.to_ptr());
         SourceMapGenerator {
             file,
@@ -56,19 +55,12 @@ impl SourceMapGenerator {
         self.mappings.add(map);
     }
 
-    pub fn set_source_content(
-        &mut self,
-        source_file: StringPtr,
-        source_content: Option<StringPtr>,
-    ) {
-        let source_file = source_file.to_ptr();
-        let source_content = source_content.map(|sp| sp.to_ptr());
-
-        let source = if let Some(root) = self.source_root.clone() {
-            Rc::new(utils::relative(&root, &source_file))
-        } else {
-            source_file
-        };
+    pub fn set_source_content(&mut self, source: i32, source_content: Option<i32>) {
+        // let source = if let Some(root) = self.source_root.clone() {
+        //     Rc::new(utils::relative(&root, &source))
+        // } else {
+        //     source
+        // };
 
         if let Some(content) = source_content {
             self.sources_contents.entry(source).or_insert(content);
@@ -79,16 +71,16 @@ impl SourceMapGenerator {
 
     pub fn to_source_map(&mut self) -> SourceMap {
         let version = 3;
-        let sources: Vec<String> = self.sources.keys().map(|sp| (**sp).clone()).collect();
-        let names: Vec<String> = self.names.keys().map(|sp| (**sp).clone()).collect();
+        let sources: Vec<i32> = self.sources.keys().map(|sidx| *sidx).collect();
+        let names: Vec<i32> = self.names.keys().map(|sidx| *sidx).collect();
         let mappings = self.serialize_mappings();
-        let file = self.file.clone().map(|sp| (*sp).clone());
+        let file = self.file;
         let source_root = self.source_root.clone().map(|sp| (*sp).clone());
-        let mut sources_content: Vec<String> = Vec::new();
+        let mut sources_content: Vec<i32> = Vec::new();
 
         for src in self.sources.keys() {
             if let Some(content) = self.sources_contents.get(src) {
-                sources_content.push((**content).clone());
+                sources_content.push(*content);
             }
         }
         return SourceMap {
@@ -207,46 +199,40 @@ impl SourceMapGenerator {
     }
 
     pub fn from_source_map(
-        sources: Vec<StringPtr>,
-        sources_content: Vec<StringPtr>,
+        sources: Vec<i32>,
+        sources_content: Vec<i32>,
         mappings: StringPtr,
-        names: Vec<StringPtr>,
-        file: Option<StringPtr>,
+        names: Vec<i32>,
+        file: Option<i32>,
         source_root: Option<StringPtr>,
         check_dup: bool,
     ) -> SourceMapGenerator {
         let mut generator = SourceMapGenerator::new(file, source_root, true);
 
         let mut contents = sources_content.into_iter();
-        let sources: Vec<Rc<String>> = if check_dup {
-            let mut set: HashSet<Rc<String>> = HashSet::new();
+        let sources: Vec<i32> = if check_dup {
+            let mut set: HashSet<i32> = HashSet::new();
             sources
                 .into_iter()
-                .map(|sp| sp.to_ptr())
-                .filter(|sp| {
-                    generator.set_source_content(StringPtr::Ptr(sp.clone()), contents.next());
-                    set.insert(sp.clone())
+                .filter(|sidx| {
+                    generator.set_source_content(*sidx, contents.next());
+                    set.insert(*sidx)
                 })
                 .collect()
         } else {
             sources
                 .into_iter()
-                .map(|sp| {
-                    let sp = sp.to_ptr();
-                    generator.set_source_content(StringPtr::Ptr(sp.clone()), contents.next());
-                    sp
+                .map(|sidx| {
+                    generator.set_source_content(sidx, contents.next());
+                    sidx
                 })
                 .collect()
         };
-        let names: Vec<Rc<String>> = if check_dup {
-            let mut set: HashSet<Rc<String>> = HashSet::new();
-            names
-                .into_iter()
-                .map(|sp| sp.to_ptr())
-                .filter(|sp| set.insert(sp.clone()))
-                .collect()
+        let names: Vec<i32> = if check_dup {
+            let mut set: HashSet<i32> = HashSet::new();
+            names.into_iter().filter(|sidx| set.insert(*sidx)).collect()
         } else {
-            names.into_iter().map(|sp| sp.to_ptr()).collect()
+            names.into_iter().collect()
         };
 
         let mappings: _Mappings<()> = parse_mappings(mappings.get().as_bytes()).unwrap();

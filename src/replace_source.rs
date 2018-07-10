@@ -239,8 +239,8 @@ fn split_sourcenode(
             left_children.reserve(n.children.len());
             right_children.reserve(n.children.len());
             let c_position = n.position;
-            let c_source = n.source.map(|sp| StringPtr::Ptr(sp));
-            let c_name = n.name.map(|sp| StringPtr::Ptr(sp));
+            let c_source = n.source;
+            let c_name = n.name;
             let c_source_contents = n.source_contents;
             for child in n.children.into_iter() {
                 if !is_splitted {
@@ -307,7 +307,7 @@ fn replacement_to_sourcenode(old_node: SmNode, new_string: Rc<String>) -> SmNode
         let mut map = node.to_source_map_generator(None, None);
         let original_mapping = map.original_position_for(1, 0);
         let position = original_mapping.original;
-        let file = original_mapping.source.map(|sp| StringPtr::Ptr(sp));
+        let file = original_mapping.source;
         let chunks = Some(SmNode::NRcString(new_string.clone()));
         SmNode::NSourceNode(SourceNode::new(position, file, None, chunks))
     } else {

@@ -15,17 +15,17 @@ impl _SourceNode {
         }
     }
 
-    pub fn _new_string_string_string_number(
+    pub fn _new_string_sidx_sidx_number(
         generated_code: String,
-        source: String,
-        original_source: String,
+        source: i32,
+        original_source: i32,
         starting_line: u32,
     ) -> _SourceNode {
         _SourceNode {
             val: SourceNode::new(
                 generated_code,
-                Some(StringPtr::Str(source)),
-                Some(StringPtr::Str(original_source)),
+                Some(source),
+                Some(original_source),
                 starting_line as usize,
             ),
         }

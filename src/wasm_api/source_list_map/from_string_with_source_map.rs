@@ -7,20 +7,17 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 pub fn _from_string_with_source_map(
     code: String,
-    sources: StringVec,
-    sources_content: StringVec,
+    sources: &[i32],
+    sources_content: &[i32],
     mappings: String,
 ) -> _SourceListMap {
-    let sources = sources.get_raw();
-    let sources_content = sources_content.get_raw();
+    let sources = sources.to_vec();
+    let sources_content = sources_content.to_vec();
 
     _SourceListMap::new(from_string_with_source_map(
         StringPtr::Str(code),
-        sources.into_iter().map(|s| StringPtr::Str(s)).collect(),
-        sources_content
-            .into_iter()
-            .map(|s| StringPtr::Str(s))
-            .collect(),
+        sources,
+        sources_content,
         StringPtr::Str(mappings),
     ))
 }
