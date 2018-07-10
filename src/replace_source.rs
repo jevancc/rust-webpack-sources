@@ -176,9 +176,7 @@ impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
             let mut code_iter_bound = 0;
             let mut code_step_n_chars = |n: usize| {
                 if n > 0 {
-                    code_iter_bound = code_iter
-                    .nth(n - 1)
-                    .map_or(code_byte_len, |(bs, _)| bs);
+                    code_iter_bound = code_iter.nth(n - 1).map_or(code_byte_len, |(bs, _)| bs);
                 }
                 code_iter_bound
             };
@@ -220,7 +218,7 @@ impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
                 self.replacement_idx -= 1;
             }
             self.current_idx = new_current_idx;
-            final_str.push_str(&code[start_bound as usize ..]);
+            final_str.push_str(&code[start_bound as usize..]);
             final_str
         }
     }
