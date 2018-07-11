@@ -56,19 +56,22 @@ impl ReplaceSource {
     }
 
     pub fn replace_string(&mut self, s: &str) -> String {
-        let mut results: Vec<&str> = vec![s];
+        let mut results: Vec<(&str, bool)> = vec![(s, false)];
 
         self.sort_replacements();
         for repl in &self.replacements {
             let rem_source = results.pop().unwrap();
-            let splitted1 = utils::split_str(rem_source, (repl.1 >> 4) as i32 + 1, None);
-            let splitted2 = utils::split_str(splitted1.0, (repl.0 >> 4) as i32, None);
-            results.push(splitted1.1);
-            results.push(&repl.2);
-            results.push(splitted2.0);
+            let splitted1 = utils::split_str(rem_source.0, (repl.1 >> 4) as i32 + 1, rem_source.1);
+            let splitted2 = utils::split_str(splitted1.0, (repl.0 >> 4) as i32, splitted1.2);
+            results.push((splitted1.1, splitted1.3));
+            results.push((&repl.2, false));
+            results.push((splitted2.0, splitted2.2));
         }
-        results.reverse();
-        results.join("")
+        let mut result_string = String::with_capacity(s.len());
+        for (s, _) in results.iter().rev() {
+            result_string.push_str(s);
+        }
+        result_string
     }
 
     // pub fn replacements_to_string(&mut self) -> String {
@@ -286,7 +289,7 @@ fn split_sourcenode(
             if n_len as i32 <= split_position {
                 Err((split_position - n_len as i32, SmNode::NRcString(n)))
             } else {
-                let (left, right, _, _) = utils::split_str(&n, split_position, Some(n_len));
+                let (left, right, _, _) = utils::split_str(&n, split_position, false);
                 let left = Rc::new(String::from(left));
                 let right = Rc::new(String::from(right));
                 Ok((SmNode::NRcString(left), SmNode::NRcString(right)))
