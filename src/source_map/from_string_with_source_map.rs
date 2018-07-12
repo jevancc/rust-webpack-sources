@@ -28,19 +28,16 @@ pub fn from_string_with_source_map(
     let mut lines = Vec::<(&str, bool, bool)>::new(); // line, is_existing, single_byte_char_only
     {
         let mut line_start = 0;
-        let mut line_end = 0;
         let mut single_byte_char_only = true;
-        for c in code.chars() {
-            line_end += c.len_utf8();
+        for (p, c) in code.char_indices() {
             if c.len_utf8() > 1 {
                 single_byte_char_only = false;
             }
 
             if c == '\n' {
-                line_end += 1;
+                let line_end = p + 1;
                 lines.push((&code[line_start..line_end], true, single_byte_char_only));
                 line_start = line_end;
-                line_end = 0;
                 single_byte_char_only = true;
             }
         }
