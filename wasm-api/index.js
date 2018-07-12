@@ -1,3 +1,5 @@
+let wasm = require("./build/webpack_sources");
+let StringCache = require("./StringCache");
 exports.Source = require("./Source");
 
 exports.RawSource = require("./RawSource");
@@ -15,3 +17,8 @@ exports.SourceListMap = require("./wasm-source-list-map").SourceListMap;
 exports.SingleLineNode = require("./wasm-source-list-map").SingleLineNode;
 exports.SourceNode = require("./wasm-source-list-map").SourceNode;
 exports.CodeNode = require("./wasm-source-list-map").CodeNode;
+
+exports.reset = function () {
+    StringCache.reset();
+    // wasm.reset();
+} 

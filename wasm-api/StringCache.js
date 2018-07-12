@@ -34,3 +34,10 @@ function indexOf(str) {
     return set.get(str);
 }
 module.exports.indexOf = indexOf;
+
+function reset() {
+   array.splice(0, array.length);
+   set.clear();
+   init();
+}
+module.exports.reset = reset;
