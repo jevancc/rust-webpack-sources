@@ -18,7 +18,7 @@ exports.SingleLineNode = require("./wasm-source-list-map").SingleLineNode;
 exports.SourceNode = require("./wasm-source-list-map").SourceNode;
 exports.CodeNode = require("./wasm-source-list-map").CodeNode;
 
-exports.reset = function () {
+exports.reset = function() {
     StringCache.reset();
     // wasm.reset();
-} 
+};

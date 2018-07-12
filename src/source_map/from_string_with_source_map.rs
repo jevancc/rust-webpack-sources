@@ -82,8 +82,7 @@ pub fn from_string_with_source_map(
             last_generated_position.0 += 1;
         }
         if last_generated_position.1 < generated_position.1 {
-            let splitted =
-                utils::split_str(next_line.0, generated_position.1 as i32, next_line.2);
+            let splitted = utils::split_str(next_line.0, generated_position.1 as i32, next_line.2);
             node.add(Node::NString(String::from(splitted.0)));
             next_line.0 = splitted.1;
             next_line.2 = splitted.3; // new len

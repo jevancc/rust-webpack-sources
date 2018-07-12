@@ -4,7 +4,11 @@ pub fn split_str(s: &str, pos: i32, single_byte_char_only: bool) -> (&str, &str,
         ("", s, true, single_byte_char_only)
     } else {
         let s_bytes = s.len();
-        let split_pos = s.char_indices().skip(pos as usize).next().map_or(s_bytes, |(p, _)| p);
+        let split_pos = s
+            .char_indices()
+            .skip(pos as usize)
+            .next()
+            .map_or(s_bytes, |(p, _)| p);
         let (ls, rs) = s.split_at(split_pos);
         (ls, rs, split_pos == pos as usize, single_byte_char_only)
     }
