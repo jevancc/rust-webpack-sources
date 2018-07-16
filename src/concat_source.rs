@@ -17,7 +17,7 @@ impl ConcatSource {
 
     pub fn add(&mut self, item: Source) {
         if let Source::Concat(cs) = item {
-            self.children.append(&mut cs.borrow_mut().children);
+            self.children.append(&mut cs.borrow().children.clone());
         } else {
             self.children.push(item);
         }
