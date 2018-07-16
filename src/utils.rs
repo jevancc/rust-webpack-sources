@@ -10,9 +10,9 @@ pub fn split_str(s: &str, pos: i32, single_byte_char_only: bool) -> (&str, &str,
             cmp::min(pos as usize, s_bytes)
         } else {
             s.char_indices()
-            .skip(pos as usize)
-            .next()
-            .map_or(s_bytes, |(p, _)| p)
+                .skip(pos as usize)
+                .next()
+                .map_or(s_bytes, |(p, _)| p)
         };
 
         let (ls, rs) = s.split_at(split_pos);
