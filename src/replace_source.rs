@@ -296,7 +296,7 @@ fn split_sourcenode(
             }
         }
         SmNode::NString(n) => split_sourcenode(SmNode::NRcString(Rc::new(n)), split_position),
-        _ => panic!(),
+        _ => unreachable!(),
     }
 }
 
@@ -310,6 +310,6 @@ fn replacement_to_sourcenode(old_node: SmNode, new_string: Rc<String>) -> SmNode
         let chunks = Some(SmNode::NRcString(new_string.clone()));
         SmNode::NSourceNode(SourceNode::new(position, file, None, chunks))
     } else {
-        panic!()
+        unreachable!()
     }
 }

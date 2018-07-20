@@ -62,7 +62,7 @@ impl SourceTrait for Source {
             Source::Concat(s) => s.borrow_mut().list_map(columns, module),
             Source::LineToLineMapped(s) => s.borrow_mut().list_map(columns, module),
             Source::SourceMapSource(s) => s.borrow_mut().list_map(columns, module),
-            Source::SString(_) => panic!(),
+            Source::SString(_) => unreachable!(),
         }
     }
 
@@ -76,7 +76,7 @@ impl SourceTrait for Source {
             Source::Concat(s) => s.borrow_mut().node(columns, module),
             Source::LineToLineMapped(s) => s.borrow_mut().node(columns, module),
             Source::SourceMapSource(s) => s.borrow_mut().node(columns, module),
-            Source::SString(_) => panic!(),
+            Source::SString(_) => unreachable!(),
         }
     }
 }
