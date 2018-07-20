@@ -27,6 +27,15 @@ function at(idx) {
 }
 module.exports.at = at;
 
+function resolveIntArray(intArray) {
+    let strs = [];
+    intArray.forEach(idx => {
+        strs.push(at(idx));
+    });
+    return strs;
+}
+module.exports.resolveIntArray = resolveIntArray;
+
 function indexOf(str) {
     if (str === "webpack/bootstrap") {
         return 0;

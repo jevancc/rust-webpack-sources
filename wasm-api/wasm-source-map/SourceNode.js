@@ -41,21 +41,30 @@ class SourceNode extends wasm._MSourceNode {
     }
 
     toStringWithSourceMap(args) {
-        let parsed = JSON.parse(this._to_string_with_source_map_null());
-        return {
-            source: parsed.source,
+        let stringWithSourceMap = this._to_string_with_source_map_null();
+        let ret = {
+            source: stringWithSourceMap.s(),
             map: {
                 file: args.file,
-                mappings: parsed.map.mappings,
-                names: (parsed.map.names || []).map(StringCache.at),
-                sources: (parsed.map.sources || []).map(StringCache.at),
-                sourcesContent:
-                    (parsed.map.sources_content || []).length > 0
-                        ? (parsed.map.sources_content || []).map(StringCache.at)
-                        : undefined,
-                version: parsed.map.version || 3
+                version: stringWithSourceMap.version || 3,
+                sources: StringCache.resolveIntArray(
+                    stringWithSourceMap.sources()
+                ),
+                sourcesContent: StringCache.resolveIntArray(
+                    stringWithSourceMap.sources_content()
+                ),
+                names: StringCache.resolveIntArray(stringWithSourceMap.names()),
+                mappings: stringWithSourceMap.mappings()
             }
         };
+        if (ret.map.sourcesContent.length === 0) {
+            ret.map.sourcesContent = undefined;
+        }
+        if (ret.map.names.length === 0) {
+            ret.map.names = undefined;
+        }
+        stringWithSourceMap.free();
+        return ret;
     }
 }
 

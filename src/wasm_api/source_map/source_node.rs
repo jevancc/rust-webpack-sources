@@ -1,7 +1,7 @@
-use serde_json;
-use source_map::types::*;
 use source_map::*;
+use source_map::types::*;
 use wasm_bindgen::prelude::*;
+use wasm_api::JsStringWithSourceMap;
 
 #[wasm_bindgen]
 pub struct _MSourceNode {
@@ -35,12 +35,9 @@ impl _MSourceNode {
         self.val.add(Node::NSourceNode(chunk.val));
     }
 
-    pub fn _to_string_with_source_map_sidx(&mut self, file: i32) -> String {
-        serde_json::to_string(&self.val.to_string_with_source_map(Some(file), None)).unwrap()
-    }
-
-    pub fn _to_string_with_source_map_null(&mut self) -> String {
-        serde_json::to_string(&self.val.to_string_with_source_map(None, None)).unwrap()
+    pub fn _to_string_with_source_map_null(&mut self) -> JsStringWithSourceMap {
+        let string_with_source_map = self.val.to_string_with_source_map(None, None);
+        JsStringWithSourceMap::from(string_with_source_map)
     }
 }
 

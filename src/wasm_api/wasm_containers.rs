@@ -1,6 +1,64 @@
 use source_list_map::types::*;
+use types::StringWithSourceMap;
 use wasm_api::{_CodeNode, _SingleLineNode, _SourceListMap, _SourceNode};
 use wasm_bindgen::prelude::*;
+
+#[wasm_bindgen]
+pub struct JsStringWithSourceMap {
+    s: String,
+    pub version: i32,
+    pub file: i32,
+    sources: Vec<i32>,
+    sources_content: Vec<i32>,
+    names: Vec<i32>,
+    mappings: String,
+}
+
+#[wasm_bindgen]
+impl JsStringWithSourceMap {
+    pub fn sources(&self) -> Box<[i32]> {
+        self.sources.clone().into_boxed_slice()
+    }
+
+    pub fn sources_content(&self) -> Box<[i32]> {
+        self.sources_content.clone().into_boxed_slice()
+    }
+
+    pub fn names(&self) -> Box<[i32]> {
+        self.names.clone().into_boxed_slice()
+    }
+
+    pub fn s(&self) -> String {
+        self.s.clone()
+    }
+
+    pub fn mappings(&self) -> String{
+        self.mappings.clone()
+    }
+}
+
+impl JsStringWithSourceMap {
+    pub fn from(smap: StringWithSourceMap) -> JsStringWithSourceMap {
+        let s = smap.source;
+        let map = smap.map;
+        let version = map.version;
+        let file = map.file.unwrap_or(-1);
+        let mappings = map.mappings;
+
+        let sources = map.sources;
+        let sources_content = map.sources_content;
+        let names = map.names;
+        JsStringWithSourceMap {
+            s,
+            version,
+            file,
+            sources,
+            sources_content,
+            names,
+            mappings,
+        }
+    }
+}
 
 #[wasm_bindgen]
 pub struct StringVec {

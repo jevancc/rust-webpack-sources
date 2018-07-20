@@ -1,8 +1,7 @@
 use super::mapping_functions::{IdenticalFunction, PrefixMappingFunction, TestMappingFunction};
-use serde_json;
 use source_list_map::types::*;
 use source_list_map::*;
-use wasm_api::NodeVec;
+use wasm_api::{NodeVec, JsStringWithSourceMap};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -46,15 +45,9 @@ impl _SourceListMap {
         self.val.to_string()
     }
 
-    pub fn _to_string_with_source_map(&mut self) -> String {
-        serde_json::to_string(&self.val.to_string_with_source_map(None)).unwrap()
-        // let srcmap = self.val.to_string_with_source_map(None);
-        // JsSrcMap {
-        //     source: srcmap.source,
-        //     map_sources_content: srcmap.map.sources_content,
-        //     map_sources: srcmap.map.sources,
-        //     mappings: srcmap.map.mappings,
-        // }
+    pub fn _to_string_with_source_map_null(&mut self) -> JsStringWithSourceMap {
+        let string_with_source_map = self.val.to_string_with_source_map(None);
+        JsStringWithSourceMap::from(string_with_source_map)
     }
 }
 
@@ -88,28 +81,6 @@ pub fn _sourcelistmap_map_generated_code_prefix(
     }
 }
 
-// #[wasm_bindgen]
-// pub fn _sourcelistmap_map_generated_code_replace(
-//     slp: _SourceListMap,
-//     replacements: String,
-// ) -> _SourceListMap {
-//     let replacements: Vec<(i64, i64, Rc<String>, usize)> = serde_json::from_str(&replacements).unwrap();
-//     let mut mf = ReplaceMappingFunction::new(&replacements);
-//
-//     let mut map = slp.val.map_generated_code(&mut mf);
-//     let mut extra_code = String::new();
-//     while mf.replacement_idx >= 0 {
-//         extra_code += &replacements[mf.replacement_idx as usize].2;
-//         mf.replacement_idx -= 1;
-//     }
-//
-//     if !extra_code.is_empty() {
-//         map.add(Node::NString(extra_code), None, None);
-//     }
-//
-//     _SourceListMap { val: map }
-// }
-
 impl _SourceListMap {
     pub fn new(slp: SourceListMap) -> _SourceListMap {
         _SourceListMap { val: slp }
@@ -127,30 +98,3 @@ impl _SourceListMap {
         self.val
     }
 }
-
-// #[wasm_bindgen]
-// pub struct JsSrcMap {
-//     source: String,
-//     map_sources: Vec<i32>,
-//     map_sources_content: Vec<i32>,
-//     mappings: String,
-// }
-//
-// #[wasm_bindgen]
-// impl JsSrcMap {
-//     pub fn get_source(&self) -> String {
-//         self.source.clone()
-//     }
-//
-//     pub fn get_map_contents(&self) -> &[i32] {
-//         &self.map_sources_content[..]
-//     }
-//
-//     pub fn get_map_sourcesh(&self) -> Box<[i32]> {
-//         &self.map_sources[..]
-//     }
-//
-//     pub fn get_mappings(&self) -> String {
-//         self.mappings.clone()
-//     }
-// }
