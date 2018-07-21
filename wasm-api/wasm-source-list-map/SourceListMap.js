@@ -101,7 +101,7 @@ class SourceListMap extends wasm._SourceListMap {
     toStringWithSourceMap(args) {
         let stringWithSourceMap = this._to_string_with_source_map_null();
         let ret = {
-            source: stringWithSourceMap.s(),
+            source: args.noSource ? "" : stringWithSourceMap.s(),
             map: {
                 file: args.file,
                 version: stringWithSourceMap.version || 3,
