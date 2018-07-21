@@ -5,6 +5,7 @@
 "use strict";
 let SourceNode = require("./wasm-source-map").SourceNode;
 let SourceListMap = require("./wasm-source-list-map").SourceListMap;
+let SourcesPool = require("./SourcesPool");
 let wasm = require("./build/webpack_sources");
 
 let ptrCache = new Map();
@@ -17,6 +18,7 @@ class RawSource extends wasm._RawSource {
         } else {
             this.ptr = RawSource._new_string(value).ptr;
             ptrCache.set(value, this.ptr);
+            SourcesPool.add(this);
         }
         this._value = value;
     }

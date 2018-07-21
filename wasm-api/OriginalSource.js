@@ -3,6 +3,7 @@
 let SourceNode = require("./wasm-source-map").SourceNode;
 let SourceListMap = require("./wasm-source-list-map").SourceListMap;
 let StringCache = require("./StringCache");
+let SourcesPool = require("./SourcesPool");
 let wasm = require("./build/webpack_sources");
 
 let ptrCache = new Map();
@@ -24,6 +25,7 @@ class OriginalSource extends wasm._OriginalSource {
                     this._name_idx
                 ).ptr;
                 ptrCache.set(this._value_idx, this.ptr);
+                SourcesPool.add(this);
             }
         } else {
             this.ptr = OriginalSource._new_string_sidx_sidx(
@@ -31,6 +33,7 @@ class OriginalSource extends wasm._OriginalSource {
                 this._value_idx,
                 this._name_idx
             ).ptr;
+            SourcesPool.add(this);
         }
     }
 

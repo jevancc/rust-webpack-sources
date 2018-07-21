@@ -44,9 +44,9 @@ function indexOf(str) {
 }
 module.exports.indexOf = indexOf;
 
-function reset() {
+function clear() {
     array.splice(0, array.length);
     set.clear();
     init();
 }
-module.exports.reset = reset;
+module.exports.clear = clear;

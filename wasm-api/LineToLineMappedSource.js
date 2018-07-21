@@ -7,6 +7,7 @@
 let SourceNode = require("./wasm-source-map").SourceNode;
 let SourceListMap = require("./wasm-source-list-map").SourceListMap;
 let StringCache = require("./StringCache");
+let SourcesPool = require("./SourcesPool");
 let wasm = require("./build/webpack_sources");
 
 class LineToLineMappedSource extends wasm._LineToLineMappedSource {
@@ -22,6 +23,7 @@ class LineToLineMappedSource extends wasm._LineToLineMappedSource {
             this._name_idx,
             this._originalSource_idx
         ).ptr;
+        SourcesPool.add(this);
     }
 
     source() {
