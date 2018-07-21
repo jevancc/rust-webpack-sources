@@ -8,6 +8,10 @@ let wasm = require("./build/webpack_sources");
 
 let ptrCache = new Map();
 class OriginalSource extends wasm._OriginalSource {
+    static _clearPtrCache() {
+        ptrCache.clear();
+    }
+
     constructor(value, name) {
         super(0);
         this._value = value;

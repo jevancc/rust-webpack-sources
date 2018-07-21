@@ -10,6 +10,10 @@ let wasm = require("./build/webpack_sources");
 
 let ptrCache = new Map();
 class RawSource extends wasm._RawSource {
+    static _clearPtrCache() {
+        ptrCache.clear();
+    }
+
     constructor(value) {
         super(0);
         let cachedPtr = ptrCache.get(value);

@@ -22,4 +22,6 @@ exports.CodeNode = require("./wasm-source-list-map").CodeNode;
 exports.clear = function() {
     StringCache.clear();
     SourcesPool.clear();
+    require("./RawSource")._clearPtrCache();
+    require("./OriginalSource")._clearPtrCache();
 };
