@@ -112,6 +112,20 @@ module.exports._sourcelistmap_map_generated_code_prefix = function(arg0, arg1) {
     );
 };
 
+let cachegetInt32Memory = null;
+function getInt32Memory() {
+    if (
+        cachegetInt32Memory === null ||
+        cachegetInt32Memory.buffer !== wasm.memory.buffer
+    )
+        cachegetInt32Memory = new Int32Array(wasm.memory.buffer);
+    return cachegetInt32Memory;
+}
+
+function getArrayI32FromWasm(ptr, len) {
+    return getInt32Memory().subarray(ptr / 4, ptr / 4 + len);
+}
+
 const __wbg_f_log_clog_n_target = console.log;
 
 module.exports.__wbg_f_log_clog_n = function(arg0, arg1) {
@@ -119,9 +133,9 @@ module.exports.__wbg_f_log_clog_n = function(arg0, arg1) {
     __wbg_f_log_clog_n_target(varg0);
 };
 
-class _MSourceNode {
+class _SingleLineNode {
     static __construct(ptr) {
-        return new _MSourceNode(ptr);
+        return new _SingleLineNode(ptr);
     }
 
     constructor(ptr) {
@@ -131,53 +145,226 @@ class _MSourceNode {
     free() {
         const ptr = this.ptr;
         this.ptr = 0;
-        wasm.__wbg__msourcenode_free(ptr);
+        wasm.__wbg__singlelinenode_free(ptr);
     }
-    static _new_number_number_sidx_null(arg0, arg1, arg2) {
-        return _MSourceNode.__construct(
-            wasm._msourcenode__new_number_number_sidx_null(arg0, arg1, arg2)
-        );
-    }
-    static _new_null_null_null_null() {
-        return _MSourceNode.__construct(
-            wasm._msourcenode__new_null_null_null_null()
-        );
-    }
-    _add_string(arg0) {
+    static _new_string_null_null_number(arg0, arg1) {
         const [ptr0, len0] = passStringToWasm(arg0);
-        return wasm._msourcenode__add_string(this.ptr, ptr0, len0);
-    }
-    _add_sourcenode(arg0) {
-        const ptr0 = arg0.ptr;
-        arg0.ptr = 0;
-        return wasm._msourcenode__add_sourcenode(this.ptr, ptr0);
-    }
-    _to_string_with_source_map_sidx(arg0) {
-        const retptr = globalArgumentPtr();
-        wasm._msourcenode__to_string_with_source_map_sidx(
-            retptr,
-            this.ptr,
-            arg0
+        return _SingleLineNode.__construct(
+            wasm._singlelinenode__new_string_null_null_number(ptr0, len0, arg1)
         );
-        const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
-        return realRet;
     }
-    _to_string_with_source_map_null() {
-        const retptr = globalArgumentPtr();
-        wasm._msourcenode__to_string_with_source_map_null(retptr, this.ptr);
-        const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
-        return realRet;
+    static _new_string_sidx_sidx_number(arg0, arg1, arg2, arg3) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return _SingleLineNode.__construct(
+            wasm._singlelinenode__new_string_sidx_sidx_number(
+                ptr0,
+                len0,
+                arg1,
+                arg2,
+                arg3
+            )
+        );
+    }
+    _clone() {
+        return _SingleLineNode.__construct(
+            wasm._singlelinenode__clone(this.ptr)
+        );
     }
 }
-module.exports._MSourceNode = _MSourceNode;
+module.exports._SingleLineNode = _SingleLineNode;
+
+class _PrefixSource {
+    static __construct(ptr) {
+        return new _PrefixSource(ptr);
+    }
+
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg__prefixsource_free(ptr);
+    }
+    static _new_string_string(arg0, arg1) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        const [ptr1, len1] = passStringToWasm(arg1);
+        return _PrefixSource.__construct(
+            wasm._prefixsource__new_string_string(ptr0, len0, ptr1, len1)
+        );
+    }
+    static _new_string_raw_source(arg0, arg1) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return _PrefixSource.__construct(
+            wasm._prefixsource__new_string_raw_source(ptr0, len0, arg1.ptr)
+        );
+    }
+    static _new_string_original_source(arg0, arg1) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return _PrefixSource.__construct(
+            wasm._prefixsource__new_string_original_source(ptr0, len0, arg1.ptr)
+        );
+    }
+    static _new_string_replace_source(arg0, arg1) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return _PrefixSource.__construct(
+            wasm._prefixsource__new_string_replace_source(ptr0, len0, arg1.ptr)
+        );
+    }
+    static _new_string_prefix_source(arg0, arg1) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return _PrefixSource.__construct(
+            wasm._prefixsource__new_string_prefix_source(ptr0, len0, arg1.ptr)
+        );
+    }
+    static _new_string_concat_source(arg0, arg1) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return _PrefixSource.__construct(
+            wasm._prefixsource__new_string_concat_source(ptr0, len0, arg1.ptr)
+        );
+    }
+    static _new_string_line_to_line_mapped_source(arg0, arg1) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return _PrefixSource.__construct(
+            wasm._prefixsource__new_string_line_to_line_mapped_source(
+                ptr0,
+                len0,
+                arg1.ptr
+            )
+        );
+    }
+    static _new_string_source_map_source(arg0, arg1) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return _PrefixSource.__construct(
+            wasm._prefixsource__new_string_source_map_source(
+                ptr0,
+                len0,
+                arg1.ptr
+            )
+        );
+    }
+    _source() {
+        const retptr = globalArgumentPtr();
+        wasm._prefixsource__source(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const ptr = mem[retptr / 4];
+        const len = mem[retptr / 4 + 1];
+        const realRet = getStringFromWasm(ptr, len).slice();
+        wasm.__wbindgen_free(ptr, len * 1);
+        return realRet;
+    }
+    _size() {
+        return wasm._prefixsource__size(this.ptr);
+    }
+    _list_map_bool_bool(arg0, arg1) {
+        return _SourceListMap.__construct(
+            wasm._prefixsource__list_map_bool_bool(
+                this.ptr,
+                arg0 ? 1 : 0,
+                arg1 ? 1 : 0
+            )
+        );
+    }
+    _node_bool_bool(arg0, arg1) {
+        return _MSourceNode.__construct(
+            wasm._prefixsource__node_bool_bool(
+                this.ptr,
+                arg0 ? 1 : 0,
+                arg1 ? 1 : 0
+            )
+        );
+    }
+}
+module.exports._PrefixSource = _PrefixSource;
+
+class NodeVec {
+    static __construct(ptr) {
+        return new NodeVec(ptr);
+    }
+
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg_nodevec_free(ptr);
+    }
+    static new() {
+        return NodeVec.__construct(wasm.nodevec_new());
+    }
+    push_string(arg0) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return wasm.nodevec_push_string(this.ptr, ptr0, len0);
+    }
+    push_sourcenode(arg0) {
+        return wasm.nodevec_push_sourcenode(this.ptr, arg0.ptr);
+    }
+    push_codenode(arg0) {
+        return wasm.nodevec_push_codenode(this.ptr, arg0.ptr);
+    }
+    push_singlelinenode(arg0) {
+        return wasm.nodevec_push_singlelinenode(this.ptr, arg0.ptr);
+    }
+    push_sourcelistmap(arg0) {
+        return wasm.nodevec_push_sourcelistmap(this.ptr, arg0.ptr);
+    }
+}
+module.exports.NodeVec = NodeVec;
+
+class _RawSource {
+    static __construct(ptr) {
+        return new _RawSource(ptr);
+    }
+
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg__rawsource_free(ptr);
+    }
+    static _new_string(arg0) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return _RawSource.__construct(wasm._rawsource__new_string(ptr0, len0));
+    }
+    _source() {
+        const retptr = globalArgumentPtr();
+        wasm._rawsource__source(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const ptr = mem[retptr / 4];
+        const len = mem[retptr / 4 + 1];
+        const realRet = getStringFromWasm(ptr, len).slice();
+        wasm.__wbindgen_free(ptr, len * 1);
+        return realRet;
+    }
+    _size() {
+        return wasm._rawsource__size(this.ptr);
+    }
+    _list_map_bool_bool(arg0, arg1) {
+        return _SourceListMap.__construct(
+            wasm._rawsource__list_map_bool_bool(
+                this.ptr,
+                arg0 ? 1 : 0,
+                arg1 ? 1 : 0
+            )
+        );
+    }
+    _node_bool_bool(arg0, arg1) {
+        return _MSourceNode.__construct(
+            wasm._rawsource__node_bool_bool(
+                this.ptr,
+                arg0 ? 1 : 0,
+                arg1 ? 1 : 0
+            )
+        );
+    }
+}
+module.exports._RawSource = _RawSource;
 
 class _OriginalSource {
     static __construct(ptr) {
@@ -235,6 +422,47 @@ class _OriginalSource {
     }
 }
 module.exports._OriginalSource = _OriginalSource;
+
+class _MSourceNode {
+    static __construct(ptr) {
+        return new _MSourceNode(ptr);
+    }
+
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg__msourcenode_free(ptr);
+    }
+    static _new_number_number_sidx_null(arg0, arg1, arg2) {
+        return _MSourceNode.__construct(
+            wasm._msourcenode__new_number_number_sidx_null(arg0, arg1, arg2)
+        );
+    }
+    static _new_null_null_null_null() {
+        return _MSourceNode.__construct(
+            wasm._msourcenode__new_null_null_null_null()
+        );
+    }
+    _add_string(arg0) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return wasm._msourcenode__add_string(this.ptr, ptr0, len0);
+    }
+    _add_sourcenode(arg0) {
+        const ptr0 = arg0.ptr;
+        arg0.ptr = 0;
+        return wasm._msourcenode__add_sourcenode(this.ptr, ptr0);
+    }
+    _to_string_with_source_map_null() {
+        return JsStringWithSourceMap.__construct(
+            wasm._msourcenode__to_string_with_source_map_null(this.ptr)
+        );
+    }
+}
+module.exports._MSourceNode = _MSourceNode;
 
 class _ReplaceSource {
     static __construct(ptr) {
@@ -347,46 +575,6 @@ class _ReplaceSource {
 }
 module.exports._ReplaceSource = _ReplaceSource;
 
-class _SingleLineNode {
-    static __construct(ptr) {
-        return new _SingleLineNode(ptr);
-    }
-
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg__singlelinenode_free(ptr);
-    }
-    static _new_string_null_null_number(arg0, arg1) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _SingleLineNode.__construct(
-            wasm._singlelinenode__new_string_null_null_number(ptr0, len0, arg1)
-        );
-    }
-    static _new_string_sidx_sidx_number(arg0, arg1, arg2, arg3) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _SingleLineNode.__construct(
-            wasm._singlelinenode__new_string_sidx_sidx_number(
-                ptr0,
-                len0,
-                arg1,
-                arg2,
-                arg3
-            )
-        );
-    }
-    _clone() {
-        return _SingleLineNode.__construct(
-            wasm._singlelinenode__clone(this.ptr)
-        );
-    }
-}
-module.exports._SingleLineNode = _SingleLineNode;
-
 class _SourceNode {
     static __construct(ptr) {
         return new _SourceNode(ptr);
@@ -424,6 +612,340 @@ class _SourceNode {
     }
 }
 module.exports._SourceNode = _SourceNode;
+
+class _LineToLineMappedSource {
+    static __construct(ptr) {
+        return new _LineToLineMappedSource(ptr);
+    }
+
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg__linetolinemappedsource_free(ptr);
+    }
+    static _new_string_sidx_sidx(arg0, arg1, arg2) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return _LineToLineMappedSource.__construct(
+            wasm._linetolinemappedsource__new_string_sidx_sidx(
+                ptr0,
+                len0,
+                arg1,
+                arg2
+            )
+        );
+    }
+    _source() {
+        const retptr = globalArgumentPtr();
+        wasm._linetolinemappedsource__source(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const ptr = mem[retptr / 4];
+        const len = mem[retptr / 4 + 1];
+        const realRet = getStringFromWasm(ptr, len).slice();
+        wasm.__wbindgen_free(ptr, len * 1);
+        return realRet;
+    }
+    _size() {
+        return wasm._linetolinemappedsource__size(this.ptr);
+    }
+    _list_map_bool_bool(arg0, arg1) {
+        return _SourceListMap.__construct(
+            wasm._linetolinemappedsource__list_map_bool_bool(
+                this.ptr,
+                arg0 ? 1 : 0,
+                arg1 ? 1 : 0
+            )
+        );
+    }
+    _node_bool_bool(arg0, arg1) {
+        return _MSourceNode.__construct(
+            wasm._linetolinemappedsource__node_bool_bool(
+                this.ptr,
+                arg0 ? 1 : 0,
+                arg1 ? 1 : 0
+            )
+        );
+    }
+}
+module.exports._LineToLineMappedSource = _LineToLineMappedSource;
+
+class _SourceListMap {
+    static __construct(ptr) {
+        return new _SourceListMap(ptr);
+    }
+
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg__sourcelistmap_free(ptr);
+    }
+    static _new() {
+        return _SourceListMap.__construct(wasm._sourcelistmap__new());
+    }
+    static _new_nodes(arg0) {
+        const ptr0 = arg0.ptr;
+        arg0.ptr = 0;
+        return _SourceListMap.__construct(wasm._sourcelistmap__new_nodes(ptr0));
+    }
+    _add_node(arg0) {
+        const ptr0 = arg0.ptr;
+        arg0.ptr = 0;
+        return wasm._sourcelistmap__add_node(this.ptr, ptr0);
+    }
+    _add_node_sidx_sidx(arg0, arg1, arg2) {
+        const ptr0 = arg0.ptr;
+        arg0.ptr = 0;
+        return wasm._sourcelistmap__add_node_sidx_sidx(
+            this.ptr,
+            ptr0,
+            arg1,
+            arg2
+        );
+    }
+    _prepend_node(arg0) {
+        const ptr0 = arg0.ptr;
+        arg0.ptr = 0;
+        return wasm._sourcelistmap__prepend_node(this.ptr, ptr0);
+    }
+    _prepend_node_sidx_sidx(arg0, arg1, arg2) {
+        const ptr0 = arg0.ptr;
+        arg0.ptr = 0;
+        return wasm._sourcelistmap__prepend_node_sidx_sidx(
+            this.ptr,
+            ptr0,
+            arg1,
+            arg2
+        );
+    }
+    _to_string() {
+        const retptr = globalArgumentPtr();
+        wasm._sourcelistmap__to_string(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const ptr = mem[retptr / 4];
+        const len = mem[retptr / 4 + 1];
+        const realRet = getStringFromWasm(ptr, len).slice();
+        wasm.__wbindgen_free(ptr, len * 1);
+        return realRet;
+    }
+    _to_string_with_source_map_null() {
+        return JsStringWithSourceMap.__construct(
+            wasm._sourcelistmap__to_string_with_source_map_null(this.ptr)
+        );
+    }
+}
+module.exports._SourceListMap = _SourceListMap;
+
+class _ConcatSource {
+    static __construct(ptr) {
+        return new _ConcatSource(ptr);
+    }
+
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg__concatsource_free(ptr);
+    }
+    static _new() {
+        return _ConcatSource.__construct(wasm._concatsource__new());
+    }
+    _add_string(arg0) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return wasm._concatsource__add_string(this.ptr, ptr0, len0);
+    }
+    _add_raw_source(arg0) {
+        return wasm._concatsource__add_raw_source(this.ptr, arg0.ptr);
+    }
+    _add_original_source(arg0) {
+        return wasm._concatsource__add_original_source(this.ptr, arg0.ptr);
+    }
+    _add_replace_source(arg0) {
+        return wasm._concatsource__add_replace_source(this.ptr, arg0.ptr);
+    }
+    _add_prefix_source(arg0) {
+        return wasm._concatsource__add_prefix_source(this.ptr, arg0.ptr);
+    }
+    _add_concat_source(arg0) {
+        return wasm._concatsource__add_concat_source(this.ptr, arg0.ptr);
+    }
+    _add_line_to_line_mapped_source(arg0) {
+        return wasm._concatsource__add_line_to_line_mapped_source(
+            this.ptr,
+            arg0.ptr
+        );
+    }
+    _add_source_map_source(arg0) {
+        return wasm._concatsource__add_source_map_source(this.ptr, arg0.ptr);
+    }
+    _source() {
+        const retptr = globalArgumentPtr();
+        wasm._concatsource__source(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const ptr = mem[retptr / 4];
+        const len = mem[retptr / 4 + 1];
+        const realRet = getStringFromWasm(ptr, len).slice();
+        wasm.__wbindgen_free(ptr, len * 1);
+        return realRet;
+    }
+    _size() {
+        return wasm._concatsource__size(this.ptr);
+    }
+    _list_map_bool_bool(arg0, arg1) {
+        return _SourceListMap.__construct(
+            wasm._concatsource__list_map_bool_bool(
+                this.ptr,
+                arg0 ? 1 : 0,
+                arg1 ? 1 : 0
+            )
+        );
+    }
+    _node_bool_bool(arg0, arg1) {
+        return _MSourceNode.__construct(
+            wasm._concatsource__node_bool_bool(
+                this.ptr,
+                arg0 ? 1 : 0,
+                arg1 ? 1 : 0
+            )
+        );
+    }
+}
+module.exports._ConcatSource = _ConcatSource;
+
+class JsStringWithSourceMap {
+    static __construct(ptr) {
+        return new JsStringWithSourceMap(ptr);
+    }
+
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+    get version() {
+        return wasm.__wbg_get_jsstringwithsourcemap_version(this.ptr);
+    }
+    set version(arg0) {
+        return wasm.__wbg_set_jsstringwithsourcemap_version(this.ptr, arg0);
+    }
+    get file() {
+        return wasm.__wbg_get_jsstringwithsourcemap_file(this.ptr);
+    }
+    set file(arg0) {
+        return wasm.__wbg_set_jsstringwithsourcemap_file(this.ptr, arg0);
+    }
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg_jsstringwithsourcemap_free(ptr);
+    }
+    sources() {
+        const retptr = globalArgumentPtr();
+        wasm.jsstringwithsourcemap_sources(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const ptr = mem[retptr / 4];
+        const len = mem[retptr / 4 + 1];
+        const realRet = getArrayI32FromWasm(ptr, len).slice();
+        wasm.__wbindgen_free(ptr, len * 4);
+        return realRet;
+    }
+    sources_content() {
+        const retptr = globalArgumentPtr();
+        wasm.jsstringwithsourcemap_sources_content(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const ptr = mem[retptr / 4];
+        const len = mem[retptr / 4 + 1];
+        const realRet = getArrayI32FromWasm(ptr, len).slice();
+        wasm.__wbindgen_free(ptr, len * 4);
+        return realRet;
+    }
+    names() {
+        const retptr = globalArgumentPtr();
+        wasm.jsstringwithsourcemap_names(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const ptr = mem[retptr / 4];
+        const len = mem[retptr / 4 + 1];
+        const realRet = getArrayI32FromWasm(ptr, len).slice();
+        wasm.__wbindgen_free(ptr, len * 4);
+        return realRet;
+    }
+    s() {
+        const retptr = globalArgumentPtr();
+        wasm.jsstringwithsourcemap_s(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const ptr = mem[retptr / 4];
+        const len = mem[retptr / 4 + 1];
+        const realRet = getStringFromWasm(ptr, len).slice();
+        wasm.__wbindgen_free(ptr, len * 1);
+        return realRet;
+    }
+    mappings() {
+        const retptr = globalArgumentPtr();
+        wasm.jsstringwithsourcemap_mappings(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const ptr = mem[retptr / 4];
+        const len = mem[retptr / 4 + 1];
+        const realRet = getStringFromWasm(ptr, len).slice();
+        wasm.__wbindgen_free(ptr, len * 1);
+        return realRet;
+    }
+}
+module.exports.JsStringWithSourceMap = JsStringWithSourceMap;
+
+class _CodeNode {
+    static __construct(ptr) {
+        return new _CodeNode(ptr);
+    }
+
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg__codenode_free(ptr);
+    }
+    static _new_string(arg0) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return _CodeNode.__construct(wasm._codenode__new_string(ptr0, len0));
+    }
+    _clone() {
+        return _CodeNode.__construct(wasm._codenode__clone(this.ptr));
+    }
+}
+module.exports._CodeNode = _CodeNode;
+
+class StringVec {
+    static __construct(ptr) {
+        return new StringVec(ptr);
+    }
+
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        wasm.__wbg_stringvec_free(ptr);
+    }
+    static new() {
+        return StringVec.__construct(wasm.stringvec_new());
+    }
+    push_string(arg0) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return wasm.stringvec_push_string(this.ptr, ptr0, len0);
+    }
+}
+module.exports.StringVec = StringVec;
 
 class _SourceMapSource {
     static __construct(ptr) {
@@ -509,460 +1031,6 @@ class _SourceMapSource {
     }
 }
 module.exports._SourceMapSource = _SourceMapSource;
-
-class StringVec {
-    static __construct(ptr) {
-        return new StringVec(ptr);
-    }
-
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_stringvec_free(ptr);
-    }
-    static new() {
-        return StringVec.__construct(wasm.stringvec_new());
-    }
-    push_string(arg0) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return wasm.stringvec_push_string(this.ptr, ptr0, len0);
-    }
-}
-module.exports.StringVec = StringVec;
-
-class _RawSource {
-    static __construct(ptr) {
-        return new _RawSource(ptr);
-    }
-
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg__rawsource_free(ptr);
-    }
-    static _new_string(arg0) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _RawSource.__construct(wasm._rawsource__new_string(ptr0, len0));
-    }
-    _source() {
-        const retptr = globalArgumentPtr();
-        wasm._rawsource__source(retptr, this.ptr);
-        const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
-        return realRet;
-    }
-    _size() {
-        return wasm._rawsource__size(this.ptr);
-    }
-    _list_map_bool_bool(arg0, arg1) {
-        return _SourceListMap.__construct(
-            wasm._rawsource__list_map_bool_bool(
-                this.ptr,
-                arg0 ? 1 : 0,
-                arg1 ? 1 : 0
-            )
-        );
-    }
-    _node_bool_bool(arg0, arg1) {
-        return _MSourceNode.__construct(
-            wasm._rawsource__node_bool_bool(
-                this.ptr,
-                arg0 ? 1 : 0,
-                arg1 ? 1 : 0
-            )
-        );
-    }
-}
-module.exports._RawSource = _RawSource;
-
-class NodeVec {
-    static __construct(ptr) {
-        return new NodeVec(ptr);
-    }
-
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg_nodevec_free(ptr);
-    }
-    static new() {
-        return NodeVec.__construct(wasm.nodevec_new());
-    }
-    push_string(arg0) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return wasm.nodevec_push_string(this.ptr, ptr0, len0);
-    }
-    push_sourcenode(arg0) {
-        return wasm.nodevec_push_sourcenode(this.ptr, arg0.ptr);
-    }
-    push_codenode(arg0) {
-        return wasm.nodevec_push_codenode(this.ptr, arg0.ptr);
-    }
-    push_singlelinenode(arg0) {
-        return wasm.nodevec_push_singlelinenode(this.ptr, arg0.ptr);
-    }
-    push_sourcelistmap(arg0) {
-        return wasm.nodevec_push_sourcelistmap(this.ptr, arg0.ptr);
-    }
-}
-module.exports.NodeVec = NodeVec;
-
-class _SourceListMap {
-    static __construct(ptr) {
-        return new _SourceListMap(ptr);
-    }
-
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg__sourcelistmap_free(ptr);
-    }
-    static _new() {
-        return _SourceListMap.__construct(wasm._sourcelistmap__new());
-    }
-    static _new_nodes(arg0) {
-        const ptr0 = arg0.ptr;
-        arg0.ptr = 0;
-        return _SourceListMap.__construct(wasm._sourcelistmap__new_nodes(ptr0));
-    }
-    _add_node(arg0) {
-        const ptr0 = arg0.ptr;
-        arg0.ptr = 0;
-        return wasm._sourcelistmap__add_node(this.ptr, ptr0);
-    }
-    _add_node_sidx_sidx(arg0, arg1, arg2) {
-        const ptr0 = arg0.ptr;
-        arg0.ptr = 0;
-        return wasm._sourcelistmap__add_node_sidx_sidx(
-            this.ptr,
-            ptr0,
-            arg1,
-            arg2
-        );
-    }
-    _prepend_node(arg0) {
-        const ptr0 = arg0.ptr;
-        arg0.ptr = 0;
-        return wasm._sourcelistmap__prepend_node(this.ptr, ptr0);
-    }
-    _prepend_node_sidx_sidx(arg0, arg1, arg2) {
-        const ptr0 = arg0.ptr;
-        arg0.ptr = 0;
-        return wasm._sourcelistmap__prepend_node_sidx_sidx(
-            this.ptr,
-            ptr0,
-            arg1,
-            arg2
-        );
-    }
-    _to_string() {
-        const retptr = globalArgumentPtr();
-        wasm._sourcelistmap__to_string(retptr, this.ptr);
-        const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
-        return realRet;
-    }
-    _to_string_with_source_map() {
-        const retptr = globalArgumentPtr();
-        wasm._sourcelistmap__to_string_with_source_map(retptr, this.ptr);
-        const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
-        return realRet;
-    }
-}
-module.exports._SourceListMap = _SourceListMap;
-
-class _ConcatSource {
-    static __construct(ptr) {
-        return new _ConcatSource(ptr);
-    }
-
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg__concatsource_free(ptr);
-    }
-    static _new() {
-        return _ConcatSource.__construct(wasm._concatsource__new());
-    }
-    _add_string(arg0) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return wasm._concatsource__add_string(this.ptr, ptr0, len0);
-    }
-    _add_raw_source(arg0) {
-        return wasm._concatsource__add_raw_source(this.ptr, arg0.ptr);
-    }
-    _add_original_source(arg0) {
-        return wasm._concatsource__add_original_source(this.ptr, arg0.ptr);
-    }
-    _add_replace_source(arg0) {
-        return wasm._concatsource__add_replace_source(this.ptr, arg0.ptr);
-    }
-    _add_prefix_source(arg0) {
-        return wasm._concatsource__add_prefix_source(this.ptr, arg0.ptr);
-    }
-    _add_concat_source(arg0) {
-        return wasm._concatsource__add_concat_source(this.ptr, arg0.ptr);
-    }
-    _add_line_to_line_mapped_source(arg0) {
-        return wasm._concatsource__add_line_to_line_mapped_source(
-            this.ptr,
-            arg0.ptr
-        );
-    }
-    _add_source_map_source(arg0) {
-        return wasm._concatsource__add_source_map_source(this.ptr, arg0.ptr);
-    }
-    _source() {
-        const retptr = globalArgumentPtr();
-        wasm._concatsource__source(retptr, this.ptr);
-        const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
-        return realRet;
-    }
-    _size() {
-        return wasm._concatsource__size(this.ptr);
-    }
-    _list_map_bool_bool(arg0, arg1) {
-        return _SourceListMap.__construct(
-            wasm._concatsource__list_map_bool_bool(
-                this.ptr,
-                arg0 ? 1 : 0,
-                arg1 ? 1 : 0
-            )
-        );
-    }
-    _node_bool_bool(arg0, arg1) {
-        return _MSourceNode.__construct(
-            wasm._concatsource__node_bool_bool(
-                this.ptr,
-                arg0 ? 1 : 0,
-                arg1 ? 1 : 0
-            )
-        );
-    }
-}
-module.exports._ConcatSource = _ConcatSource;
-
-class _PrefixSource {
-    static __construct(ptr) {
-        return new _PrefixSource(ptr);
-    }
-
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg__prefixsource_free(ptr);
-    }
-    static _new_string_string(arg0, arg1) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        const [ptr1, len1] = passStringToWasm(arg1);
-        return _PrefixSource.__construct(
-            wasm._prefixsource__new_string_string(ptr0, len0, ptr1, len1)
-        );
-    }
-    static _new_string_raw_source(arg0, arg1) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _PrefixSource.__construct(
-            wasm._prefixsource__new_string_raw_source(ptr0, len0, arg1.ptr)
-        );
-    }
-    static _new_string_original_source(arg0, arg1) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _PrefixSource.__construct(
-            wasm._prefixsource__new_string_original_source(ptr0, len0, arg1.ptr)
-        );
-    }
-    static _new_string_replace_source(arg0, arg1) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _PrefixSource.__construct(
-            wasm._prefixsource__new_string_replace_source(ptr0, len0, arg1.ptr)
-        );
-    }
-    static _new_string_prefix_source(arg0, arg1) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _PrefixSource.__construct(
-            wasm._prefixsource__new_string_prefix_source(ptr0, len0, arg1.ptr)
-        );
-    }
-    static _new_string_concat_source(arg0, arg1) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _PrefixSource.__construct(
-            wasm._prefixsource__new_string_concat_source(ptr0, len0, arg1.ptr)
-        );
-    }
-    static _new_string_line_to_line_mapped_source(arg0, arg1) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _PrefixSource.__construct(
-            wasm._prefixsource__new_string_line_to_line_mapped_source(
-                ptr0,
-                len0,
-                arg1.ptr
-            )
-        );
-    }
-    static _new_string_source_map_source(arg0, arg1) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _PrefixSource.__construct(
-            wasm._prefixsource__new_string_source_map_source(
-                ptr0,
-                len0,
-                arg1.ptr
-            )
-        );
-    }
-    _source() {
-        const retptr = globalArgumentPtr();
-        wasm._prefixsource__source(retptr, this.ptr);
-        const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
-        return realRet;
-    }
-    _size() {
-        return wasm._prefixsource__size(this.ptr);
-    }
-    _list_map_bool_bool(arg0, arg1) {
-        return _SourceListMap.__construct(
-            wasm._prefixsource__list_map_bool_bool(
-                this.ptr,
-                arg0 ? 1 : 0,
-                arg1 ? 1 : 0
-            )
-        );
-    }
-    _node_bool_bool(arg0, arg1) {
-        return _MSourceNode.__construct(
-            wasm._prefixsource__node_bool_bool(
-                this.ptr,
-                arg0 ? 1 : 0,
-                arg1 ? 1 : 0
-            )
-        );
-    }
-}
-module.exports._PrefixSource = _PrefixSource;
-
-class _LineToLineMappedSource {
-    static __construct(ptr) {
-        return new _LineToLineMappedSource(ptr);
-    }
-
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg__linetolinemappedsource_free(ptr);
-    }
-    static _new_string_sidx_sidx(arg0, arg1, arg2) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _LineToLineMappedSource.__construct(
-            wasm._linetolinemappedsource__new_string_sidx_sidx(
-                ptr0,
-                len0,
-                arg1,
-                arg2
-            )
-        );
-    }
-    _source() {
-        const retptr = globalArgumentPtr();
-        wasm._linetolinemappedsource__source(retptr, this.ptr);
-        const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
-        return realRet;
-    }
-    _size() {
-        return wasm._linetolinemappedsource__size(this.ptr);
-    }
-    _list_map_bool_bool(arg0, arg1) {
-        return _SourceListMap.__construct(
-            wasm._linetolinemappedsource__list_map_bool_bool(
-                this.ptr,
-                arg0 ? 1 : 0,
-                arg1 ? 1 : 0
-            )
-        );
-    }
-    _node_bool_bool(arg0, arg1) {
-        return _MSourceNode.__construct(
-            wasm._linetolinemappedsource__node_bool_bool(
-                this.ptr,
-                arg0 ? 1 : 0,
-                arg1 ? 1 : 0
-            )
-        );
-    }
-}
-module.exports._LineToLineMappedSource = _LineToLineMappedSource;
-
-class _CodeNode {
-    static __construct(ptr) {
-        return new _CodeNode(ptr);
-    }
-
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg__codenode_free(ptr);
-    }
-    static _new_string(arg0) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _CodeNode.__construct(wasm._codenode__new_string(ptr0, len0));
-    }
-    _clone() {
-        return _CodeNode.__construct(wasm._codenode__clone(this.ptr));
-    }
-}
-module.exports._CodeNode = _CodeNode;
 
 module.exports.__wbindgen_throw = function(ptr, len) {
     throw new Error(getStringFromWasm(ptr, len));
