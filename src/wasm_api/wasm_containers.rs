@@ -32,7 +32,7 @@ impl JsStringWithSourceMap {
         self.s.clone()
     }
 
-    pub fn mappings(&self) -> String{
+    pub fn mappings(&self) -> String {
         self.mappings.clone()
     }
 }

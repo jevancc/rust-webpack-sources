@@ -1,7 +1,7 @@
-use source_map::*;
 use source_map::types::*;
-use wasm_bindgen::prelude::*;
+use source_map::*;
 use wasm_api::JsStringWithSourceMap;
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub struct _MSourceNode {

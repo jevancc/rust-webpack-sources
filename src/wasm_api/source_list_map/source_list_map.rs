@@ -1,7 +1,7 @@
 use super::mapping_functions::{IdenticalFunction, PrefixMappingFunction, TestMappingFunction};
 use source_list_map::types::*;
 use source_list_map::*;
-use wasm_api::{NodeVec, JsStringWithSourceMap};
+use wasm_api::{JsStringWithSourceMap, NodeVec};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
