@@ -36,8 +36,10 @@ impl SourceNode {
 
     pub fn add(&mut self, chunk: Node) {
         match chunk {
-            Node::NNodeVec(mut nv) => {
-                self.children.append(&mut nv);
+            Node::NNodeVec(nv) => {
+                for node in nv {
+                    self.children.push(node);
+                }
             }
             Node::NSourceNode(sn) => {
                 self.children.push(Node::NSourceNode(sn));
@@ -56,14 +58,14 @@ impl SourceNode {
     }
 
     pub fn to_string_with_source_map(
-        &self,
+        self,
         file: Option<i32>,
         source_root: Option<StringPtr>,
     ) -> StringWithSourceMap {
         let source_root = source_root.map(|sp| sp.to_ptr());
         let skip_validation = true;
         let mut context = ToSourceMapContext::new(file, source_root, skip_validation);
-        self.walk(&mut context);
+        self.map_generated_code(&mut context);
 
         StringWithSourceMap {
             source: context.generated_code,
@@ -72,32 +74,42 @@ impl SourceNode {
     }
 
     pub fn to_source_map_generator(
-        &self,
+        self,
         file: Option<i32>,
         source_root: Option<StringPtr>,
     ) -> SourceMapGenerator {
         let source_root = source_root.map(|sp| sp.to_ptr());
         let skip_validation = true;
         let mut context = ToSourceMapContext::new(file, source_root, skip_validation);
-        self.walk(&mut context);
+        self.map_generated_code(&mut context);
 
         context.map
     }
 
-    fn walk<T: WalkFunction>(&self, context: &mut T) {
-        for child in &self.children {
+    fn map_generated_code<T: WalkFunction>(self, context: &mut T) {
+        // position: source: Option<i32>, Option<(usize, usize)>, name: Option<i32>
+        let mut parents: Vec<(Option<i32>, Option<(usize, usize)>, Option<i32>)> = Vec::new();
+        parents.push((self.source, self.position, self.name));
+
+        let mut stack: Vec<(usize, Node)> = self.children.into_iter().rev().map(|child| (0, child)).collect();
+        while let Some((pidx, child)) = stack.pop() {
             match child {
                 Node::NSourceNode(sn) => {
-                    sn.walk(context);
+                    let parent_idx = parents.len();
+                    let mut children: Vec<(usize, Node)>
+                        = sn.children.into_iter().rev().map(|child| (parent_idx, child)).collect();
+                    stack.append(&mut children);
+                    parents.push((sn.source, sn.position, sn.name));
+
+                    for (source, source_content) in sn.source_contents {
+                        context.process_source_content(source, source_content);
+                    }
                 }
                 Node::NRcString(chunk) => {
-                    context.process_chunk(&chunk, &self.source, &self.position, &self.name);
+                    context.process_chunk(&chunk, &parents[pidx].0, &parents[pidx].1, &parents[pidx].2);
                 }
                 _ => {}
             }
-        }
-        for (source, source_content) in &self.source_contents {
-            context.process_source_content(*source, *source_content);
         }
     }
 

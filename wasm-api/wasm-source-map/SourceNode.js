@@ -41,7 +41,7 @@ class SourceNode extends wasm._MSourceNode {
     }
 
     toStringWithSourceMap(args) {
-        let stringWithSourceMap = this._to_string_with_source_map_null();
+        let stringWithSourceMap = wasm._sourcenode_to_string_with_source_map_null(this);
         let ret = {
             source: args.noSource ? "" : stringWithSourceMap.s(),
             map: {
@@ -60,7 +60,6 @@ class SourceNode extends wasm._MSourceNode {
         if (ret.map.sourcesContent.length === 0) {
             ret.map.sourcesContent = undefined;
         }
-        stringWithSourceMap.free();
         return ret;
     }
 }

@@ -34,11 +34,12 @@ impl _MSourceNode {
     pub fn _add_sourcenode(&mut self, chunk: _MSourceNode) {
         self.val.add(Node::NSourceNode(chunk.val));
     }
+}
 
-    pub fn _to_string_with_source_map_null(&mut self) -> JsStringWithSourceMap {
-        let string_with_source_map = self.val.to_string_with_source_map(None, None);
-        JsStringWithSourceMap::from(string_with_source_map)
-    }
+#[wasm_bindgen]
+pub fn _sourcenode_to_string_with_source_map_null(sn: _MSourceNode) -> JsStringWithSourceMap {
+    let string_with_source_map = sn.val.to_string_with_source_map(None, None);
+    JsStringWithSourceMap::from(string_with_source_map)
 }
 
 impl _MSourceNode {
