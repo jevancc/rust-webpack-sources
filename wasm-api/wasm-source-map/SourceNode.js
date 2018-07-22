@@ -60,9 +60,6 @@ class SourceNode extends wasm._MSourceNode {
         if (ret.map.sourcesContent.length === 0) {
             ret.map.sourcesContent = undefined;
         }
-        if (ret.map.names.length === 0) {
-            ret.map.names = undefined;
-        }
         stringWithSourceMap.free();
         return ret;
     }

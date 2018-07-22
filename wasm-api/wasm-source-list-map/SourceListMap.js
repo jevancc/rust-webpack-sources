@@ -111,15 +111,12 @@ class SourceListMap extends wasm._SourceListMap {
                 sourcesContent: StringCache.resolveIntArray(
                     stringWithSourceMap.sources_content()
                 ),
-                names: StringCache.resolveIntArray(stringWithSourceMap.names()),
+                // names: StringCache.resolveIntArray(stringWithSourceMap.names()),
                 mappings: stringWithSourceMap.mappings()
             }
         };
         if (ret.map.sourcesContent.length === 0) {
             ret.map.sourcesContent = undefined;
-        }
-        if (ret.map.names.length === 0) {
-            ret.map.names = undefined;
         }
         stringWithSourceMap.free();
         return ret;

@@ -1,6 +1,3 @@
-let wasm = require("./build/webpack_sources");
-let StringCache = require("./StringCache");
-let SourcesPool = require("./SourcesPool");
 exports.Source = require("./Source");
 
 exports.RawSource = require("./RawSource");
@@ -20,8 +17,8 @@ exports.SourceNode = require("./wasm-source-list-map").SourceNode;
 exports.CodeNode = require("./wasm-source-list-map").CodeNode;
 
 exports.clear = function() {
-    StringCache.clear();
-    SourcesPool.clear();
+    require("./StringCache").clear();
+    require("./SourcesPool").clear();
     require("./RawSource")._clearPtrCache();
     require("./OriginalSource")._clearPtrCache();
 };
