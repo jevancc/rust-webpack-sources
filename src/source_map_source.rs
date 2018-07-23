@@ -15,6 +15,7 @@ pub struct SourceMapSource {
     map_sources_content: Vec<i32>,
     map_names: Vec<i32>,
     map_mappings: Rc<String>,
+    map_generator: Option<SourceMapGenerator>,
 
     original_source: Option<i32>,
 
@@ -22,6 +23,8 @@ pub struct SourceMapSource {
     innermap_sources_content: Option<Vec<i32>>,
     innermap_names: Option<Vec<i32>>,
     innermap_mappings: Option<Rc<String>>,
+    innermap_generator: Option<SourceMapGenerator>,
+    innermap_applied: bool,
 }
 
 impl SourceMapSource {
@@ -33,6 +36,7 @@ impl SourceMapSource {
         map_sources_content: Vec<i32>,
         map_mappings: String,
         map_names: Vec<i32>,
+        map_generator: Option<SourceMapGenerator>,
     ) -> SourceMapSource {
         SourceMapSource {
             value: Rc::new(value),
@@ -42,11 +46,40 @@ impl SourceMapSource {
             map_sources_content: map_sources_content,
             map_names: map_names,
             map_mappings: Rc::new(map_mappings),
+            map_generator,
             original_source: None,
             innermap_sources: None,
             innermap_sources_content: None,
             innermap_names: None,
             innermap_mappings: None,
+            innermap_generator: None,
+            innermap_applied: false,
+        }
+    }
+
+    pub fn new_with_generator(
+        value: String,
+        value_idx: i32,
+        name: i32,
+        mut map_generator: SourceMapGenerator,
+    ) -> SourceMapSource {
+        let map = map_generator.to_source_map();
+        SourceMapSource {
+            value: Rc::new(value),
+            value_idx,
+            name,
+            map_sources: map.sources,
+            map_sources_content: map.sources_content,
+            map_names: map.names,
+            map_mappings: Rc::new(map.mappings),
+            map_generator: Some(map_generator),
+            original_source: None,
+            innermap_sources: None,
+            innermap_sources_content: None,
+            innermap_names: None,
+            innermap_mappings: None,
+            innermap_generator: None,
+            innermap_applied: false,
         }
     }
 
@@ -60,11 +93,24 @@ impl SourceMapSource {
         map_sources_content: Vec<i32>,
         map_mappings: String,
         map_names: Vec<i32>,
+        map_generator: Option<SourceMapGenerator>,
     ) {
         self.innermap_sources = Some(map_sources);
         self.innermap_sources_content = Some(map_sources_content);
         self.innermap_mappings = Some(Rc::new(map_mappings));
         self.innermap_names = Some(map_names);
+        self.innermap_generator = map_generator;
+        self.innermap_applied = false;
+    }
+
+    pub fn set_inner_source_map_generator(&mut self, mut map_generator: SourceMapGenerator) {
+        let map = map_generator.to_source_map();
+        self.innermap_sources = Some(map.sources);
+        self.innermap_sources_content = Some(map.sources_content);
+        self.innermap_mappings = Some(Rc::new(map.mappings));
+        self.innermap_names = Some(map.names);
+        self.innermap_generator = Some(map_generator);
+        self.innermap_applied = false;
     }
 }
 
@@ -79,29 +125,39 @@ impl SourceTrait for SourceMapSource {
 
     fn node(&mut self, _columns: bool, _module: bool) -> SourceNode {
         let code = StringPtr::Ptr(self.value.clone());
-        let mut generator = SourceMapGenerator::from_source_map(
-            self.map_sources.clone(),
-            self.map_sources_content.clone(),
-            StringPtr::Ptr(self.map_mappings.clone()),
-            self.map_names.clone(),
-            None,
-            None,
-            true,
-        );
-        if self.innermap_mappings.is_some() {
-            let inner_generator = SourceMapGenerator::from_source_map(
-                self.innermap_sources.clone().unwrap(),
-                self.innermap_sources_content.clone().unwrap(),
-                StringPtr::Ptr(self.innermap_mappings.clone().unwrap()),
-                self.innermap_names.clone().unwrap(),
+        if self.map_generator.is_none() {
+            self.map_generator = Some(SourceMapGenerator::from_source_map(
+                self.map_sources.clone(),
+                self.map_sources_content.clone(),
+                StringPtr::Ptr(self.map_mappings.clone()),
+                self.map_names.clone(),
                 None,
                 None,
                 true,
-            );
+            ));
+        }
+
+        let generator = self.map_generator.as_mut().unwrap();
+        if self.innermap_mappings.is_some() {
+            if self.innermap_generator.is_none() {
+                self.innermap_generator = Some(SourceMapGenerator::from_source_map(
+                    self.innermap_sources.clone().unwrap(),
+                    self.innermap_sources_content.clone().unwrap(),
+                    StringPtr::Ptr(self.innermap_mappings.clone().unwrap()),
+                    self.innermap_names.clone().unwrap(),
+                    None,
+                    None,
+                    true,
+                ));
+            }
+            let inner_generator = self.innermap_generator.as_mut().unwrap();
             if self.original_source.is_some() {
                 generator.set_source_content(self.name, self.original_source);
             }
-            generator.apply_source_map_generator(inner_generator, Some(self.name));
+            if !self.innermap_applied {
+                self.innermap_applied = true;
+                generator.apply_source_map_generator(inner_generator, Some(self.name));
+            }
         }
         source_map::from_string_with_source_map_generator(code, generator)
     }

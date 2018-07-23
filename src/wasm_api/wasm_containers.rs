@@ -71,6 +71,10 @@ impl JsStringWithSourceMap {
             generator: Some(generator),
         }
     }
+
+    pub fn get_raw(self) -> (String, Option<SourceMap>, Option<SourceMapGenerator>) {
+        (self.s, self.map, self.generator)
+    }
 }
 
 #[wasm_bindgen]

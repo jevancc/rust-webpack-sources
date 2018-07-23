@@ -3,32 +3,9 @@ use super::{SourceMapGenerator, SourceNode};
 use types::StringPtr;
 use utils;
 
-pub fn from_string_with_source_map(
-    code: StringPtr,
-    sources: Vec<i32>,
-    sources_content: Vec<i32>,
-    mappings: StringPtr,
-    names: Vec<i32>,
-    file: Option<i32>,
-    source_root: Option<StringPtr>,
-) -> SourceNode {
-    from_string_with_source_map_generator(
-        code,
-        SourceMapGenerator::from_source_map(
-            sources,
-            sources_content,
-            mappings,
-            names,
-            file,
-            source_root,
-            true,
-        ),
-    )
-}
-
 pub fn from_string_with_source_map_generator(
     code: StringPtr,
-    generator: SourceMapGenerator,
+    generator: &mut SourceMapGenerator,
 ) -> SourceNode {
     let mut node = SourceNode::new(None, None, None, None);
 
@@ -60,7 +37,7 @@ pub fn from_string_with_source_map_generator(
     let mut line_iter = lines.into_iter();
     let mut next_line: (&str, bool, bool) = line_iter.next().unwrap_or(("", false, true));
 
-    for mapping in generator.mappings.list.into_iter() {
+    for mapping in &generator.mappings.list {
         let generated_position = mapping.generated;
         if last_mapping.is_some() {
             if last_generated_position.0 < generated_position.0 {
@@ -80,7 +57,7 @@ pub fn from_string_with_source_map_generator(
                 next_line.2 = splitted.3;
                 last_generated_position.1 = generated_position.1;
                 node.add_mapping_with_code(last_mapping, code);
-                last_mapping = Some(mapping);
+                last_mapping = Some(mapping.clone());
                 continue;
             }
         }
@@ -97,7 +74,7 @@ pub fn from_string_with_source_map_generator(
             next_line.2 = splitted.3; // new len
             last_generated_position.1 = generated_position.1;
         }
-        last_mapping = Some(mapping);
+        last_mapping = Some(mapping.clone());
     }
 
     if next_line.1 {
@@ -112,6 +89,6 @@ pub fn from_string_with_source_map_generator(
         }
         node.add(Node::NString(remaining));
     }
-    node.source_contents = generator.sources_contents;
+    node.source_contents = generator.sources_contents.clone();
     node
 }

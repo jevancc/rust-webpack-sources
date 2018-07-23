@@ -22,43 +22,57 @@ class SourceMapSource extends wasm._SourceMapSource {
         this._name = name;
         this._sourceMap = sourceMap;
 
-        let sources = (sourceMap.sources || []).map(StringCache.add);
-        let sourcesContent = (sourceMap.sourcesContent || []).map(
-            StringCache.add
-        );
-        let mappings = sourceMap.mappings;
-        let names = (sourceMap.names || []).map(StringCache.add);
-
-        this.ptr = SourceMapSource._new_string_sidx_string_map(
-            value,
-            this._value_index,
-            name,
-            sources,
-            sourcesContent,
-            mappings,
-            names
-        ).ptr;
+        if (sourceMap.wasmObj) {
+            this.ptr = SourceMapSource._new_string_sidx_string_wasmmap(
+                value,
+                this._value_index,
+                name,
+                sourceMap.wasmObj
+            ).ptr;
+        } else {
+            let sources = (sourceMap.sources || []).map(StringCache.add);
+            let sourcesContent = (sourceMap.sourcesContent || []).map(
+                StringCache.add
+            );
+            let mappings = sourceMap.mappings;
+            let names = (sourceMap.names || []).map(StringCache.add);
+            this.ptr = SourceMapSource._new_string_sidx_string_map(
+                value,
+                this._value_index,
+                name,
+                sources,
+                sourcesContent,
+                mappings,
+                names
+            ).ptr;
+        }
 
         if (originalSource) {
-            self._originalSource = originalSource;
+            this._originalSource = originalSource;
             this._set_original_source_sidx(StringCache.add(originalSource));
         }
         if (innerSourceMap) {
-            self._innerSourceMap = innerSourceMap;
-            let innerSources = (innerSourceMap.sources || []).map(
-                StringCache.add
-            );
-            let innerSourcesContent = (innerSourceMap.sourcesContent || []).map(
-                StringCache.add
-            );
-            let innerMappings = innerSourceMap.mappings;
-            let innerNames = (innerSourceMap.names || []).map(StringCache.add);
-            this._set_inner_source_map_map(
-                innerSources,
-                sourcesContent,
-                innerMappings,
-                innerNames
-            );
+            this._innerSourceMap = innerSourceMap;
+            if (innerSourceMap.wasmObj) {
+                this._set_inner_source_map_wasmmap(innerSourceMap.wasmObj);
+            } else {
+                let innerSources = (innerSourceMap.sources || []).map(
+                    StringCache.add
+                );
+                let innerSourcesContent = (
+                    innerSourceMap.sourcesContent || []
+                ).map(StringCache.add);
+                let innerMappings = innerSourceMap.mappings;
+                let innerNames = (innerSourceMap.names || []).map(
+                    StringCache.add
+                );
+                this._set_inner_source_map_map(
+                    innerSources,
+                    sourcesContent,
+                    innerMappings,
+                    innerNames
+                );
+            }
         }
         WasmObjectPool.add(this);
     }

@@ -2,7 +2,7 @@ use source::SourceTrait;
 use source_map_source::*;
 use std::cell::RefCell;
 use std::rc::Rc;
-use wasm_api::{_MSourceNode, _SourceListMap};
+use wasm_api::{JsStringWithSourceMap, _MSourceNode, _SourceListMap};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -31,7 +31,41 @@ impl _SourceMapSource {
                 map_sources_content.to_vec(),
                 map_mappings,
                 map_names.to_vec(),
+                None,
             ))),
+        }
+    }
+
+    pub fn _new_string_sidx_string_wasmmap(
+        value: String,
+        value_idx: i32,
+        name: i32,
+        wasm_map: JsStringWithSourceMap,
+    ) -> _SourceMapSource {
+        let (_, map, generator) = wasm_map.get_raw();
+
+        if let Some(map) = map {
+            _SourceMapSource {
+                val: Rc::new(RefCell::new(SourceMapSource::new(
+                    value,
+                    value_idx,
+                    name,
+                    map.sources,
+                    map.sources_content,
+                    map.mappings,
+                    map.names,
+                    generator,
+                ))),
+            }
+        } else {
+            _SourceMapSource {
+                val: Rc::new(RefCell::new(SourceMapSource::new_with_generator(
+                    value,
+                    value_idx,
+                    name,
+                    generator.unwrap(),
+                ))),
+            }
         }
     }
 
@@ -51,7 +85,25 @@ impl _SourceMapSource {
             map_sources_content.to_vec(),
             map_mappings,
             map_names.to_vec(),
+            None,
         );
+    }
+
+    pub fn _set_inner_source_map_wasmmap(&mut self, wasm_map: JsStringWithSourceMap) {
+        let (_, map, generator) = wasm_map.get_raw();
+        if let Some(map) = map {
+            self.val.borrow_mut().set_inner_source_map(
+                map.sources,
+                map.sources_content,
+                map.mappings,
+                map.names,
+                generator,
+            );
+        } else {
+            self.val
+                .borrow_mut()
+                .set_inner_source_map_generator(generator.unwrap());
+        }
     }
 
     pub fn _source(&mut self) -> String {

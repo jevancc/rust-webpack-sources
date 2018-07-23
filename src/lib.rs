@@ -5,8 +5,6 @@ extern crate serde_json;
 extern crate source_map_mappings;
 extern crate vlq;
 extern crate wasm_bindgen;
-#[macro_use]
-extern crate serde_derive;
 
 mod concat_source;
 mod line_to_line_mapped_source;

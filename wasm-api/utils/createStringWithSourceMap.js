@@ -120,8 +120,8 @@ function createStringWithSourceMap(WasmStringWithSourceMap, file, isNames) {
         );
     }
 
-    defineConst(sourceMap, "generator", function() {
-        if (!modified) {
+    defineConst(sourceMap, "wasmObj", function() {
+        if (!modified && WasmStringWithSourceMap.ptr) {
             return WasmStringWithSourceMap;
         } else {
             return null;

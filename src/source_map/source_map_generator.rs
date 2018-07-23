@@ -198,7 +198,7 @@ impl SourceMapGenerator {
 
     pub fn apply_source_map_generator(
         &mut self,
-        mut generator: SourceMapGenerator,
+        generator: &mut SourceMapGenerator,
         source_file: Option<i32>,
     ) {
         let source_file = if source_file.is_none() {
@@ -242,8 +242,8 @@ impl SourceMapGenerator {
             self.add_name(name);
         }
 
-        for (source, content) in generator.sources_contents.into_iter() {
-            self.set_source_content(source, Some(content));
+        for (source, content) in &generator.sources_contents {
+            self.set_source_content(*source, Some(*content));
         }
     }
 
