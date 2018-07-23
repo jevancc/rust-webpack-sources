@@ -6,7 +6,7 @@
 
 let SourceNode = require("./wasm-source-map").SourceNode;
 let SourceListMap = require("./wasm-source-list-map").SourceListMap;
-let SourcesPool = require("./SourcesPool");
+let WasmObjectPool = require("./WasmObjectPool");
 let wasm = require("./build/webpack_sources");
 
 class PrefixSource extends wasm._PrefixSource {
@@ -52,7 +52,7 @@ class PrefixSource extends wasm._PrefixSource {
 
         this._js_source = source;
         this._js_prefix = prefix;
-        SourcesPool.add(this);
+        WasmObjectPool.add(this);
     }
 
     source() {

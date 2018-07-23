@@ -5,7 +5,7 @@
 "use strict";
 let SourceNode = require("./wasm-source-map").SourceNode;
 let SourceListMap = require("./wasm-source-list-map").SourceListMap;
-let SourcesPool = require("./SourcesPool");
+let WasmObjectPool = require("./WasmObjectPool");
 let wasm = require("./build/webpack_sources");
 
 class ConcatSource extends wasm._ConcatSource {
@@ -16,7 +16,7 @@ class ConcatSource extends wasm._ConcatSource {
         for (let i = 0; i < arguments.length; i++) {
             this.add(arguments[i]);
         }
-        SourcesPool.add(this);
+        WasmObjectPool.add(this);
     }
 
     add(item) {

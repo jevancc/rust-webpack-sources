@@ -1,12 +1,14 @@
 "use strict";
 
-let wasm = require("../build/webpack_sources");
 let CodeNode = require("./CodeNode");
 let SourceNode = require("./SourceNode");
 let SingleLineNode = require("./SingleLineNode");
 let StringVec = require("./utils").StringVec;
 let NodeVec = require("./utils").NodeVec;
 let StringCache = require("../StringCache");
+let WasmObjectPool = require("../WasmObjectPool");
+let createStringWithSourceMap = require("../utils/createStringWithSourceMap");
+let wasm = require("../build/webpack_sources");
 
 class SourceListMap extends wasm._SourceListMap {
     constructor(generatedCode, source, originalSource) {
@@ -100,26 +102,7 @@ class SourceListMap extends wasm._SourceListMap {
 
     toStringWithSourceMap(args) {
         let stringWithSourceMap = this._to_string_with_source_map_null();
-        let ret = {
-            source: args.noSource ? "" : stringWithSourceMap.s(),
-            map: {
-                file: args.file,
-                version: stringWithSourceMap.version || 3,
-                sources: StringCache.resolveIntArray(
-                    stringWithSourceMap.sources()
-                ),
-                sourcesContent: StringCache.resolveIntArray(
-                    stringWithSourceMap.sources_content()
-                ),
-                // names: StringCache.resolveIntArray(stringWithSourceMap.names()),
-                mappings: stringWithSourceMap.mappings()
-            }
-        };
-        if (ret.map.sourcesContent.length === 0) {
-            ret.map.sourcesContent = undefined;
-        }
-        stringWithSourceMap.free();
-        return ret;
+        return createStringWithSourceMap(stringWithSourceMap, args.file);
     }
 
     static isSourceListMap(obj) {

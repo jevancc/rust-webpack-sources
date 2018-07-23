@@ -36,8 +36,9 @@ impl _MSourceNode {
     }
 
     pub fn _to_string_with_source_map_null(&mut self) -> JsStringWithSourceMap {
-        let string_with_source_map = self.val.to_string_with_source_map(None, None);
-        JsStringWithSourceMap::from(string_with_source_map)
+        JsStringWithSourceMap::from_with_generator(
+            self.val.to_string_with_source_map_generator(None, None),
+        )
     }
 }
 

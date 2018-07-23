@@ -1,6 +1,8 @@
 "use strict";
 
 let StringCache = require("../StringCache");
+let WasmObjectPool = require("../WasmObjectPool");
+let createStringWithSourceMap = require("../utils/createStringWithSourceMap");
 let wasm = require("../build/webpack_sources");
 
 class SourceNode extends wasm._MSourceNode {
@@ -42,26 +44,7 @@ class SourceNode extends wasm._MSourceNode {
 
     toStringWithSourceMap(args) {
         let stringWithSourceMap = this._to_string_with_source_map_null();
-        let ret = {
-            source: args.noSource ? "" : stringWithSourceMap.s(),
-            map: {
-                file: args.file,
-                version: stringWithSourceMap.version || 3,
-                sources: StringCache.resolveIntArray(
-                    stringWithSourceMap.sources()
-                ),
-                sourcesContent: StringCache.resolveIntArray(
-                    stringWithSourceMap.sources_content()
-                ),
-                names: StringCache.resolveIntArray(stringWithSourceMap.names()),
-                mappings: stringWithSourceMap.mappings()
-            }
-        };
-        if (ret.map.sourcesContent.length === 0) {
-            ret.map.sourcesContent = undefined;
-        }
-        stringWithSourceMap.free();
-        return ret;
+        return createStringWithSourceMap(stringWithSourceMap, args.file, true);
     }
 }
 

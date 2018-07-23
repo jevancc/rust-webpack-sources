@@ -46,8 +46,7 @@ impl _SourceListMap {
     }
 
     pub fn _to_string_with_source_map_null(&mut self) -> JsStringWithSourceMap {
-        let string_with_source_map = self.val.to_string_with_source_map(None);
-        JsStringWithSourceMap::from(string_with_source_map)
+        JsStringWithSourceMap::from(self.val.to_string_with_source_map(None))
     }
 }
 

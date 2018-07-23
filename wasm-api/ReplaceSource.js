@@ -9,7 +9,7 @@ let SourceListMap = require("./wasm-source-list-map").SourceListMap;
 let fromStringWithSourceMap = require("./wasm-source-list-map")
     .fromStringWithSourceMap;
 let SourceMapConsumer = require("source-map").SourceMapConsumer;
-let SourcesPool = require("./SourcesPool");
+let WasmObjectPool = require("./WasmObjectPool");
 let wasm = require("./build/webpack_sources");
 
 class ReplaceSource extends wasm._ReplaceSource {
@@ -41,7 +41,7 @@ class ReplaceSource extends wasm._ReplaceSource {
         } else {
             throw new Error("Invalid source");
         }
-        SourcesPool.add(this);
+        WasmObjectPool.add(this);
     }
 
     replace(start, end, newValue) {

@@ -2,7 +2,7 @@ use super::types::{Mapping, Node};
 use super::SourceMapGenerator;
 use std::collections::HashMap;
 use std::rc::Rc;
-use types::{StringPtr, StringWithSourceMap};
+use types::{StringPtr, StringWithSourceMap, StringWithSourceMapGenerator};
 
 #[derive(Clone, Debug)]
 pub struct SourceNode {
@@ -68,6 +68,22 @@ impl SourceNode {
         StringWithSourceMap {
             source: context.generated_code,
             map: context.map.to_source_map(),
+        }
+    }
+
+    pub fn to_string_with_source_map_generator(
+        &self,
+        file: Option<i32>,
+        source_root: Option<StringPtr>,
+    ) -> StringWithSourceMapGenerator {
+        let source_root = source_root.map(|sp| sp.to_ptr());
+        let skip_validation = true;
+        let mut context = ToSourceMapContext::new(file, source_root, skip_validation);
+        self.walk(&mut context);
+
+        StringWithSourceMapGenerator {
+            source: context.generated_code,
+            generator: context.map,
         }
     }
 

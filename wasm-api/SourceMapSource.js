@@ -11,7 +11,7 @@ let fromStringWithSourceMap = require("./wasm-source-list-map")
 let SourceMapConsumer = require("source-map").SourceMapConsumer;
 let SourceMapGenerator = require("source-map").SourceMapGenerator;
 let StringCache = require("./StringCache");
-let SourcesPool = require("./SourcesPool");
+let WasmObjectPool = require("./WasmObjectPool");
 let wasm = require("./build/webpack_sources");
 
 class SourceMapSource extends wasm._SourceMapSource {
@@ -60,7 +60,7 @@ class SourceMapSource extends wasm._SourceMapSource {
                 innerNames
             );
         }
-        SourcesPool.add(this);
+        WasmObjectPool.add(this);
     }
 
     source() {

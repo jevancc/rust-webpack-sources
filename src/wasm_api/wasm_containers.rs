@@ -1,61 +1,74 @@
 use source_list_map::types::*;
-use types::StringWithSourceMap;
+use source_map::SourceMapGenerator;
+use types::*;
 use wasm_api::{_CodeNode, _SingleLineNode, _SourceListMap, _SourceNode};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub struct JsStringWithSourceMap {
     s: String,
-    pub version: i32,
-    pub file: i32,
-    sources: Vec<i32>,
-    sources_content: Vec<i32>,
-    names: Vec<i32>,
-    mappings: String,
+    map: Option<SourceMap>,
+    generator: Option<SourceMapGenerator>,
 }
 
 #[wasm_bindgen]
 impl JsStringWithSourceMap {
-    pub fn sources(&self) -> Box<[i32]> {
-        self.sources.clone().into_boxed_slice()
-    }
-
-    pub fn sources_content(&self) -> Box<[i32]> {
-        self.sources_content.clone().into_boxed_slice()
-    }
-
-    pub fn names(&self) -> Box<[i32]> {
-        self.names.clone().into_boxed_slice()
-    }
-
     pub fn s(&self) -> String {
         self.s.clone()
     }
 
-    pub fn mappings(&self) -> String {
-        self.mappings.clone()
+    pub fn version(&mut self) -> i32 {
+        self.map().version
+    }
+
+    pub fn file(&mut self) -> i32 {
+        self.map().file.unwrap_or(-1)
+    }
+
+    pub fn sources(&mut self) -> Box<[i32]> {
+        self.map().sources.clone().into_boxed_slice()
+    }
+
+    pub fn sources_content(&mut self) -> Box<[i32]> {
+        self.map().sources_content.clone().into_boxed_slice()
+    }
+
+    pub fn names(&mut self) -> Box<[i32]> {
+        self.map().names.clone().into_boxed_slice()
+    }
+
+    pub fn mappings(&mut self) -> String {
+        self.map().mappings.clone()
     }
 }
 
 impl JsStringWithSourceMap {
+    #[inline]
+    fn map(&mut self) -> &SourceMap {
+        if self.map.is_none() {
+            self.map = Some(self.generator.as_mut().unwrap().to_source_map());
+        }
+        self.map.as_ref().unwrap()
+    }
+
     pub fn from(smap: StringWithSourceMap) -> JsStringWithSourceMap {
         let s = smap.source;
         let map = smap.map;
-        let version = map.version;
-        let file = map.file.unwrap_or(-1);
-        let mappings = map.mappings;
-
-        let sources = map.sources;
-        let sources_content = map.sources_content;
-        let names = map.names;
         JsStringWithSourceMap {
             s,
-            version,
-            file,
-            sources,
-            sources_content,
-            names,
-            mappings,
+            map: Some(map),
+            generator: None,
+        }
+    }
+
+    pub fn from_with_generator(smapgen: StringWithSourceMapGenerator) -> JsStringWithSourceMap {
+        let s = smapgen.source;
+        let generator = smapgen.generator;
+
+        JsStringWithSourceMap {
+            s,
+            map: None,
+            generator: Some(generator),
         }
     }
 }
