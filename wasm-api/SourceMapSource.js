@@ -45,7 +45,9 @@ class SourceMapSource extends wasm._SourceMapSource {
         }
         if (innerSourceMap) {
             self._innerSourceMap = innerSourceMap;
-            let innerSources = (innerSourceMap.sources || []).map(StringCache.add);
+            let innerSources = (innerSourceMap.sources || []).map(
+                StringCache.add
+            );
             let innerSourcesContent = (innerSourceMap.sourcesContent || []).map(
                 StringCache.add
             );
