@@ -1,6 +1,6 @@
 {
   "name": "wasm-webpack-sources",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Source code handling classes for webpack",
   "main": "wasm-api",
   "scripts": {
