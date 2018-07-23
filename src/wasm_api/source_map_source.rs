@@ -35,6 +35,25 @@ impl _SourceMapSource {
         }
     }
 
+    pub fn _set_original_source_sidx(&mut self, source: i32) {
+        self.val.borrow_mut().set_original_source(source);
+    }
+
+    pub fn _set_inner_source_map_map(
+        &mut self,
+        map_sources: &[i32],
+        map_sources_content: &[i32],
+        map_mappings: String,
+        map_names: &[i32],
+    ) {
+        self.val.borrow_mut().set_inner_source_map(
+            map_sources.to_vec(),
+            map_sources_content.to_vec(),
+            map_mappings,
+            map_names.to_vec(),
+        );
+    }
+
     pub fn _source(&mut self) -> String {
         (*self.val.borrow_mut().source()).clone()
     }

@@ -15,7 +15,7 @@ let SourcesPool = require("./SourcesPool");
 let wasm = require("./build/webpack_sources");
 
 class SourceMapSource extends wasm._SourceMapSource {
-    constructor(value, name, sourceMap) {
+    constructor(value, name, sourceMap, originalSource, innerSourceMap) {
         super(0);
         this._value = value;
         this._value_index = StringCache.add(value);
@@ -38,6 +38,26 @@ class SourceMapSource extends wasm._SourceMapSource {
             mappings,
             names
         ).ptr;
+
+        if (originalSource) {
+            self._originalSource = originalSource;
+            this._set_original_source_sidx(StringCache.add(originalSource));
+        }
+        if (innerSourceMap) {
+            self._innerSourceMap = innerSourceMap;
+            let innerSources = (innerSourceMap.sources || []).map(StringCache.add);
+            let innerSourcesContent = (innerSourceMap.sourcesContent || []).map(
+                StringCache.add
+            );
+            let innerMappings = innerSourceMap.mappings;
+            let innerNames = (innerSourceMap.names || []).map(StringCache.add);
+            this._set_inner_source_map_map(
+                innerSources,
+                sourcesContent,
+                innerMappings,
+                innerNames
+            );
+        }
         SourcesPool.add(this);
     }
 
@@ -51,7 +71,9 @@ class SourceMapSource extends wasm._SourceMapSource {
 
     updateHash(hash) {
         hash.update(this._value);
-        // if (this._originalSource) hash.update(this._originalSource);
+        if (this._originalSource) {
+            hash.update(this._originalSource);
+        }
     }
 }
 

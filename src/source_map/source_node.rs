@@ -183,13 +183,14 @@ impl WalkFunction for ToSourceMapContext {
             self.last_original_source = None;
             self.source_mapping_active = false;
         }
-        let mut chars = chunk.chars().peekable();
-        while let Some(c) = chars.next() {
+
+        let chunk_len = chunk.len();
+        for (b, c) in chunk.char_indices() {
             if c == '\n' {
                 self.generated_position.0 += 1; // line++
                 self.generated_position.1 = 0; // column = 0
 
-                if chars.peek().is_none() {
+                if b == chunk_len - 1 {
                     self.last_original_source = None;
                     self.source_mapping_active = false;
                 } else if self.source_mapping_active {

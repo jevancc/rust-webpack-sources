@@ -12,15 +12,24 @@ pub fn from_string_with_source_map(
     file: Option<i32>,
     source_root: Option<StringPtr>,
 ) -> SourceNode {
-    let generator = SourceMapGenerator::from_source_map(
-        sources,
-        sources_content,
-        mappings,
-        names,
-        file,
-        source_root,
-        true,
-    );
+    from_string_with_source_map_generator(
+        code,
+        SourceMapGenerator::from_source_map(
+            sources,
+            sources_content,
+            mappings,
+            names,
+            file,
+            source_root,
+            true,
+        ),
+    )
+}
+
+pub fn from_string_with_source_map_generator(
+    code: StringPtr,
+    generator: SourceMapGenerator,
+) -> SourceNode {
     let mut node = SourceNode::new(None, None, None, None);
 
     let code = code.get();

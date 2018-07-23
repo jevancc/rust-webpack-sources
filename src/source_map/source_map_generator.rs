@@ -36,20 +36,25 @@ impl SourceMapGenerator {
         }
     }
 
+    #[inline]
+    fn add_source(&mut self, source: i32) {
+        let len = self.sources.len();
+        self.sources.entry(source).or_insert(len);
+    }
+
+    #[inline]
+    fn add_name(&mut self, name: i32) {
+        let len = self.names.len();
+        self.names.entry(name).or_insert(len);
+    }
+
     pub fn add_mapping(&mut self, map: Mapping) {
         if !self.skip_validation {
             SourceMapGenerator::validate_mapping(&map).unwrap();
         }
 
-        if let Some(source) = map.source.clone() {
-            let len = self.sources.len();
-            self.sources.entry(source).or_insert(len);
-        }
-
-        if let Some(name) = map.name.clone() {
-            let len = self.names.len();
-            self.names.entry(name).or_insert(len);
-        }
+        map.source.map(|source| self.add_source(source));
+        map.name.map(|name| self.add_name(name));
 
         self.mappings.add(map);
     }
@@ -191,6 +196,57 @@ impl SourceMapGenerator {
         };
     }
 
+    pub fn apply_source_map_generator(
+        &mut self,
+        mut generator: SourceMapGenerator,
+        source_file: Option<i32>,
+    ) {
+        let source_file = if source_file.is_none() {
+            if generator.file.is_none() {
+                panic!("SourceMapGenerator.prototype.applySourceMap requires either an explicit source file,
+                        or the source map's \"file\" property. Both were omitted.");
+            }
+            generator.file
+        } else {
+            source_file
+        };
+
+        // let source_root = self.source_root.clone();
+        // process source_root
+        self.mappings.set_unsorted();
+        let mut new_sources = Vec::<i32>::with_capacity(self.sources.len());
+        let mut new_names = Vec::<i32>::with_capacity(self.names.len());
+        for mapping in self.mappings.list.iter_mut() {
+            if let Some((line, column)) = mapping.original {
+                if mapping.source == source_file {
+                    let original = generator.original_position_for(line, column);
+                    if original.source.is_some() {
+                        mapping.source = original.source;
+                    }
+                    // process source_root
+                    if original.name.is_some() {
+                        mapping.name = original.name;
+                    }
+                    mapping.original = original.original;
+                }
+            }
+            mapping.source.map(|source| new_sources.push(source));
+            mapping.name.map(|name| new_names.push(name));
+        }
+        self.sources.clear();
+        for source in new_sources {
+            self.add_source(source);
+        }
+        self.names.clear();
+        for name in new_names {
+            self.add_name(name);
+        }
+
+        for (source, content) in generator.sources_contents.into_iter() {
+            self.set_source_content(source, Some(content));
+        }
+    }
+
     pub fn from_source_map(
         sources: Vec<i32>,
         sources_content: Vec<i32>,
@@ -225,7 +281,7 @@ impl SourceMapGenerator {
             let mut set: HashSet<i32> = HashSet::new();
             names.into_iter().filter(|sidx| set.insert(*sidx)).collect()
         } else {
-            names.into_iter().collect()
+            names
         };
 
         let mappings: _Mappings<()> = parse_mappings(mappings.get().as_bytes()).unwrap();

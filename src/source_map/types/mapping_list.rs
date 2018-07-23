@@ -38,4 +38,9 @@ impl MappingList {
             self.sorted = true;
         }
     }
+
+    pub fn set_unsorted(&mut self) {
+        self.sorted = false;
+        self.last = None;
+    }
 }
