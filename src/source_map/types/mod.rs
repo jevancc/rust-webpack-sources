@@ -5,12 +5,11 @@ pub use super::types::mapping::*;
 pub use super::types::mapping_list::*;
 
 use source_map::SourceNode;
-use std::rc::Rc;
+use types::string_slice::StringSlice;
 
 #[derive(Clone, Debug)]
 pub enum Node {
     NSourceNode(SourceNode),
-    NString(String),
-    NRcString(Rc<String>),
+    NString(StringSlice),
     NNodeVec(Vec<Node>),
 }

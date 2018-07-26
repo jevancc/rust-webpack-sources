@@ -1,14 +1,12 @@
 use source::{Source, SourceTrait};
 use source_list_map::{MappingFunction, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
-use std::rc::Rc;
+use types::string_slice::*;
 
 fn clone_and_prefix(node: SmNode, prefix: &str, append: &mut i32) -> Result<SmNode, &'static str> {
     match node {
-        SmNode::NRcString(s) => {
-            Ok(clone_and_prefix(SmNode::NString((*s).clone()), prefix, append).unwrap())
-        }
-        SmNode::NString(mut s) => {
+        SmNode::NString(s) => {
+            let mut s = s.into_string();
             let end_with_new_line = s.ends_with('\n');
             if end_with_new_line {
                 s.pop();
@@ -25,7 +23,7 @@ fn clone_and_prefix(node: SmNode, prefix: &str, append: &mut i32) -> Result<SmNo
             if end_with_new_line {
                 *append += 1;
             }
-            Ok(SmNode::NRcString(Rc::new(s)))
+            Ok(SmNode::NString(StringSlice::from(s)))
         }
         SmNode::NSourceNode(mut sn) => {
             let mut new_children = Vec::<SmNode>::new();
@@ -35,7 +33,9 @@ fn clone_and_prefix(node: SmNode, prefix: &str, append: &mut i32) -> Result<SmNo
             sn.children = new_children;
             Ok(SmNode::NSourceNode(sn))
         }
-        _ => Ok(SmNode::NString(String::new())),
+        _ => {
+            Ok(SmNode::NString(StringSlice::new()))
+        }
     }
 }
 
@@ -52,7 +52,7 @@ impl PrefixSource {
 }
 
 impl SourceTrait for PrefixSource {
-    fn source(&mut self) -> Rc<String> {
+    fn source(&mut self) -> StringSlice {
         let mut s = self.prefix.clone() + self.source.source().as_str();
         if s.ends_with('\n') {
             s.pop();
@@ -61,7 +61,7 @@ impl SourceTrait for PrefixSource {
         } else {
             s = s.replace('\n', &(String::from("\n") + &self.prefix));
         }
-        Rc::new(s)
+        StringSlice::from(s)
     }
 
     fn node(&mut self, columns: bool, module: bool) -> SourceNode {

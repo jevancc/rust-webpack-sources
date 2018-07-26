@@ -1,7 +1,7 @@
 use super::types::Node;
 use linked_hash_map::LinkedHashMap;
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct MappingsContext {
     pub sources: LinkedHashMap<Option<i32>, (usize, Option<Node>)>,
     pub has_source_content: bool,
@@ -30,9 +30,6 @@ impl MappingsContext {
                 Some(Node::NString(_)) => {
                     self.has_source_content = true;
                 }
-                Some(Node::NRcString(_)) => {
-                    self.has_source_content = true;
-                }
                 Some(Node::NStringIdx(_)) => {
                     self.has_source_content = true;
                 }
@@ -45,24 +42,15 @@ impl MappingsContext {
         }
     }
 
-    pub fn get_arrays(&self) -> Srcs {
+    pub fn get_arrays(&self) -> (Vec<Option<i32>>, Vec<i32>) {
         let mut sources: Vec<Option<i32>> = Vec::new();
-        let mut sources_content: Vec<Node> = Vec::new();
-        for (key, val) in self.sources.clone() {
-            sources.push(key);
-            if let Some(content) = val.1 {
-                sources_content.push(content);
+        let mut sources_content: Vec<i32> = Vec::new();
+        for (key, val) in &self.sources {
+            sources.push(key.clone());
+            if let Some(Node::NStringIdx(idx)) = val.1 {
+                sources_content.push(idx);
             }
         }
-
-        Srcs {
-            sources,
-            sources_content,
-        }
+        (sources, sources_content)
     }
-}
-
-pub struct Srcs {
-    pub sources: Vec<Option<i32>>,
-    pub sources_content: Vec<Node>,
 }

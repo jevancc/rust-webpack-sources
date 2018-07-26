@@ -2,6 +2,7 @@ use replace_source::*;
 use source::{Source, SourceTrait};
 use std::cell::RefCell;
 use std::rc::Rc;
+use types::string_slice::*;
 use wasm_api::{
     _ConcatSource, _LineToLineMappedSource, _OriginalSource, _PrefixSource, _RawSource,
     _SourceMapSource,
@@ -19,7 +20,7 @@ impl _ReplaceSource {
     // TODO: use macro
     pub fn _new_string(source: String) -> _ReplaceSource {
         _ReplaceSource {
-            val: Rc::new(RefCell::new(ReplaceSource::new(Source::SString(Rc::new(
+            val: Rc::new(RefCell::new(ReplaceSource::new(Source::SString(StringSlice::from(
                 source,
             ))))),
         }
@@ -92,7 +93,7 @@ impl _ReplaceSource {
     }
 
     pub fn _source(&mut self) -> String {
-        (*self.val.borrow_mut().source()).clone()
+        self.val.borrow_mut().source().into_string()
     }
 
     pub fn _size(&mut self) -> u32 {

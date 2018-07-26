@@ -1,5 +1,6 @@
 use source_list_map::*;
 use wasm_bindgen::prelude::*;
+use types::string_slice::*;
 
 #[wasm_bindgen]
 pub struct _SourceNode {
@@ -10,7 +11,7 @@ pub struct _SourceNode {
 impl _SourceNode {
     pub fn _new_string_null_null_number(generated_code: String, starting_line: u32) -> _SourceNode {
         _SourceNode {
-            val: SourceNode::new(generated_code, None, None, starting_line as usize),
+            val: SourceNode::new(StringSlice::from(generated_code), None, None, starting_line as usize),
         }
     }
 
@@ -22,7 +23,7 @@ impl _SourceNode {
     ) -> _SourceNode {
         _SourceNode {
             val: SourceNode::new(
-                generated_code,
+                StringSlice::from(generated_code),
                 Some(source),
                 Some(original_source),
                 starting_line as usize,

@@ -1,5 +1,6 @@
 use super::types::Node;
 use super::{utils, MappingFunction, MappingsContext};
+use types::string_slice::*;
 use std::str;
 
 #[derive(Clone, Debug)]
@@ -8,8 +9,10 @@ pub struct CodeNode {
 }
 
 impl CodeNode {
-    pub fn new(generated_code: String) -> Self {
-        CodeNode { generated_code }
+    pub fn new(generated_code: StringSlice) -> Self {
+        CodeNode {
+            generated_code: generated_code.into_string()
+        }
     }
 
     pub fn add_generated_code(&mut self, generated_code: &str) {
@@ -18,7 +21,7 @@ impl CodeNode {
 
     pub fn map_generated_code<T: MappingFunction>(self, mf: &mut T) -> CodeNode {
         let generated_code = mf.map(self.generated_code);
-        CodeNode::new(generated_code)
+        CodeNode::new(StringSlice::from(generated_code))
     }
 
     pub fn merge(mut self, other_node: &Node) -> Result<Node, Node> {

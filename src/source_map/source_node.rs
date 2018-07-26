@@ -1,8 +1,8 @@
 use super::types::{Mapping, Node};
 use super::SourceMapGenerator;
 use std::collections::HashMap;
-use std::rc::Rc;
-use types::{StringPtr, StringWithSourceMap, StringWithSourceMapGenerator};
+use types::{StringWithSourceMap, StringWithSourceMapGenerator};
+use types::string_slice::*;
 
 #[derive(Clone, Debug)]
 pub struct SourceNode {
@@ -43,10 +43,7 @@ impl SourceNode {
                 self.children.push(Node::NSourceNode(sn));
             }
             Node::NString(s) => {
-                self.children.push(Node::NRcString(Rc::new(s)));
-            }
-            Node::NRcString(sp) => {
-                self.children.push(Node::NRcString(sp));
+                self.children.push(Node::NString(s));
             }
         }
     }
@@ -58,9 +55,8 @@ impl SourceNode {
     pub fn to_string_with_source_map(
         &self,
         file: Option<i32>,
-        source_root: Option<StringPtr>,
+        source_root: Option<StringSlice>,
     ) -> StringWithSourceMap {
-        let source_root = source_root.map(|sp| sp.to_ptr());
         let skip_validation = true;
         let mut context = ToSourceMapContext::new(file, source_root, skip_validation);
         self.walk(&mut context);
@@ -74,9 +70,8 @@ impl SourceNode {
     pub fn to_string_with_source_map_generator(
         &self,
         file: Option<i32>,
-        source_root: Option<StringPtr>,
+        source_root: Option<StringSlice>,
     ) -> StringWithSourceMapGenerator {
-        let source_root = source_root.map(|sp| sp.to_ptr());
         let skip_validation = true;
         let mut context = ToSourceMapContext::new(file, source_root, skip_validation);
         self.walk(&mut context);
@@ -90,9 +85,8 @@ impl SourceNode {
     pub fn to_source_map_generator(
         &self,
         file: Option<i32>,
-        source_root: Option<StringPtr>,
+        source_root: Option<StringSlice>,
     ) -> SourceMapGenerator {
-        let source_root = source_root.map(|sp| sp.to_ptr());
         let skip_validation = true;
         let mut context = ToSourceMapContext::new(file, source_root, skip_validation);
         self.walk(&mut context);
@@ -106,10 +100,12 @@ impl SourceNode {
                 Node::NSourceNode(sn) => {
                     sn.walk(context);
                 }
-                Node::NRcString(chunk) => {
+                Node::NString(chunk) => {
                     context.process_chunk(&chunk, &self.source, &self.position, &self.name);
                 }
-                _ => {}
+                _ => {
+                    unreachable!()
+                }
             }
         }
         for (source, source_content) in &self.source_contents {
@@ -117,19 +113,19 @@ impl SourceNode {
         }
     }
 
-    pub fn add_mapping_with_code(&mut self, mapping: Option<Mapping>, code: &str) {
+    pub fn add_mapping_with_code(&mut self, mapping: Option<Mapping>, code: StringSlice) {
         let is_original = mapping
             .as_ref()
             .map_or(false, |mapping| mapping.source.is_some());
         if !is_original {
-            self.add(Node::NString(String::from(code)));
+            self.add(Node::NString(code));
         } else {
             let mapping = mapping.unwrap();
             self.add(Node::NSourceNode(SourceNode::new(
                 mapping.original,
                 mapping.source,
                 mapping.name,
-                Some(Node::NString(String::from(code))),
+                Some(Node::NString(code)),
             )));
         }
     }
@@ -148,10 +144,9 @@ struct ToSourceMapContext {
 impl ToSourceMapContext {
     pub fn new(
         file: Option<i32>,
-        source_root: Option<Rc<String>>,
+        source_root: Option<StringSlice>,
         skip_validation: bool,
     ) -> ToSourceMapContext {
-        let source_root = source_root.map(|sp| StringPtr::Ptr(sp));
         ToSourceMapContext {
             map: SourceMapGenerator::new(file, source_root, skip_validation),
             source_mapping_active: false,
@@ -167,7 +162,7 @@ impl ToSourceMapContext {
 impl WalkFunction for ToSourceMapContext {
     fn process_chunk(
         &mut self,
-        chunk: &Rc<String>,
+        chunk: &str,
         original_source: &Option<i32>,
         original_position: &Option<(usize, usize)>,
         original_name: &Option<i32>,
@@ -231,7 +226,7 @@ impl WalkFunction for ToSourceMapContext {
 trait WalkFunction {
     fn process_chunk(
         &mut self,
-        chunk: &Rc<String>,
+        chunk: &str,
         original_source: &Option<i32>,
         original_position: &Option<(usize, usize)>,
         original_name: &Option<i32>,

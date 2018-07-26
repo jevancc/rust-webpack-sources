@@ -2,6 +2,7 @@ use concat_source::*;
 use source::{Source, SourceTrait};
 use std::cell::RefCell;
 use std::rc::Rc;
+use types::string_slice::*;
 use wasm_api::{
     _LineToLineMappedSource, _OriginalSource, _PrefixSource, _RawSource, _ReplaceSource,
     _SourceMapSource,
@@ -23,7 +24,7 @@ impl _ConcatSource {
     }
 
     pub fn _add_string(&mut self, item: String) {
-        self.val.borrow_mut().add(Source::SString(Rc::new(item)));
+        self.val.borrow_mut().add(Source::SString(StringSlice::from(item)));
     }
     pub fn _add_raw_source(&mut self, item: &_RawSource) {
         self.val.borrow_mut().add(Source::Raw(item.get_raw()))
@@ -52,7 +53,7 @@ impl _ConcatSource {
     }
 
     pub fn _source(&mut self) -> String {
-        (*self.val.borrow_mut().source()).clone()
+        self.val.borrow_mut().source().into_string()
     }
 
     pub fn _size(&mut self) -> u32 {

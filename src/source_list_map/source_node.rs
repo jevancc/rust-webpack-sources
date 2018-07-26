@@ -1,6 +1,7 @@
 use super::types::Node;
 use super::{utils, MappingsContext, SingleLineNode};
 use std::str;
+use types::string_slice::*;
 use vlq;
 
 #[derive(Clone, Debug)]
@@ -15,7 +16,7 @@ pub struct SourceNode {
 
 impl SourceNode {
     pub fn new(
-        generated_code: String,
+        generated_code: StringSlice,
         source: Option<i32>,
         original_source: Option<i32>,
         starting_line: usize,
@@ -23,16 +24,16 @@ impl SourceNode {
         SourceNode {
             ends_with_new_line: generated_code.ends_with('\n'),
             number_of_lines: utils::number_of_lines(&generated_code),
-            generated_code,
+            generated_code: generated_code.into_string(),
             original_source,
             source,
             starting_line,
         }
     }
 
-    pub fn add_generated_code(&mut self, code: &str) {
-        self.generated_code += code;
-        self.number_of_lines += utils::number_of_lines(code);
+    pub fn add_generated_code(&mut self, code: StringSlice) {
+        self.generated_code += &code;
+        self.number_of_lines += utils::number_of_lines(&code);
         self.ends_with_new_line = code.ends_with('\n');
     }
 
@@ -96,11 +97,12 @@ impl SourceNode {
                 self.source.clone(),
                 self.original_source.clone().map(|n| Node::NStringIdx(n)),
             );
-            let mut mappings = String::from("A");
-            if mappings_context.unfinished_generated_line != 0 {
-                mappings = String::from(",");
+            let mut mappings = if mappings_context.unfinished_generated_line != 0 {
                 vlq::encode(mappings_context.unfinished_generated_line as i64, &mut buf).unwrap();
-            }
+                String::from(",")
+            } else {
+                String::from("A")
+            };
             vlq::encode(
                 source_index as i64 - mappings_context.current_source as i64,
                 &mut buf,
@@ -138,25 +140,26 @@ impl SourceNode {
     pub fn get_normalized_nodes(&self) -> Vec<SingleLineNode> {
         let mut results = Vec::<SingleLineNode>::new();
         let mut current_line = self.starting_line;
-        let mut lines = self.generated_code.split('\n').peekable();
 
-        while let Some(line) = lines.next() {
-            let line_code = if lines.peek().is_some() {
-                String::from(line) + "\n"
+        let mut code = StringSlice::from(self.generated_code.clone());
+        let mut line_start = 0;
+        let code_len = code.len();
+        while line_start < code_len {
+            let line_end = if let Some(pos) = code.find('\n') {
+                pos + 1
             } else {
-                if !self.ends_with_new_line {
-                    String::from(line)
-                } else {
-                    break;
-                }
+                code_len - line_start
             };
 
+            let (line, rest) = code.split_at(line_end);
             results.push(SingleLineNode::new(
-                line_code,
+                line,
                 self.source.clone(),
                 self.original_source.clone(),
                 current_line,
             ));
+            code = rest;
+            line_start += line_end;
             current_line += 1;
         }
         results

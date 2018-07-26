@@ -1,6 +1,7 @@
 use source::{Source, SourceTrait};
 use source_list_map::{types::Node as SlmNode, MappingFunction, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
+use types::string_slice::*;
 use std::cmp;
 use std::rc::Rc;
 use utils;
@@ -86,9 +87,9 @@ impl ReplaceSource {
 }
 
 impl SourceTrait for ReplaceSource {
-    fn source(&mut self) -> Rc<String> {
+    fn source(&mut self) -> StringSlice {
         let s = self.source.source();
-        Rc::new(self.replace_string(&s))
+        StringSlice::from(self.replace_string(&s))
     }
 
     fn node(&mut self, columns: bool, module: bool) -> SourceNode {
@@ -101,22 +102,22 @@ impl SourceTrait for ReplaceSource {
                 Ok((l1, r1)) => match split_sourcenode(l1, (repl.0 >> 4) as i32) {
                     Ok((l2, r2)) => {
                         result.push(r1);
-                        result.push(replacement_to_sourcenode(r2, repl.2.clone()));
+                        result.push(replacement_to_sourcenode(r2, StringSlice::from(&repl.2)));
                         result.push(l2);
                     }
                     Err((_, l1)) => {
                         result.push(r1.clone());
-                        result.push(replacement_to_sourcenode(r1, repl.2.clone()));
+                        result.push(replacement_to_sourcenode(r1, StringSlice::from(&repl.2)));
                         result.push(l1);
                     }
                 },
                 Err((_, rem_source)) => match split_sourcenode(rem_source, (repl.0 >> 4) as i32) {
                     Ok((l2, r2)) => {
-                        result.push(replacement_to_sourcenode(r2, repl.2.clone()));
+                        result.push(replacement_to_sourcenode(r2, StringSlice::from(&repl.2)));
                         result.push(l2);
                     }
                     Err((_, rem_source)) => {
-                        result.push(SmNode::NRcString(repl.2.clone()));
+                        result.push(SmNode::NString(StringSlice::from(&repl.2)));
                         result.push(rem_source);
                     }
                 },
@@ -139,7 +140,7 @@ impl SourceTrait for ReplaceSource {
         }
 
         if !extra_code.is_empty() {
-            map.add(SlmNode::NString(extra_code), None, None);
+            map.add(SlmNode::NString(StringSlice::from(extra_code)), None, None);
         }
         map
     }
@@ -284,30 +285,27 @@ fn split_sourcenode(
                 Err((split_position, SmNode::NSourceNode(node)))
             }
         }
-        SmNode::NRcString(n) => {
-            let n_len = n.chars().count();
+        SmNode::NString(n) => {
+            let n_len = n.as_ref().chars().count();
             if n_len as i32 <= split_position {
-                Err((split_position - n_len as i32, SmNode::NRcString(n)))
+                Err((split_position - n_len as i32, SmNode::NString(n)))
             } else {
-                let (left, right, _, _) = utils::split_str(&n, split_position, false);
-                let left = Rc::new(String::from(left));
-                let right = Rc::new(String::from(right));
-                Ok((SmNode::NRcString(left), SmNode::NRcString(right)))
+                let (left, right, _, _) = utils::split_string_slice(n, split_position, false);
+                Ok((SmNode::NString(left), SmNode::NString(right)))
             }
         }
-        SmNode::NString(n) => split_sourcenode(SmNode::NRcString(Rc::new(n)), split_position),
         _ => unreachable!(),
     }
 }
 
 #[inline]
-fn replacement_to_sourcenode(old_node: SmNode, new_string: Rc<String>) -> SmNode {
+fn replacement_to_sourcenode(old_node: SmNode, new_string: StringSlice) -> SmNode {
     if let SmNode::NSourceNode(node) = old_node {
         let mut map = node.to_source_map_generator(None, None);
         let original_mapping = map.original_position_for(1, 0);
         let position = original_mapping.original;
         let file = original_mapping.source;
-        let chunks = Some(SmNode::NRcString(new_string.clone()));
+        let chunks = Some(SmNode::NString(new_string));
         SmNode::NSourceNode(SourceNode::new(position, file, None, chunks))
     } else {
         unreachable!()

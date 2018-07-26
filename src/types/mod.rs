@@ -1,5 +1,6 @@
-mod source_map;
-mod string_ptr;
+pub mod source_map;
+// pub mod string_ptr;
+pub mod string_slice;
 
 pub use super::types::source_map::*;
-pub use super::types::string_ptr::StringPtr;
+// pub use super::types::string_ptr::_StringPtr;

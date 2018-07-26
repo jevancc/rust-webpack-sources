@@ -107,7 +107,7 @@ impl _SourceMapSource {
     }
 
     pub fn _source(&mut self) -> String {
-        (*self.val.borrow_mut().source()).clone()
+        self.val.borrow_mut().source().into_string()
     }
 
     pub fn _size(&mut self) -> u32 {

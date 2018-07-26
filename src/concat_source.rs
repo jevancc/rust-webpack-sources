@@ -1,7 +1,7 @@
 use source::{Source, SourceTrait};
 use source_list_map::{types::Node as SlmNode, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
-use std::rc::Rc;
+use types::string_slice::*;
 
 #[derive(Debug)]
 pub struct ConcatSource {
@@ -25,12 +25,12 @@ impl ConcatSource {
 }
 
 impl SourceTrait for ConcatSource {
-    fn source(&mut self) -> Rc<String> {
+    fn source(&mut self) -> StringSlice {
         let mut new = String::new();
         for child in &mut self.children {
-            new += child.source().as_str();
+            new += &child.source();
         }
-        Rc::new(new)
+        StringSlice::from(new)
     }
 
     fn size(&mut self) -> usize {
@@ -47,7 +47,7 @@ impl SourceTrait for ConcatSource {
             map.add(
                 if let Source::SString(s) = child {
                     // TODO: Check why error occurs when returning SlmNode::NString
-                    SlmNode::NRcString(s.clone())
+                    SlmNode::NString(s.clone())
                 } else {
                     SlmNode::NSourceListMap(child.list_map(columns, module))
                 },
@@ -68,8 +68,7 @@ impl SourceTrait for ConcatSource {
                     .iter_mut()
                     .map(|child| {
                         if let Source::SString(s) = child {
-                            // TODO: Check why error occurs when returning SmNode::NString
-                            SmNode::NRcString(s.clone())
+                            SmNode::NString(s.clone())
                         } else {
                             SmNode::NSourceNode(child.node(columns, module))
                         }

@@ -1,6 +1,7 @@
 use source_map::types::*;
 use source_map::*;
 use wasm_api::JsStringWithSourceMap;
+use types::string_slice::*;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -28,7 +29,7 @@ impl _MSourceNode {
     }
 
     pub fn _add_string(&mut self, chunk: String) {
-        self.val.add(Node::NString(chunk));
+        self.val.add(Node::NString(StringSlice::from(chunk)));
     }
 
     pub fn _add_sourcenode(&mut self, chunk: _MSourceNode) {

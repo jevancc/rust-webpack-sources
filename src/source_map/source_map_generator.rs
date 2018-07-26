@@ -2,15 +2,15 @@ use super::types::{Mapping, MappingList};
 use linked_hash_map::LinkedHashMap;
 use source_map_mappings::{parse_mappings, Mappings as _Mappings};
 use std::collections::{HashMap, HashSet};
-use std::rc::Rc;
 use std::str;
-use types::{SourceMap, StringPtr};
+use types::SourceMap;
+use types::string_slice::*;
 use vlq;
 
 #[derive(Debug)]
 pub struct SourceMapGenerator {
     file: Option<i32>,
-    source_root: Option<Rc<String>>,
+    source_root: Option<StringSlice>,
     skip_validation: bool,
     sources: LinkedHashMap<i32, usize>,
     names: LinkedHashMap<i32, usize>,
@@ -21,10 +21,9 @@ pub struct SourceMapGenerator {
 impl SourceMapGenerator {
     pub fn new(
         file: Option<i32>,
-        source_root: Option<StringPtr>,
+        source_root: Option<StringSlice>,
         skip_validation: bool,
     ) -> SourceMapGenerator {
-        let source_root = source_root.map(|sp| sp.to_ptr());
         SourceMapGenerator {
             file,
             source_root,
@@ -73,7 +72,7 @@ impl SourceMapGenerator {
         let names: Vec<i32> = self.names.keys().map(|sidx| *sidx).collect();
         let mappings = self.serialize_mappings();
         let file = self.file;
-        let source_root = self.source_root.clone().map(|sp| (*sp).clone());
+        let source_root = self.source_root.clone().map(|sp| sp.into_string());
         let mut sources_content: Vec<i32> = Vec::new();
 
         for src in self.sources.keys() {
@@ -168,6 +167,7 @@ impl SourceMapGenerator {
                     previous_name = *name_idx;
                 }
             }
+            // result += unsafe { str::from_utf8_unchecked(&buf) };
             result += str::from_utf8(&buf).unwrap();
             buf.clear();
         }
@@ -250,10 +250,10 @@ impl SourceMapGenerator {
     pub fn from_source_map(
         sources: Vec<i32>,
         sources_content: Vec<i32>,
-        mappings: StringPtr,
+        mappings: StringSlice,
         names: Vec<i32>,
         file: Option<i32>,
-        source_root: Option<StringPtr>,
+        source_root: Option<StringSlice>,
         check_dup: bool,
     ) -> SourceMapGenerator {
         let mut generator = SourceMapGenerator::new(file, source_root, true);
@@ -284,7 +284,7 @@ impl SourceMapGenerator {
             names
         };
 
-        let mappings: _Mappings<()> = parse_mappings(mappings.get().as_bytes()).unwrap();
+        let mappings: _Mappings<()> = parse_mappings(mappings.as_bytes()).unwrap();
         let mappings = mappings.by_generated_location();
 
         for mapping in mappings {

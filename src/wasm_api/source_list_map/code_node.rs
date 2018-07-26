@@ -1,4 +1,5 @@
 use source_list_map::*;
+use types::string_slice::*;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -10,7 +11,7 @@ pub struct _CodeNode {
 impl _CodeNode {
     pub fn _new_string(generated_code: String) -> _CodeNode {
         _CodeNode {
-            val: CodeNode::new(generated_code),
+            val: CodeNode::new(StringSlice::from(generated_code)),
         }
     }
 

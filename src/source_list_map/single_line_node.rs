@@ -1,6 +1,7 @@
 use super::types::Node;
 use super::{utils, MappingFunction, MappingsContext, SourceNode};
 use std::str;
+use types::string_slice::*;
 use vlq;
 
 #[derive(Clone, Debug)]
@@ -15,7 +16,7 @@ pub struct SingleLineNode {
 
 impl SingleLineNode {
     pub fn new(
-        generated_code: String,
+        generated_code: StringSlice,
         source: Option<i32>,
         original_source: Option<i32>,
         line: usize,
@@ -26,13 +27,13 @@ impl SingleLineNode {
             line,
             number_of_lines: utils::number_of_lines(&generated_code),
             ends_with_new_line: generated_code.ends_with('\n'),
-            generated_code,
+            generated_code: generated_code.into_string(),
         }
     }
 
     pub fn map_generated_code<T: MappingFunction>(self, mf: &mut T) -> SingleLineNode {
         let generated_code = mf.map(self.generated_code);
-        SingleLineNode::new(generated_code, self.source, self.original_source, self.line)
+        SingleLineNode::new(StringSlice::from(generated_code), self.source, self.original_source, self.line)
     }
 
     pub fn merge(self, other_node: &Node) -> Result<Node, Node> {
@@ -54,8 +55,9 @@ impl SingleLineNode {
                 && self.number_of_lines == 1
                 && other_node.number_of_lines <= 1
             {
+                let new_code = self.generated_code + &other_node.generated_code;
                 Ok(Node::NSourceNode(SourceNode::new(
-                    self.generated_code + &other_node.generated_code,
+                    StringSlice::from(new_code),
                     self.source,
                     self.original_source,
                     self.line,
@@ -91,11 +93,12 @@ impl SingleLineNode {
                 self.original_source.clone().map(|n| Node::NStringIdx(n)),
             );
 
-            let mut mappings = String::from("A");
-            if mappings_context.unfinished_generated_line != 0 {
+            let mut mappings = if mappings_context.unfinished_generated_line != 0 {
                 vlq::encode(mappings_context.unfinished_generated_line as i64, &mut buf).unwrap();
-                mappings = String::from(",");
-            }
+                String::from(",")
+            } else {
+                String::from("A")
+            };
             vlq::encode(
                 source_index as i64 - mappings_context.current_source as i64,
                 &mut buf,

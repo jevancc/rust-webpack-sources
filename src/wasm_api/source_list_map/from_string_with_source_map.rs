@@ -1,5 +1,5 @@
 use source_list_map::*;
-use types::StringPtr;
+use types::string_slice::*;
 use wasm_api::_SourceListMap;
 use wasm_bindgen::prelude::*;
 
@@ -14,9 +14,9 @@ pub fn _from_string_with_source_map(
     let sources_content = sources_content.to_vec();
 
     _SourceListMap::new(from_string_with_source_map(
-        StringPtr::Str(code),
+        StringSlice::from(code),
         sources,
         sources_content,
-        StringPtr::Str(mappings),
+        StringSlice::from(mappings),
     ))
 }

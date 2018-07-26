@@ -1,11 +1,11 @@
 use source::SourceTrait;
 use source_list_map::{types::GenCode, types::Node as SlmNode, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
-use std::rc::Rc;
+use types::string_slice::*;
 
 #[derive(Debug)]
 pub struct LineToLineMappedSource {
-    value: Rc<String>,
+    value: StringSlice,
     name: i32,
     original_source: i32,
 }
@@ -13,7 +13,7 @@ pub struct LineToLineMappedSource {
 impl LineToLineMappedSource {
     pub fn new(value: String, name: i32, original_source: i32) -> LineToLineMappedSource {
         LineToLineMappedSource {
-            value: Rc::new(value),
+            value: StringSlice::from(value),
             name,
             original_source,
         }
@@ -21,7 +21,7 @@ impl LineToLineMappedSource {
 }
 
 impl SourceTrait for LineToLineMappedSource {
-    fn source(&mut self) -> Rc<String> {
+    fn source(&mut self) -> StringSlice {
         self.value.clone()
     }
 
@@ -30,17 +30,31 @@ impl SourceTrait for LineToLineMappedSource {
     }
 
     fn node(&mut self, _columns: bool, _module: bool) -> SourceNode {
-        let mut lines = self.value.split('\n').enumerate().peekable();
         let mut chunks = Vec::<SmNode>::new();
-        while let Some((idx, line)) = lines.next() {
-            let line = String::from(line) + if lines.peek().is_none() { "\n" } else { "" };
+
+        let mut code = self.value.clone();
+        let mut line_start = 0;
+        let mut current_line = 1;
+        let code_len = code.len();
+
+        while line_start < code_len {
+            let line_end = if let Some(pos) = code.find('\n') {
+                pos + 1
+            } else {
+                code_len - line_start
+            };
+            let (line, rest) = code.split_at(line_end);
             chunks.push(SmNode::NSourceNode(SourceNode::new(
-                Some((idx + 1, 0)),
+                Some((current_line, 0)),
                 Some(self.name.clone()),
                 None,
                 Some(SmNode::NString(line)),
             )));
+            code = rest;
+            line_start += line_end;
+            current_line += 1;
         }
+
         let mut node = SourceNode::new(None, None, None, Some(SmNode::NNodeVec(chunks)));
         node.set_source_content(self.name.clone(), self.original_source.clone());
         node
@@ -48,7 +62,7 @@ impl SourceTrait for LineToLineMappedSource {
 
     fn list_map(&mut self, _columns: bool, _module: bool) -> SourceListMap {
         SourceListMap::new(
-            Some(GenCode::Code(SlmNode::NRcString(self.value.clone()))),
+            Some(GenCode::Code(SlmNode::NString(self.value.clone()))),
             Some(self.name.clone()),
             Some(self.original_source.clone()),
         )

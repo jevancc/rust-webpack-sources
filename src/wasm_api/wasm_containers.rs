@@ -1,6 +1,7 @@
 use source_list_map::types::*;
 use source_map::SourceMapGenerator;
 use types::*;
+use types::string_slice::*;
 use wasm_api::{_CodeNode, _SingleLineNode, _SourceListMap, _SourceNode};
 use wasm_bindgen::prelude::*;
 
@@ -77,35 +78,35 @@ impl JsStringWithSourceMap {
     }
 }
 
-#[wasm_bindgen]
-pub struct StringVec {
-    val: Vec<String>,
-}
-
-#[wasm_bindgen]
-impl StringVec {
-    pub fn new() -> StringVec {
-        StringVec { val: Vec::new() }
-    }
-
-    pub fn push_string(&mut self, s: String) {
-        self.val.push(s);
-    }
-}
-
-impl StringVec {
-    pub fn get(&self) -> &Vec<String> {
-        &self.val
-    }
-
-    pub fn get_mut(&mut self) -> &mut Vec<String> {
-        &mut self.val
-    }
-
-    pub fn get_raw(self) -> Vec<String> {
-        self.val
-    }
-}
+// #[wasm_bindgen]
+// pub struct StringVec {
+//     val: Vec<String>,
+// }
+//
+// #[wasm_bindgen]
+// impl StringVec {
+//     pub fn new() -> StringVec {
+//         StringVec { val: Vec::new() }
+//     }
+//
+//     pub fn push_string(&mut self, s: String) {
+//         self.val.push(s);
+//     }
+// }
+//
+// impl StringVec {
+//     pub fn get(&self) -> &Vec<String> {
+//         &self.val
+//     }
+//
+//     pub fn get_mut(&mut self) -> &mut Vec<String> {
+//         &mut self.val
+//     }
+//
+//     pub fn get_raw(self) -> Vec<String> {
+//         self.val
+//     }
+// }
 
 #[wasm_bindgen]
 pub struct NodeVec {
@@ -119,7 +120,7 @@ impl NodeVec {
     }
 
     pub fn push_string(&mut self, s: String) {
-        self.val.push(Node::NString(s));
+        self.val.push(Node::NString(StringSlice::from(s)));
     }
 
     pub fn push_sourcenode(&mut self, sn: &_SourceNode) {

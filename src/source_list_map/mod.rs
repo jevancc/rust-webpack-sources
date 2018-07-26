@@ -17,12 +17,11 @@ pub use source_list_map::source_node::SourceNode;
 
 pub mod types {
     use super::{CodeNode, SingleLineNode, SourceListMap, SourceNode};
-    use std::rc::Rc;
+    use types::string_slice::StringSlice;
 
-    #[derive(Clone, Debug)]
+    #[derive(Debug, Clone)]
     pub enum Node {
-        NRcString(Rc<String>),
-        NString(String),
+        NString(StringSlice),
         NCodeNode(CodeNode),
         NSourceNode(SourceNode),
         NSingleLineNode(SingleLineNode),
@@ -30,7 +29,7 @@ pub mod types {
         NStringIdx(i32),
     }
 
-    #[derive(Clone, Debug)]
+    #[derive(Debug)]
     pub enum GenCode {
         Code(Node),
         CodeVec(Vec<Node>),

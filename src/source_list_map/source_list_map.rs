@@ -2,7 +2,7 @@ use super::types::{GenCode, Node};
 use super::{CodeNode, MappingFunction, MappingsContext, SourceNode};
 use types::{SourceMap, StringWithSourceMap};
 
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone)]
 pub struct SourceListMap {
     pub children: Vec<Node>,
 }
@@ -35,10 +35,6 @@ impl SourceListMap {
         original_source: Option<i32>,
     ) -> &mut SourceListMap {
         match generated_code {
-            Node::NRcString(sp) => {
-                let s: String = (*sp).clone();
-                self.add(Node::NString(s), source, original_source);
-            }
             Node::NString(s) => {
                 if source.is_some() {
                     self.children.push(Node::NSourceNode(SourceNode::new(
@@ -56,7 +52,7 @@ impl SourceListMap {
                         let len = self.children.len();
                         let mut ln = self.children.get_mut(len - 1).unwrap();
                         if let Node::NCodeNode(ref mut ln) = ln {
-                            ln.add_generated_code(&s);
+                            ln.add_generated_code(s.as_ref());
                         }
                     } else {
                         self.children.push(Node::NCodeNode(CodeNode::new(s)));
@@ -91,10 +87,6 @@ impl SourceListMap {
         original_source: Option<i32>,
     ) -> &mut SourceListMap {
         match generated_code {
-            Node::NRcString(sp) => {
-                let s: String = (*sp).clone();
-                self.prepend(Node::NString(s), source, original_source);
-            }
             Node::NString(s) => {
                 if source.is_none() {
                     self.children.insert(
@@ -215,7 +207,7 @@ impl SourceListMap {
                 Node::NCodeNode(ref sln) => src += sln.get_generated_code(),
                 Node::NSourceNode(ref sln) => src += sln.get_generated_code(),
                 Node::NSingleLineNode(ref sln) => src += sln.get_generated_code(),
-                Node::NString(ref sln) => src += &sln,
+                Node::NString(ref sln) => src += sln.as_ref(),
                 _ => {}
             }
         }
@@ -237,19 +229,8 @@ impl SourceListMap {
             map: SourceMap {
                 version: 3,
                 file: Some(file),
-                sources: arrays.sources.iter().map(|idx| idx.unwrap_or(-1)).collect(),
-                sources_content: if mc.has_source_content {
-                    let mut vec = Vec::<i32>::new();
-                    for sc in arrays.sources_content {
-                        match sc {
-                            Node::NStringIdx(idx) => vec.push(idx),
-                            _ => {}
-                        }
-                    }
-                    vec
-                } else {
-                    vec![]
-                },
+                sources: arrays.0.iter().map(|idx| idx.unwrap_or(-1)).collect(),
+                sources_content: arrays.1,
                 mappings,
                 names: vec![],
                 source_root: None,
@@ -257,19 +238,3 @@ impl SourceListMap {
         }
     }
 }
-
-//
-// #[derive(Debug, PartialEq, Serialize, Deserialize)]
-// pub struct StringWithSrcMap {
-//     pub source: String,
-//     pub map: SrcMap,
-// }
-//
-// #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-// pub struct SrcMap {
-//     pub version: i32,
-//     pub file: String,
-//     pub sources: Vec<String>,
-//     pub sources_content: Vec<String>,
-//     pub mappings: String,
-// }

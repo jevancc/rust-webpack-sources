@@ -1,16 +1,18 @@
 use super::types::{GenCode, Node};
 use super::{CodeNode, SourceListMap, SourceNode};
-use types::StringPtr;
+use types::string_slice::*;
 use vlq;
 
+// TODO: Use "StringSlice" to enhance performance
 pub fn from_string_with_source_map(
-    code: StringPtr,
+    // code must be "StringSlice" here and guarantee the string lives longer than returned SourceNode
+    code: StringSlice,
     sources: Vec<i32>,
     sources_content: Vec<i32>,
-    mappings: StringPtr,
+    mappings: StringSlice,
 ) -> SourceListMap {
-    let mappings = mappings.get().split(';').enumerate();
-    let mut lines = code.get().split('\n').enumerate();
+    let mappings = mappings.as_ref().split(';').enumerate();
+    let mut lines = code.as_ref().split('\n').enumerate();
     let lines_count = lines.clone().count();
     let mut nodes: Vec<Node> = vec![];
 
@@ -123,14 +125,14 @@ fn add_code(nodes: &mut Vec<Node>, current_source_node_line: &mut usize, generat
         }
         Some(Node::NSourceNode(ref mut n)) => {
             if generated_code.trim().is_empty() {
-                n.add_generated_code(&generated_code);
+                n.add_generated_code(StringSlice::from(generated_code));
                 *current_source_node_line += 1;
                 return;
             }
         }
         _ => {}
     }
-    nodes.push(Node::NCodeNode(CodeNode::new(generated_code)));
+    nodes.push(Node::NCodeNode(CodeNode::new(StringSlice::from(generated_code))));
 }
 
 #[inline]
@@ -144,13 +146,13 @@ fn add_source(
 ) {
     if let Some(Node::NSourceNode(ref mut n)) = nodes.last_mut() {
         if n.source == source && *current_source_node_line == line {
-            n.add_generated_code(&generated_code);
+            n.add_generated_code(StringSlice::from(generated_code));
             *current_source_node_line += 1;
             return;
         }
     }
     nodes.push(Node::NSourceNode(SourceNode::new(
-        generated_code,
+        StringSlice::from(generated_code),
         source,
         original_source,
         line,
