@@ -1,7 +1,7 @@
 use source_list_map::types::*;
 use source_map::SourceMapGenerator;
-use types::*;
 use types::string_slice::*;
+use types::*;
 use wasm_api::{_CodeNode, _SingleLineNode, _SourceListMap, _SourceNode};
 use wasm_bindgen::prelude::*;
 

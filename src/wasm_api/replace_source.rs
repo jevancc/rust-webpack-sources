@@ -20,9 +20,9 @@ impl _ReplaceSource {
     // TODO: use macro
     pub fn _new_string(source: String) -> _ReplaceSource {
         _ReplaceSource {
-            val: Rc::new(RefCell::new(ReplaceSource::new(Source::SString(StringSlice::from(
-                source,
-            ))))),
+            val: Rc::new(RefCell::new(ReplaceSource::new(Source::SString(
+                StringSlice::from(source),
+            )))),
         }
     }
     pub fn _new_raw_source(source: &_RawSource) -> _ReplaceSource {

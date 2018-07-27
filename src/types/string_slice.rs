@@ -1,13 +1,12 @@
 // use std::ops::{Add, AddAssign, Deref};
-use std::ops::Deref;
-use std::string::ToString;
 use std::cmp::min;
+use std::convert::From;
+use std::hash;
+use std::ops::Deref;
 use std::rc::Rc;
 use std::slice;
 use std::str;
-use std::convert::From;
-use std::hash;
-
+use std::string::ToString;
 
 #[derive(Debug, Clone)]
 pub struct StringSlice(*const u8, usize, Rc<String>);
@@ -25,17 +24,21 @@ impl StringSlice {
     pub fn substr(&self, start: usize, stop: usize) -> Self {
         let start = min(start, self.1);
         let stop = min(stop, self.1);
-        StringSlice(unsafe {
-            self.0.offset(start as isize)
-        }, stop - start, self.2.clone())
+        StringSlice(
+            unsafe { self.0.offset(start as isize) },
+            stop - start,
+            self.2.clone(),
+        )
     }
 
     pub fn split_at(self, mid: usize) -> (Self, Self) {
         let mid = min(mid, self.1);
-        unsafe {(
-            StringSlice(self.0, mid, self.2.clone()),
-            StringSlice(self.0.offset(mid as isize), self.1 - mid, self.2.clone())
-        )}
+        unsafe {
+            (
+                StringSlice(self.0, mid, self.2.clone()),
+                StringSlice(self.0.offset(mid as isize), self.1 - mid, self.2),
+            )
+        }
     }
 
     #[inline]
@@ -45,25 +48,19 @@ impl StringSlice {
 
     #[inline]
     pub fn as_str(&self) -> &str {
-        unsafe {
-            str::from_utf8_unchecked(slice::from_raw_parts(self.0, self.1))
-        }
+        unsafe { str::from_utf8_unchecked(slice::from_raw_parts(self.0, self.1)) }
     }
 
     #[inline]
     pub fn as_bytes(&self) -> &[u8] {
-        unsafe {
-            slice::from_raw_parts(self.0, self.1)
-        }
+        unsafe { slice::from_raw_parts(self.0, self.1) }
     }
 
     pub fn into_string(self) -> String {
         if self.0 == self.2.as_str().as_ptr() && self.1 == self.2.len() {
             Rc::try_unwrap(self.2).unwrap_or_else(|s| (*s).clone())
         } else {
-            unsafe {
-                str::from_utf8_unchecked(slice::from_raw_parts(self.0, self.1)).to_string()
-            }
+            unsafe { str::from_utf8_unchecked(slice::from_raw_parts(self.0, self.1)).to_string() }
         }
     }
 
@@ -72,9 +69,7 @@ impl StringSlice {
             self.2.clone()
         } else {
             unsafe {
-                Rc::new(
-                    str::from_utf8_unchecked(slice::from_raw_parts(self.0, self.1)).to_string()
-                )
+                Rc::new(str::from_utf8_unchecked(slice::from_raw_parts(self.0, self.1)).to_string())
             }
         }
     }
@@ -97,9 +92,7 @@ impl AsRef<str> for StringSlice {
 impl ToString for StringSlice {
     #[inline]
     fn to_string(&self) -> String {
-        unsafe {
-            str::from_utf8_unchecked(slice::from_raw_parts(self.0, self.1)).to_string()
-        }
+        unsafe { str::from_utf8_unchecked(slice::from_raw_parts(self.0, self.1)).to_string() }
     }
 }
 
@@ -109,7 +102,9 @@ impl PartialEq for StringSlice {
         self.as_bytes() == other.as_bytes()
     }
     #[inline]
-    fn ne(&self, other: &StringSlice) -> bool { !(*self).eq(other) }
+    fn ne(&self, other: &StringSlice) -> bool {
+        !(*self).eq(other)
+    }
 }
 
 impl Eq for StringSlice {}
@@ -139,7 +134,6 @@ impl<'a> From<&'a Rc<String>> for StringSlice {
         StringSlice(s.as_str().as_ptr(), s.len(), s.clone())
     }
 }
-
 
 impl Deref for StringSlice {
     type Target = str;

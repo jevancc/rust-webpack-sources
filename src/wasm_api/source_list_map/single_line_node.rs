@@ -1,6 +1,6 @@
 use source_list_map::*;
-use wasm_bindgen::prelude::*;
 use types::string_slice::*;
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub struct _SingleLineNode {
@@ -14,7 +14,12 @@ impl _SingleLineNode {
         starting_line: u32,
     ) -> _SingleLineNode {
         _SingleLineNode {
-            val: SingleLineNode::new(StringSlice::from(generated_code), None, None, starting_line as usize),
+            val: SingleLineNode::new(
+                StringSlice::from(generated_code),
+                None,
+                None,
+                starting_line as usize,
+            ),
         }
     }
 
@@ -49,5 +54,4 @@ impl _SingleLineNode {
     pub fn get_mut(&mut self) -> &mut SingleLineNode {
         &mut self.val
     }
-
 }

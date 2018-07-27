@@ -38,10 +38,10 @@ impl SourceTrait for LineToLineMappedSource {
         let code_len = code.len();
 
         while line_start < code_len {
-            let line_end = if let Some(pos) = code.find('\n') {
-                pos + 1
+            let (line_end, last_line) = if let Some(pos) = code.find('\n') {
+                (pos + 1, false)
             } else {
-                code_len - line_start
+                (code_len - line_start, true)
             };
             let (line, rest) = code.split_at(line_end);
             chunks.push(SmNode::NSourceNode(SourceNode::new(
@@ -50,6 +50,9 @@ impl SourceTrait for LineToLineMappedSource {
                 None,
                 Some(SmNode::NString(line)),
             )));
+            if last_line {
+                break;
+            }
             code = rest;
             line_start += line_end;
             current_line += 1;

@@ -24,7 +24,9 @@ impl _ConcatSource {
     }
 
     pub fn _add_string(&mut self, item: String) {
-        self.val.borrow_mut().add(Source::SString(StringSlice::from(item)));
+        self.val
+            .borrow_mut()
+            .add(Source::SString(StringSlice::from(item)));
     }
     pub fn _add_raw_source(&mut self, item: &_RawSource) {
         self.val.borrow_mut().add(Source::Raw(item.get_raw()))

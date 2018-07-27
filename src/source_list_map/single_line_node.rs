@@ -33,7 +33,12 @@ impl SingleLineNode {
 
     pub fn map_generated_code<T: MappingFunction>(self, mf: &mut T) -> SingleLineNode {
         let generated_code = mf.map(self.generated_code);
-        SingleLineNode::new(StringSlice::from(generated_code), self.source, self.original_source, self.line)
+        SingleLineNode::new(
+            StringSlice::from(generated_code),
+            self.source,
+            self.original_source,
+            self.line,
+        )
     }
 
     pub fn merge(self, other_node: &Node) -> Result<Node, Node> {

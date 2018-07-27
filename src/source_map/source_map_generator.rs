@@ -3,8 +3,8 @@ use linked_hash_map::LinkedHashMap;
 use source_map_mappings::{parse_mappings, Mappings as _Mappings};
 use std::collections::{HashMap, HashSet};
 use std::str;
-use types::SourceMap;
 use types::string_slice::*;
+use types::SourceMap;
 use vlq;
 
 #[derive(Debug)]
@@ -167,8 +167,7 @@ impl SourceMapGenerator {
                     previous_name = *name_idx;
                 }
             }
-            // result += unsafe { str::from_utf8_unchecked(&buf) };
-            result += str::from_utf8(&buf).unwrap();
+            result += unsafe { str::from_utf8_unchecked(&buf) };
             buf.clear();
         }
         result

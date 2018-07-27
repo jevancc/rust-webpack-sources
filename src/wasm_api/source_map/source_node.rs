@@ -1,7 +1,7 @@
 use source_map::types::*;
 use source_map::*;
-use wasm_api::JsStringWithSourceMap;
 use types::string_slice::*;
+use wasm_api::JsStringWithSourceMap;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]

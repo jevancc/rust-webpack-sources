@@ -52,7 +52,7 @@ impl SourceListMap {
                         let len = self.children.len();
                         let mut ln = self.children.get_mut(len - 1).unwrap();
                         if let Node::NCodeNode(ref mut ln) = ln {
-                            ln.add_generated_code(s.as_ref());
+                            ln.add_generated_code(&s);
                         }
                     } else {
                         self.children.push(Node::NCodeNode(CodeNode::new(s)));
@@ -207,7 +207,7 @@ impl SourceListMap {
                 Node::NCodeNode(ref sln) => src += sln.get_generated_code(),
                 Node::NSourceNode(ref sln) => src += sln.get_generated_code(),
                 Node::NSingleLineNode(ref sln) => src += sln.get_generated_code(),
-                Node::NString(ref sln) => src += sln.as_ref(),
+                Node::NString(ref sln) => src += &sln,
                 _ => {}
             }
         }

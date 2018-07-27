@@ -1,9 +1,9 @@
 use source::{Source, SourceTrait};
 use source_list_map::{types::Node as SlmNode, MappingFunction, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
-use types::string_slice::*;
 use std::cmp;
 use std::rc::Rc;
+use types::string_slice::*;
 use utils;
 
 #[derive(Debug)]

@@ -22,27 +22,40 @@ pub fn from_string_with_source_map_generator(
 
             if c == '\n' {
                 let line_end = p + 1;
-                lines.push((code.substr(line_start, line_end), true, single_byte_char_only));
+                lines.push((
+                    code.substr(line_start, line_end),
+                    true,
+                    single_byte_char_only,
+                ));
                 line_start = line_end;
                 single_byte_char_only = true;
             }
         }
         if line_start != code_len {
-            lines.push((code.substr(line_start, code_len), true, single_byte_char_only));
+            lines.push((
+                code.substr(line_start, code_len),
+                true,
+                single_byte_char_only,
+            ));
         }
     }
 
     let mut last_generated_position: (usize, usize) = (1, 0);
     let mut last_mapping: Option<Mapping> = None;
     let mut line_iter = lines.into_iter();
-    let mut next_line: (StringSlice, bool, bool) = line_iter.next().unwrap_or((StringSlice::new(), false, true));
+    let mut next_line: (StringSlice, bool, bool) =
+        line_iter
+            .next()
+            .unwrap_or((StringSlice::new(), false, true));
 
     for mapping in &generator.mappings.list {
         let generated_position = mapping.generated;
         if last_mapping.is_some() {
             if last_generated_position.0 < generated_position.0 {
                 node.add_mapping_with_code(last_mapping, next_line.0);
-                next_line = line_iter.next().unwrap_or((StringSlice::new(), false, true));
+                next_line = line_iter
+                    .next()
+                    .unwrap_or((StringSlice::new(), false, true));
                 // line++, column = 0
                 last_generated_position.0 += 1;
                 last_generated_position.1 = 0;
@@ -64,11 +77,14 @@ pub fn from_string_with_source_map_generator(
 
         while last_generated_position.0 < generated_position.0 {
             node.add(Node::NString(next_line.0));
-            next_line = line_iter.next().unwrap_or((StringSlice::new(), false, true));
+            next_line = line_iter
+                .next()
+                .unwrap_or((StringSlice::new(), false, true));
             last_generated_position.0 += 1;
         }
         if last_generated_position.1 < generated_position.1 {
-            let splitted = utils::split_string_slice(next_line.0, generated_position.1 as i32, next_line.2);
+            let splitted =
+                utils::split_string_slice(next_line.0, generated_position.1 as i32, next_line.2);
             node.add(Node::NString(splitted.0));
             next_line.0 = splitted.1;
             next_line.2 = splitted.3; // new len
@@ -80,12 +96,16 @@ pub fn from_string_with_source_map_generator(
     if next_line.1 {
         if last_mapping.is_some() {
             node.add_mapping_with_code(last_mapping, next_line.0);
-            next_line = line_iter.next().unwrap_or((StringSlice::new(), false, true));
+            next_line = line_iter
+                .next()
+                .unwrap_or((StringSlice::new(), false, true));
         }
         let mut remaining = String::new();
         while next_line.1 {
             remaining += &next_line.0;
-            next_line = line_iter.next().unwrap_or((StringSlice::new(), false, true));
+            next_line = line_iter
+                .next()
+                .unwrap_or((StringSlice::new(), false, true));
         }
         node.add(Node::NString(StringSlice::from(remaining)));
     }

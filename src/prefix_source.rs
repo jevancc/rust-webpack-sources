@@ -3,7 +3,7 @@ use source_list_map::{MappingFunction, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
 use types::string_slice::*;
 
-fn clone_and_prefix(node: SmNode, prefix: &str, append: &mut i32) -> Result<SmNode, &'static str> {
+fn clone_and_prefix(node: SmNode, prefix: &str, append: &mut i32) -> SmNode {
     match node {
         SmNode::NString(s) => {
             let mut s = s.into_string();
@@ -23,19 +23,17 @@ fn clone_and_prefix(node: SmNode, prefix: &str, append: &mut i32) -> Result<SmNo
             if end_with_new_line {
                 *append += 1;
             }
-            Ok(SmNode::NString(StringSlice::from(s)))
+            SmNode::NString(StringSlice::from(s))
         }
         SmNode::NSourceNode(mut sn) => {
             let mut new_children = Vec::<SmNode>::new();
             for child in sn.children.into_iter() {
-                new_children.push(clone_and_prefix(child, prefix, append).unwrap());
+                new_children.push(clone_and_prefix(child, prefix, append));
             }
             sn.children = new_children;
-            Ok(SmNode::NSourceNode(sn))
+            SmNode::NSourceNode(sn)
         }
-        _ => {
-            Ok(SmNode::NString(StringSlice::new()))
-        }
+        _ => SmNode::NString(StringSlice::new()),
     }
 }
 
@@ -53,7 +51,7 @@ impl PrefixSource {
 
 impl SourceTrait for PrefixSource {
     fn source(&mut self) -> StringSlice {
-        let mut s = self.prefix.clone() + self.source.source().as_str();
+        let mut s = self.prefix.clone() + &self.source.source();
         if s.ends_with('\n') {
             s.pop();
             s = s.replace('\n', &(String::from("\n") + &self.prefix));
@@ -66,13 +64,16 @@ impl SourceTrait for PrefixSource {
 
     fn node(&mut self, columns: bool, module: bool) -> SourceNode {
         let node = self.source.node(columns, module);
-
         let mut append = 1;
         SourceNode::new(
             None,
             None,
             None,
-            Some(clone_and_prefix(SmNode::NSourceNode(node), &self.prefix, &mut append).unwrap()),
+            Some(clone_and_prefix(
+                SmNode::NSourceNode(node),
+                &self.prefix,
+                &mut append,
+            )),
         )
     }
 

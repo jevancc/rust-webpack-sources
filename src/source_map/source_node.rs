@@ -1,8 +1,8 @@
 use super::types::{Mapping, Node};
 use super::SourceMapGenerator;
 use std::collections::HashMap;
-use types::{StringWithSourceMap, StringWithSourceMapGenerator};
 use types::string_slice::*;
+use types::{StringWithSourceMap, StringWithSourceMapGenerator};
 
 #[derive(Clone, Debug)]
 pub struct SourceNode {
@@ -103,9 +103,7 @@ impl SourceNode {
                 Node::NString(chunk) => {
                     context.process_chunk(&chunk, &self.source, &self.position, &self.name);
                 }
-                _ => {
-                    unreachable!()
-                }
+                _ => unreachable!(),
             }
         }
         for (source, source_content) in &self.source_contents {

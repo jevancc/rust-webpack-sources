@@ -26,12 +26,7 @@ impl SourceTrait for RawSource {
     }
 
     fn node(&mut self, _columns: bool, _module: bool) -> SourceNode {
-        SourceNode::new(
-            None,
-            None,
-            None,
-            Some(SmNode::NString(self.value.clone())),
-        )
+        SourceNode::new(None, None, None, Some(SmNode::NString(self.value.clone())))
     }
 
     fn list_map(&mut self, _columns: bool, _module: bool) -> SourceListMap {

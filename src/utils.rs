@@ -20,8 +20,11 @@ pub fn split_str(s: &str, pos: i32, single_byte_char_only: bool) -> (&str, &str,
     }
 }
 
-pub fn split_string_slice(s: StringSlice, pos: i32, single_byte_char_only: bool)
-    -> (StringSlice, StringSlice, bool, bool) {
+pub fn split_string_slice(
+    s: StringSlice,
+    pos: i32,
+    single_byte_char_only: bool,
+) -> (StringSlice, StringSlice, bool, bool) {
     if pos <= 0 {
         (StringSlice::from(""), s, true, single_byte_char_only)
     } else {

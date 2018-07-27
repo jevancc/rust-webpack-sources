@@ -37,11 +37,11 @@ impl SourceTrait for OriginalSource {
         let mut current_line = 1;
         let code_len = code.len();
 
-        while line_start < code_len {
-            let line_end = if let Some(pos) = code.find('\n') {
-                pos + 1
+        loop {
+            let (line_end, last_line) = if let Some(pos) = code.find('\n') {
+                (pos + 1, false)
             } else {
-                code_len - line_start
+                (code_len - line_start, true)
             };
             let (line, rest) = code.split_at(line_end);
             if !columns {
@@ -59,22 +59,25 @@ impl SourceTrait for OriginalSource {
                     if item.trim().is_empty() {
                         sn2.add(SmNode::NString(item));
                     } else {
-                        pos += item.len();
+                        let len = item.len();
                         sn2.add(SmNode::NSourceNode(SourceNode::new(
                             Some((current_line, pos)),
                             Some(self.name.clone()),
                             None,
                             Some(SmNode::NString(item)),
                         )));
+                        pos += len;
                     }
                 }
                 sn.add(SmNode::NSourceNode(sn2))
+            }
+            if last_line {
+                break;
             }
             code = rest;
             line_start += line_end;
             current_line += 1;
         }
-
         sn.set_source_content(self.name.clone(), self.value_idx.clone());
         sn
     }

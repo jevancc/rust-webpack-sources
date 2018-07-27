@@ -132,7 +132,9 @@ fn add_code(nodes: &mut Vec<Node>, current_source_node_line: &mut usize, generat
         }
         _ => {}
     }
-    nodes.push(Node::NCodeNode(CodeNode::new(StringSlice::from(generated_code))));
+    nodes.push(Node::NCodeNode(CodeNode::new(StringSlice::from(
+        generated_code,
+    ))));
 }
 
 #[inline]

@@ -1,7 +1,7 @@
 use super::types::Node;
 use super::{utils, MappingFunction, MappingsContext};
-use types::string_slice::*;
 use std::str;
+use types::string_slice::*;
 
 #[derive(Clone, Debug)]
 pub struct CodeNode {
@@ -11,7 +11,7 @@ pub struct CodeNode {
 impl CodeNode {
     pub fn new(generated_code: StringSlice) -> Self {
         CodeNode {
-            generated_code: generated_code.into_string()
+            generated_code: generated_code.into_string(),
         }
     }
 
