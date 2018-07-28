@@ -87,22 +87,22 @@ impl SourceNode {
     }
 
     pub fn get_mappings(&self, mappings_context: &mut MappingsContext) -> String {
-        let mut buf = Vec::<u8>::new();
         if self.generated_code.is_empty() {
             String::new()
         } else {
-            let line_mapping = ";AACA";
+            let mut buf = Vec::<u8>::new();
+            let line_mapping = ";AACA".as_bytes();
             let lines = self.number_of_lines;
             let source_index = mappings_context.ensure_source(
                 self.source.clone(),
                 self.original_source.clone().map(|n| Node::NStringIdx(n)),
             );
-            let mut mappings = if mappings_context.unfinished_generated_line != 0 {
+            if mappings_context.unfinished_generated_line != 0 {
+                buf.push(b',');
                 vlq::encode(mappings_context.unfinished_generated_line as i64, &mut buf).unwrap();
-                String::from(",")
             } else {
-                String::from("A")
-            };
+                buf.push(b'A');
+            }
             vlq::encode(
                 source_index as i64 - mappings_context.current_source as i64,
                 &mut buf,
@@ -112,8 +112,6 @@ impl SourceNode {
                 &mut buf,
             ).unwrap();
             buf.push(b'A');
-            mappings += str::from_utf8(&buf).unwrap();
-            buf.clear();
 
             mappings_context.current_source = source_index;
             mappings_context.current_original_line = self.starting_line + lines;
@@ -121,19 +119,19 @@ impl SourceNode {
 
             let unfinished_generated_line = utils::get_unfinished_lines(&self.generated_code);
             mappings_context.unfinished_generated_line = unfinished_generated_line;
-            if lines > 0 {
-                mappings += &line_mapping.repeat(lines.saturating_sub(1));
+            for _ in 0..lines.saturating_sub(1) {
+                buf.extend_from_slice(&line_mapping);
             }
 
             if unfinished_generated_line == 0 {
-                mappings += ";";
+                buf.push(b';');
             } else {
                 if lines != 0 {
-                    mappings += line_mapping;
+                    buf.extend_from_slice(&line_mapping);
                 }
                 mappings_context.current_original_line += 1;
             }
-            mappings
+            unsafe { str::from_utf8_unchecked(&buf).to_string() }
         }
     }
 

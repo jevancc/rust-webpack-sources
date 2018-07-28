@@ -40,25 +40,25 @@ impl CodeNode {
 
     pub fn get_mappings(&self, mappings_context: &mut MappingsContext) -> String {
         let lines = utils::number_of_lines(&self.generated_code);
-        let mut mappings: String = ";".repeat(lines);
-
         if lines > 0 {
+            let mut mappings: String = ";".repeat(lines);
             mappings_context.unfinished_generated_line =
                 utils::get_unfinished_lines(&self.generated_code);
             if mappings_context.unfinished_generated_line > 0 {
-                mappings += "A";
+                mappings.push_str("A");
             }
+            mappings
         } else {
             let prev_unfinished = mappings_context.unfinished_generated_line;
             mappings_context.unfinished_generated_line +=
                 utils::get_unfinished_lines(&self.generated_code);
+
             if prev_unfinished == 0 && mappings_context.unfinished_generated_line > 0 {
-                mappings = String::from("A");
+                String::from("A")
             } else {
-                mappings = String::new();
+                String::new()
             }
         }
-        mappings
     }
 
     pub fn get_normalized_nodes(self) -> Vec<CodeNode> {
