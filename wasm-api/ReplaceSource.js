@@ -15,9 +15,9 @@ let wasm = require("./build/webpack_sources");
 class ReplaceSource extends wasm._ReplaceSource {
     constructor(source, name) {
         super(0);
-        this._js_source = source;
-        this._js_name = name;
-        this._source_cache = null;
+        this._jsSource = source;
+        this._jsName = name;
+        this._sourceCache = null;
         this._replacements = null;
 
         if (typeof source === "string") {

@@ -18,16 +18,16 @@ class SourceMapSource extends wasm._SourceMapSource {
     constructor(value, name, sourceMap, originalSource, innerSourceMap) {
         super(0);
         this._value = value;
-        this._value_index = StringCache.add(value);
+        this._valueIndex = StringCache.add(value);
         this._name = name;
         this._sourceMap = sourceMap;
 
-        if (sourceMap.wasmObj) {
+        if (sourceMap._wasmObj) {
             this.ptr = SourceMapSource._new_string_sidx_string_wasmmap(
                 value,
-                this._value_index,
+                this._valueIndex,
                 name,
-                sourceMap.wasmObj
+                sourceMap._wasmObj
             ).ptr;
         } else {
             let sources = (sourceMap.sources || []).map(StringCache.add);
@@ -38,7 +38,7 @@ class SourceMapSource extends wasm._SourceMapSource {
             let names = (sourceMap.names || []).map(StringCache.add);
             this.ptr = SourceMapSource._new_string_sidx_string_map(
                 value,
-                this._value_index,
+                this._valueIndex,
                 name,
                 sources,
                 sourcesContent,
@@ -53,8 +53,8 @@ class SourceMapSource extends wasm._SourceMapSource {
         }
         if (innerSourceMap) {
             this._innerSourceMap = innerSourceMap;
-            if (innerSourceMap.wasmObj) {
-                this._set_inner_source_map_wasmmap(innerSourceMap.wasmObj);
+            if (innerSourceMap._wasmObj) {
+                this._set_inner_source_map_wasmmap(innerSourceMap._wasmObj);
             } else {
                 let innerSources = (innerSourceMap.sources || []).map(
                     StringCache.add
@@ -68,7 +68,7 @@ class SourceMapSource extends wasm._SourceMapSource {
                 );
                 this._set_inner_source_map_map(
                     innerSources,
-                    sourcesContent,
+                    innerSourcesContent,
                     innerMappings,
                     innerNames
                 );

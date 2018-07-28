@@ -35,11 +35,11 @@ const Null = Symbol(null);
 function createStringWithSourceMap(WasmStringWithSourceMap, file, isNames) {
     let stringWithSourceMap = new Object();
     let sourceMap = new Object();
-    let _cachedS = Null;
-    let _cachedSources = Null;
-    let _cachedSourcesContent = Null;
-    let _cachedMappings = Null;
-    let _cachedNames = Null;
+    let cachedS = Null;
+    let cachedSources = Null;
+    let cachedSourcesContent = Null;
+    let cachedMappings = Null;
+    let cachedNames = Null;
     let modified = false;
 
     WasmObjectPool.add(WasmStringWithSourceMap);
@@ -51,15 +51,15 @@ function createStringWithSourceMap(WasmStringWithSourceMap, file, isNames) {
         sourceMap,
         "sources",
         function() {
-            if (_cachedSources === Null) {
-                _cachedSources = StringCache.resolveIntArray(
+            if (cachedSources === Null) {
+                cachedSources = StringCache.resolveIntArray(
                     WasmStringWithSourceMap.sources()
                 );
             }
-            return _cachedSources;
+            return cachedSources;
         },
         function(v) {
-            _cachedSources = v;
+            cachedSources = v;
             modified = true;
         }
     );
@@ -68,20 +68,20 @@ function createStringWithSourceMap(WasmStringWithSourceMap, file, isNames) {
         sourceMap,
         "sourcesContent",
         function() {
-            if (_cachedSourcesContent === Null) {
-                _cachedSourcesContent = StringCache.resolveIntArray(
+            if (cachedSourcesContent === Null) {
+                cachedSourcesContent = StringCache.resolveIntArray(
                     WasmStringWithSourceMap.sources_content()
                 );
-                if (_cachedSourcesContent.length === 0) {
-                    _cachedSourcesContent = undefined;
+                if (cachedSourcesContent.length === 0) {
+                    cachedSourcesContent = undefined;
                 }
             }
-            return (_cachedSourcesContent || []).length > 0
-                ? _cachedSourcesContent
+            return (cachedSourcesContent || []).length > 0
+                ? cachedSourcesContent
                 : undefined;
         },
         function(v) {
-            _cachedSourcesContent = v;
+            cachedSourcesContent = v;
             modified = true;
         }
     );
@@ -90,13 +90,13 @@ function createStringWithSourceMap(WasmStringWithSourceMap, file, isNames) {
         sourceMap,
         "mappings",
         function() {
-            if (_cachedMappings === Null) {
-                _cachedMappings = WasmStringWithSourceMap.mappings();
+            if (cachedMappings === Null) {
+                cachedMappings = WasmStringWithSourceMap.mappings();
             }
-            return _cachedMappings;
+            return cachedMappings;
         },
         function(v) {
-            _cachedMappings = v;
+            cachedMappings = v;
             modified = true;
         }
     );
@@ -106,21 +106,21 @@ function createStringWithSourceMap(WasmStringWithSourceMap, file, isNames) {
             sourceMap,
             "names",
             function() {
-                if (_cachedNames === Null) {
-                    _cachedNames = StringCache.resolveIntArray(
+                if (cachedNames === Null) {
+                    cachedNames = StringCache.resolveIntArray(
                         WasmStringWithSourceMap.names()
                     );
                 }
-                return _cachedNames;
+                return cachedNames;
             },
             function(v) {
-                _cachedNames = v;
+                cachedNames = v;
                 modified = true;
             }
         );
     }
 
-    defineConst(sourceMap, "wasmObj", function() {
+    defineConst(sourceMap, "_wasmObj", function() {
         if (!modified && WasmStringWithSourceMap.ptr) {
             return WasmStringWithSourceMap;
         } else {
@@ -133,13 +133,13 @@ function createStringWithSourceMap(WasmStringWithSourceMap, file, isNames) {
         stringWithSourceMap,
         "source",
         function() {
-            if (_cachedS === Null) {
-                _cachedS = WasmStringWithSourceMap.s();
+            if (cachedS === Null) {
+                cachedS = WasmStringWithSourceMap.s();
             }
-            return _cachedS;
+            return cachedS;
         },
         function(v) {
-            _cachedS = v;
+            cachedS = v;
         }
     );
 

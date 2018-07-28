@@ -50,8 +50,8 @@ class PrefixSource extends wasm._PrefixSource {
             throw new Error("Invalid source");
         }
 
-        this._js_source = source;
-        this._js_prefix = prefix;
+        this._jsSource = source;
+        this._jsPrefix = prefix;
         WasmObjectPool.add(this);
     }
 
@@ -64,10 +64,10 @@ class PrefixSource extends wasm._PrefixSource {
     }
 
     updateHash(hash) {
-        if (typeof this._js_source === "string") hash.update(this._js_source);
-        else this._js_source.updateHash(hash);
-        if (typeof this._js_prefix === "string") hash.update(this._js_prefix);
-        else this._js_prefix.updateHash(hash);
+        if (typeof this._jsSource === "string") hash.update(this._jsSource);
+        else this._jsSource.updateHash(hash);
+        if (typeof this._jsPrefix === "string") hash.update(this._jsPrefix);
+        else this._jsPrefix.updateHash(hash);
     }
 }
 

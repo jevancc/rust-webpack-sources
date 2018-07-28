@@ -15,13 +15,13 @@ class LineToLineMappedSource extends wasm._LineToLineMappedSource {
         super(0);
         this._value = value;
         this._name = name;
-        this._name_idx = StringCache.add(name);
+        this._nameIndex = StringCache.add(name);
         this._originalSource = originalSource;
-        this._originalSource_idx = StringCache.add(originalSource);
+        this._originalSourceIndex = StringCache.add(originalSource);
         this.ptr = LineToLineMappedSource._new_string_sidx_sidx(
             value,
-            this._name_idx,
-            this._originalSource_idx
+            this._nameIndex,
+            this._originalSourceIndex
         ).ptr;
         WasmObjectPool.add(this);
     }

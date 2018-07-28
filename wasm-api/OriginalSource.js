@@ -15,27 +15,27 @@ class OriginalSource extends wasm._OriginalSource {
     constructor(value, name) {
         super(0);
         this._value = value;
-        this._value_idx = StringCache.add(value);
+        this._valueIndex = StringCache.add(value);
         this._name = name;
-        this._name_idx = StringCache.add(name);
+        this._nameIndex = StringCache.add(name);
         if (name === "webpack/bootstrap") {
-            let cachedPtr = ptrCache.get(this._value_idx);
+            let cachedPtr = ptrCache.get(this._valueIndex);
             if (cachedPtr) {
                 this.ptr = cachedPtr;
             } else {
                 this.ptr = OriginalSource._new_string_sidx_sidx(
                     value,
-                    this._value_idx,
-                    this._name_idx
+                    this._valueIndex,
+                    this._nameIndex
                 ).ptr;
-                ptrCache.set(this._value_idx, this.ptr);
+                ptrCache.set(this._valueIndex, this.ptr);
                 WasmObjectPool.add(this);
             }
         } else {
             this.ptr = OriginalSource._new_string_sidx_sidx(
                 value,
-                this._value_idx,
-                this._name_idx
+                this._valueIndex,
+                this._nameIndex
             ).ptr;
             WasmObjectPool.add(this);
         }
