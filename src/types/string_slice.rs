@@ -2,6 +2,7 @@
 use std::cmp::min;
 use std::convert::From;
 use std::hash;
+use std::mem;
 use std::ops::Deref;
 use std::rc::Rc;
 use std::slice;
@@ -39,6 +40,18 @@ impl StringSlice {
                 StringSlice(self.0.offset(mid as isize), self.1 - mid, self.2),
             )
         }
+    }
+
+    pub fn split(&self, pat: char) -> Split {
+        Split::new(self.clone(), pat, false)
+    }
+
+    pub fn split_keep_seperator(&self, pat: char) -> Split {
+        Split::new(self.clone(), pat, true)
+    }
+
+    pub fn offset(self, l: isize) -> Self {
+        unsafe { StringSlice(self.0.offset(l), (self.1 as isize - l) as usize, self.2) }
     }
 
     #[inline]
@@ -151,19 +164,58 @@ impl hash::Hash for StringSlice {
     }
 }
 
-// impl<'a> Add<&'a StringSlice> for String {
-//     type Output = String;
-//
-//     #[inline]
-//     fn add(mut self, other: &StringSlice) -> String {
-//         self.push_str(other.as_str());
-//         self
-//     }
-// }
-//
-// impl<'a> AddAssign<&'a StringSlice> for String {
-//     #[inline]
-//     fn add_assign(&mut self, other: &StringSlice) {
-//         self.push_str(other.as_str());
-//     }
-// }
+pub struct Split {
+    pub is_next: bool,
+    rest: Option<StringSlice>,
+    pat: char,
+    pat_len: usize,
+    keep_seperator: bool,
+}
+
+impl Split {
+    pub fn new(s: StringSlice, pat: char, keep_seperator: bool) -> Self {
+        let pat_len = pat.len_utf8();
+        Split {
+            rest: Some(s),
+            pat,
+            pat_len,
+            keep_seperator,
+            is_next: true,
+        }
+    }
+
+    pub fn rest(&mut self) -> Option<StringSlice> {
+        let mut rest: Option<StringSlice> = None;
+        mem::swap(&mut rest, &mut self.rest);
+        self.is_next = false;
+        rest
+    }
+}
+
+impl Iterator for Split {
+    type Item = StringSlice;
+    fn next(&mut self) -> Option<StringSlice> {
+        if self.is_next {
+            let mut rest: Option<StringSlice> = None;
+            mem::swap(&mut self.rest, &mut rest);
+            let s = rest.unwrap();
+            if let Some(pos) = s.as_str().find(self.pat) {
+                if self.keep_seperator {
+                    let (s, r) = s.split_at(pos + self.pat_len);
+                    self.rest = Some(r);
+                    Some(s)
+                } else {
+                    let (s, sep_r) = s.split_at(pos);
+                    self.rest = Some(sep_r.offset(self.pat_len as isize));
+                    Some(s)
+                }
+            } else {
+                self.is_next = false;
+                self.rest = None;
+                Some(s)
+            }
+        } else {
+            None
+        }
+    }
+}

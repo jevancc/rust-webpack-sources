@@ -3,35 +3,26 @@ use super::{CodeNode, SourceListMap, SourceNode};
 use types::string_slice::*;
 use vlq;
 
-// TODO: Use "StringSlice" to enhance performance
 pub fn from_string_with_source_map(
-    // code must be "StringSlice" here and guarantee the string lives longer than returned SourceNode
     code: StringSlice,
     sources: Vec<i32>,
     sources_content: Vec<i32>,
     mappings: StringSlice,
 ) -> SourceListMap {
-    let mappings = mappings.as_ref().split(';').enumerate();
-    let mut lines = code.as_ref().split('\n').enumerate();
-    let lines_count = lines.clone().count();
-    let mut nodes: Vec<Node> = vec![];
+    let mut nodes: Vec<Node> = Vec::new();
 
     let mut current_line: i64 = 1;
     let mut current_source_index: usize = 0;
     let mut current_source_node_line: usize = 0;
 
-    for (i, mapping) in mappings {
-        if let Some((_, line)) = lines.next() {
-            let line = if i != lines_count - 1 {
-                String::from(line) + "\n"
-            } else {
-                String::from(line)
-            };
+    let mut lines = code.split_keep_seperator('\n');
+    for mapping in mappings.split(';') {
+        if let Some(line) = lines.next() {
             if !mapping.is_empty() {
                 let mut line_added: bool = false;
                 let mut rest = mapping.as_bytes().iter().cloned().peekable();
 
-                while let Some(_) = rest.peek() {
+                while rest.peek().is_some() {
                     line_added = {
                         if let Some(c) = rest.clone().peek() {
                             if *c != b',' {
@@ -98,26 +89,27 @@ pub fn from_string_with_source_map(
         }
     }
 
-    let mut last = String::new();
-    while let Some((i, line)) = lines.next() {
-        if i < lines_count - 1 && line.trim().is_empty() {
-            let line = String::from(line) + "\n";
+    while let Some(line) = lines.next() {
+        if line.clone().offset(-1).trim().is_empty() {
             add_code(&mut nodes, &mut current_source_node_line, line);
         } else {
-            last += line;
-            while let Some((_, line)) = lines.next() {
-                last += "\n";
-                last += line;
-            }
+            let last = if let Some(last) = lines.rest() {
+                last.offset(-(line.len() as isize))
+            } else {
+                line
+            };
             add_code(&mut nodes, &mut current_source_node_line, last);
-            break;
         }
     }
     SourceListMap::new(Some(GenCode::CodeVec(nodes)), None, None)
 }
 
 #[inline]
-fn add_code(nodes: &mut Vec<Node>, current_source_node_line: &mut usize, generated_code: String) {
+fn add_code(
+    nodes: &mut Vec<Node>,
+    current_source_node_line: &mut usize,
+    generated_code: StringSlice,
+) {
     match nodes.last_mut() {
         Some(Node::NCodeNode(ref mut n)) => {
             n.add_generated_code(&generated_code);
@@ -125,36 +117,34 @@ fn add_code(nodes: &mut Vec<Node>, current_source_node_line: &mut usize, generat
         }
         Some(Node::NSourceNode(ref mut n)) => {
             if generated_code.trim().is_empty() {
-                n.add_generated_code(StringSlice::from(generated_code));
+                n.add_generated_code(generated_code);
                 *current_source_node_line += 1;
                 return;
             }
         }
         _ => {}
     }
-    nodes.push(Node::NCodeNode(CodeNode::new(StringSlice::from(
-        generated_code,
-    ))));
+    nodes.push(Node::NCodeNode(CodeNode::new(generated_code)));
 }
 
 #[inline]
 fn add_source(
     nodes: &mut Vec<Node>,
     current_source_node_line: &mut usize,
-    generated_code: String,
+    generated_code: StringSlice,
     source: Option<i32>,
     original_source: Option<i32>,
     line: usize,
 ) {
     if let Some(Node::NSourceNode(ref mut n)) = nodes.last_mut() {
         if n.source == source && *current_source_node_line == line {
-            n.add_generated_code(StringSlice::from(generated_code));
+            n.add_generated_code(generated_code);
             *current_source_node_line += 1;
             return;
         }
     }
     nodes.push(Node::NSourceNode(SourceNode::new(
-        StringSlice::from(generated_code),
+        generated_code,
         source,
         original_source,
         line,

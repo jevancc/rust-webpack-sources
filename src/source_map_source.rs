@@ -165,8 +165,8 @@ impl SourceTrait for SourceMapSource {
         if !module {
             SourceListMap::new(
                 Some(GenCode::Code(SlmNode::NString(self.value.clone()))),
-                Some(self.name.clone()),
-                Some(self.value_idx.clone()),
+                Some(self.name),
+                Some(self.value_idx),
             )
         } else {
             source_list_map::from_string_with_source_map(

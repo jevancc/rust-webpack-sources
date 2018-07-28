@@ -27,7 +27,7 @@ impl CodeNode {
     pub fn merge(mut self, other_node: &Node) -> Result<Node, Node> {
         match other_node {
             Node::NCodeNode(n) => {
-                self.generated_code += &n.generated_code;
+                self.generated_code.push_str(&n.generated_code);
                 Ok(Node::NCodeNode(self))
             }
             _ => Err(Node::NCodeNode(self)),
