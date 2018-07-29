@@ -183,7 +183,7 @@ impl SourceMapGenerator {
             .take_while(|mapping| mapping.generated <= (line, column))
             .last();
         if let Some(mapping) = glb {
-            if mapping.generated == (line, column) {
+            if mapping.generated.0 == line {
                 return mapping.clone();
             }
         }
@@ -221,18 +221,20 @@ impl SourceMapGenerator {
                     let original = generator.original_position_for(line, column);
                     if original.source.is_some() {
                         mapping.source = original.source;
+                        // process source_root
+                        if original.name.is_some() {
+                            mapping.name = original.name;
+                        }
+                        mapping.original = original.original;
                     }
-                    // process source_root
-                    if original.name.is_some() {
-                        mapping.name = original.name;
-                    }
-                    mapping.original = original.original;
                 }
             }
             mapping.source.map(|source| new_sources.push(source));
             mapping.name.map(|name| new_names.push(name));
         }
-        self.sources.clear();
+        if !self.mappings.list.is_empty() {
+            self.sources.clear();
+        }
         for source in new_sources {
             self.add_source(source);
         }
@@ -263,6 +265,7 @@ impl SourceMapGenerator {
             sources
                 .into_iter()
                 .filter(|sidx| {
+                    generator.add_source(*sidx);
                     generator.set_source_content(*sidx, contents.next());
                     set.insert(*sidx)
                 })
@@ -285,10 +288,9 @@ impl SourceMapGenerator {
 
         let mappings: _Mappings<()> = parse_mappings(mappings.as_bytes()).unwrap();
         let mappings = mappings.by_generated_location();
-
         for mapping in mappings {
             let generated = (
-                mapping.generated_line as usize,
+                mapping.generated_line as usize + 1,
                 mapping.generated_column as usize,
             );
             let (original, source, name) = if let Some(original) = mapping.original.clone() {
@@ -296,7 +298,7 @@ impl SourceMapGenerator {
                 let source = sources[original.source as usize].clone();
                 (
                     Some((
-                        original.original_line as usize,
+                        original.original_line as usize + 1,
                         original.original_column as usize,
                     )),
                     Some(source),
