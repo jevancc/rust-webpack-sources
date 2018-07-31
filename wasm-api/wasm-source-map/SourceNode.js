@@ -10,11 +10,11 @@ class SourceNode extends wasm._MSourceNode {
         super(0);
         if (line !== -2) {
             if (source) {
-                let source_idx = StringCache.add(source);
+                let sourceIndex = StringCache.add(source);
                 this.ptr = SourceNode._new_number_number_sidx_null(
                     line,
                     column,
-                    source_idx
+                    sourceIndex
                 ).ptr;
             } else {
                 this.ptr = SourceNode._new_null_null_null_null().ptr;

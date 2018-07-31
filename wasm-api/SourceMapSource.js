@@ -18,7 +18,7 @@ class SourceMapSource extends wasm._SourceMapSource {
     constructor(value, name, sourceMap, originalSource, innerSourceMap) {
         super(0);
         this._value = value;
-        this._valueIndex = StringCache.add(value);
+        this._valueIndex = StringCache.addUnchecked(value);
         this._name = name;
         this._sourceMap = sourceMap;
 
@@ -32,7 +32,7 @@ class SourceMapSource extends wasm._SourceMapSource {
         } else {
             let sources = (sourceMap.sources || []).map(StringCache.add);
             let sourcesContent = (sourceMap.sourcesContent || []).map(
-                StringCache.add
+                StringCache.addUnchecked
             );
             let mappings = sourceMap.mappings;
             let names = (sourceMap.names || []).map(StringCache.add);
@@ -49,7 +49,7 @@ class SourceMapSource extends wasm._SourceMapSource {
 
         if (originalSource) {
             this._originalSource = originalSource;
-            this._set_original_source_sidx(StringCache.add(originalSource));
+            this._set_original_source_sidx(StringCache.addUnchecked(originalSource));
         }
         if (innerSourceMap) {
             this._innerSourceMap = innerSourceMap;
@@ -61,7 +61,7 @@ class SourceMapSource extends wasm._SourceMapSource {
                 );
                 let innerSourcesContent = (
                     innerSourceMap.sourcesContent || []
-                ).map(StringCache.add);
+                ).map(StringCache.addUnchecked);
                 let innerMappings = innerSourceMap.mappings;
                 let innerNames = (innerSourceMap.names || []).map(
                     StringCache.add

@@ -17,6 +17,13 @@ function add(str) {
 }
 module.exports.add = add;
 
+function addUnchecked(str) {
+    let idx = array.length;
+    array.push(str);
+    return idx;
+}
+module.exports.addUnchecked = addUnchecked;
+
 function at(idx) {
     if (idx < 0) {
         return null;

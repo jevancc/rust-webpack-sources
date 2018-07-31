@@ -17,7 +17,7 @@ class LineToLineMappedSource extends wasm._LineToLineMappedSource {
         this._name = name;
         this._nameIndex = StringCache.add(name);
         this._originalSource = originalSource;
-        this._originalSourceIndex = StringCache.add(originalSource);
+        this._originalSourceIndex = StringCache.addUnchecked(originalSource);
         this.ptr = LineToLineMappedSource._new_string_sidx_sidx(
             value,
             this._nameIndex,

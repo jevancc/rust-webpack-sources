@@ -30,9 +30,9 @@ class SourceListMap extends wasm._SourceListMap {
     add(generatedCode, source, originalSource) {
         let nodes = NodeVec([generatedCode]);
         if (source) {
-            let source_idx = StringCache.add(source);
-            let originalSource_idx = StringCache.add(originalSource);
-            this._add_node_sidx_sidx(nodes, source_idx, originalSource_idx);
+            let sourceIndex = StringCache.add(source);
+            let originalSourceIndex = StringCache.addUnchecked(originalSource);
+            this._add_node_sidx_sidx(nodes, sourceIndex, originalSourceIndex);
         } else {
             this._add_node(nodes);
         }
@@ -42,12 +42,12 @@ class SourceListMap extends wasm._SourceListMap {
     prepend(generatedCode, source, originalSource) {
         let nodes = NodeVec([generatedCode]);
         if (source) {
-            let source_idx = StringCache.add(source);
-            let originalSource_idx = StringCache.add(originalSource);
+            let sourceIndex = StringCache.add(source);
+            let originalSourceIndex = StringCache.addUnchecked(originalSource);
             this._prepend_node_sidx_sidx(
                 nodes,
-                originalSource_idx,
-                originalSource_idx
+                sourceIndex,
+                originalSourceIndex
             );
         } else {
             this._prepend_node(nodes);

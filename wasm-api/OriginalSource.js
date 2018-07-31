@@ -15,7 +15,7 @@ class OriginalSource extends wasm._OriginalSource {
     constructor(value, name) {
         super(0);
         this._value = value;
-        this._valueIndex = StringCache.add(value);
+        this._valueIndex = StringCache.addUnchecked(value);
         this._name = name;
         this._nameIndex = StringCache.add(name);
         if (name === "webpack/bootstrap") {

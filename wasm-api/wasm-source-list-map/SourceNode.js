@@ -9,12 +9,12 @@ class SourceNode extends wasm._SourceNode {
         if (generatedCode) {
             startingLine = startingLine || 1;
             if (source) {
-                let source_idx = StringCache.add(source);
-                let originalSource_idx = StringCache.add(originalSource);
+                let sourceIndex = StringCache.add(source);
+                let originalSourceIndex = StringCache.addUnchecked(originalSource);
                 this.ptr = SourceNode._new_string_sidx_sidx_number(
                     generatedCode,
-                    source_idx,
-                    originalSource_idx,
+                    sourceIndex,
+                    originalSourceIndex,
                     startingLine
                 ).ptr;
             } else {

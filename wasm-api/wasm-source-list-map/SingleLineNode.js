@@ -9,12 +9,12 @@ class SingleLineNode extends wasm._SingleLineNode {
         if (generatedCode) {
             startingLine = startingLine || 1;
             if (source) {
-                let source_idx = StringCache.add(source);
-                let originalSource_idx = StringCache.add(originalSource);
+                let sourceIndex = StringCache.add(source);
+                let originalSourceIndex = StringCache.addUnchecked(originalSource);
                 this.ptr = SingleLineNode._new_string_sidx_sidx_number(
                     generatedCode,
-                    source_idx,
-                    originalSource_idx,
+                    sourceIndex,
+                    originalSourceIndex,
                     startingLine
                 ).ptr;
             } else {
