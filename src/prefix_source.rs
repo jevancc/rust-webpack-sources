@@ -3,27 +3,39 @@ use source_list_map::{MappingFunction, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
 use types::string_slice::*;
 
+fn make_prefixed_string(s: StringSlice, prefix: &str, prefix_at_front: bool) -> StringSlice {
+    let mut result = String::with_capacity(s.len()*2);
+    if prefix_at_front {
+        result.push_str(prefix);
+    }
+
+    let mut lines = s.split_keep_seperator('\n');
+    while let Some(line) = lines.next() {
+        result.push_str(&line);
+        if let Some(rest) = &lines.rest {
+            if rest.len() > 0 {
+                result.push_str(prefix);
+            }
+        }
+    }
+    StringSlice::from(result)
+}
+
 fn clone_and_prefix(node: SmNode, prefix: &str, append: &mut i32) -> SmNode {
     match node {
         SmNode::NString(s) => {
-            let mut s = s.into_string();
             let end_with_new_line = s.ends_with('\n');
-            if end_with_new_line {
-                s.pop();
-                s = s.replace('\n', &(String::from("\n") + prefix));
-                s.push('\n');
-            } else {
-                s = s.replace('\n', &(String::from("\n") + prefix));
-            }
-
-            if *append > 0 {
+            let s = if *append > 0 {
                 *append -= 1;
-                s = String::from(prefix) + &s;
-            }
+                make_prefixed_string(s, prefix, true)
+            } else {
+                make_prefixed_string(s, prefix, false)
+            };
+
             if end_with_new_line {
                 *append += 1;
             }
-            SmNode::NString(StringSlice::from(s))
+            SmNode::NString(s)
         }
         SmNode::NSourceNode(mut sn) => {
             let mut new_children = Vec::<SmNode>::new();
@@ -51,15 +63,7 @@ impl PrefixSource {
 
 impl SourceTrait for PrefixSource {
     fn source(&mut self) -> StringSlice {
-        let mut s = self.prefix.clone() + &self.source.source();
-        if s.ends_with('\n') {
-            s.pop();
-            s = s.replace('\n', &(String::from("\n") + &self.prefix));
-            s.push('\n');
-        } else {
-            s = s.replace('\n', &(String::from("\n") + &self.prefix));
-        }
-        StringSlice::from(s)
+        StringSlice::from(make_prefixed_string(self.source.source(), &self.prefix, true))
     }
 
     fn node(&mut self, columns: bool, module: bool) -> SourceNode {
@@ -92,14 +96,6 @@ struct PrefixMappingFunction<'a> {
 
 impl<'a> MappingFunction for PrefixMappingFunction<'a> {
     fn map(&mut self, code: String) -> String {
-        let mut mapped = String::from(self.prefix) + &code;
-        if code.ends_with('\n') {
-            mapped.pop();
-            mapped = mapped.replace('\n', &(String::from("\n") + &self.prefix));
-            mapped.push('\n');
-        } else {
-            mapped = mapped.replace('\n', &(String::from("\n") + &self.prefix));
-        }
-        mapped
+        make_prefixed_string(StringSlice::from(code), &self.prefix, true).into_string()
     }
 }

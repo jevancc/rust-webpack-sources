@@ -166,7 +166,7 @@ impl hash::Hash for StringSlice {
 
 pub struct Split {
     pub is_next: bool,
-    rest: Option<StringSlice>,
+    pub rest: Option<StringSlice>,
     pat: char,
     pat_len: usize,
     keep_seperator: bool,
