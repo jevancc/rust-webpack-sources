@@ -93,7 +93,7 @@ impl _ReplaceSource {
     }
 
     pub fn _source(&mut self) -> String {
-        self.val.borrow_mut().source().into_string()
+        self.val.borrow_mut().source().to_string()
     }
 
     pub fn _size(&mut self) -> u32 {

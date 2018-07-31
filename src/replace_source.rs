@@ -4,6 +4,7 @@ use source_map::{types::Node as SmNode, SourceNode};
 use std::cmp;
 use std::rc::Rc;
 use types::string_slice::*;
+use types::string_cat::*;
 use utils;
 
 #[derive(Debug)]
@@ -56,23 +57,31 @@ impl ReplaceSource {
         }
     }
 
-    pub fn replace_string(&mut self, s: &str) -> String {
-        let mut results: Vec<(&str, bool)> = vec![(s, false)];
+    pub fn replace_string(&mut self, s: StringCat) -> StringCat {
+        let mut results: Vec<StringCat> = vec![s];
+
+        let split_str = |s: StringCat, p: i32| {
+            if p <= 0 {
+                (StringCat::default(), s)
+            } else {
+                s.split_at_char(p as usize)
+            }
+        };
 
         self.sort_replacements();
         for repl in &self.replacements {
             let rem_source = results.pop().unwrap();
-            let splitted1 = utils::split_str(rem_source.0, (repl.1 >> 4) as i32 + 1, rem_source.1);
-            let splitted2 = utils::split_str(splitted1.0, (repl.0 >> 4) as i32, splitted1.2);
-            results.push((splitted1.1, splitted1.3));
-            results.push((&repl.2, false));
-            results.push((splitted2.0, splitted2.2));
+            let splitted1 = split_str(rem_source, (repl.1 >> 4) as i32 + 1);
+            let splitted2 = split_str(splitted1.0, (repl.0 >> 4) as i32);
+            results.push(splitted1.1);
+            results.push(StringCat::from(&repl.2));
+            results.push(splitted2.0);
         }
-        let mut result_string = String::with_capacity(s.len());
-        for (s, _) in results.iter().rev() {
-            result_string.push_str(s);
+        let mut result = StringCat::default();
+        for s in results.into_iter().rev() {
+            result.cat(s);
         }
-        result_string
+        result
     }
 
     // pub fn replacements_to_string(&mut self) -> String {
@@ -87,9 +96,9 @@ impl ReplaceSource {
 }
 
 impl SourceTrait for ReplaceSource {
-    fn source(&mut self) -> StringSlice {
+    fn source(&mut self) -> StringCat {
         let s = self.source.source();
-        StringSlice::from(self.replace_string(&s))
+        self.replace_string(s)
     }
 
     fn node(&mut self, columns: bool, module: bool) -> SourceNode {

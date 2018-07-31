@@ -2,6 +2,7 @@ use source::{Source, SourceTrait};
 use source_list_map::{types::Node as SlmNode, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
 use types::string_slice::*;
+use types::string_cat::*;
 
 #[derive(Debug)]
 pub struct ConcatSource {
@@ -25,12 +26,12 @@ impl ConcatSource {
 }
 
 impl SourceTrait for ConcatSource {
-    fn source(&mut self) -> StringSlice {
-        let mut new = String::new();
+    fn source(&mut self) -> StringCat {
+        let mut result = StringCat::default();
         for child in &mut self.children {
-            new += &child.source();
+            result.cat(child.source());
         }
-        StringSlice::from(new)
+        result
     }
 
     fn size(&mut self) -> usize {

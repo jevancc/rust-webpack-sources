@@ -4,6 +4,7 @@ use source_list_map::{types::GenCode, types::Node as SlmNode, SourceListMap};
 use source_map;
 use source_map::{SourceMapGenerator, SourceNode};
 use types::string_slice::*;
+use types::string_cat::*;
 
 #[derive(Debug)]
 pub struct SourceMapSource {
@@ -114,8 +115,8 @@ impl SourceMapSource {
 }
 
 impl SourceTrait for SourceMapSource {
-    fn source(&mut self) -> StringSlice {
-        self.value.clone()
+    fn source(&mut self) -> StringCat {
+        StringCat::from(&self.value)
     }
 
     fn size(&mut self) -> usize {

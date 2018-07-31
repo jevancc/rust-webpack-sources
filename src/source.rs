@@ -11,6 +11,7 @@ use source_map::SourceNode;
 use std::cell::RefCell;
 use std::rc::Rc;
 use types::string_slice::StringSlice;
+use types::string_cat::StringCat;
 
 #[derive(Debug, Clone)]
 pub enum Source {
@@ -26,7 +27,7 @@ pub enum Source {
 
 impl SourceTrait for Source {
     #[inline]
-    fn source(&mut self) -> StringSlice {
+    fn source(&mut self) -> StringCat {
         match self {
             Source::Raw(s) => (*s).borrow_mut().source(),
             Source::Original(s) => s.borrow_mut().source(),
@@ -35,7 +36,7 @@ impl SourceTrait for Source {
             Source::Concat(s) => s.borrow_mut().source(),
             Source::LineToLineMapped(s) => s.borrow_mut().source(),
             Source::SourceMapSource(s) => s.borrow_mut().source(),
-            Source::SString(s) => s.clone(),
+            Source::SString(s) => StringCat::from(s.clone()),
         }
     }
 
@@ -83,7 +84,7 @@ impl SourceTrait for Source {
 }
 
 pub trait SourceTrait {
-    fn source(&mut self) -> StringSlice;
+    fn source(&mut self) -> StringCat;
     fn size(&mut self) -> usize {
         self.source().len()
     }

@@ -1,7 +1,9 @@
 use source::{Source, SourceTrait};
 use source_list_map::{MappingFunction, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
+use std::rc::Rc;
 use types::string_slice::*;
+use types::string_cat::*;
 
 fn clone_and_prefix(node: SmNode, prefix: &str, append: &mut i32) -> SmNode {
     match node {
@@ -40,18 +42,19 @@ fn clone_and_prefix(node: SmNode, prefix: &str, append: &mut i32) -> SmNode {
 #[derive(Debug)]
 pub struct PrefixSource {
     pub source: Source,
-    prefix: String,
+    prefix: StringSlice,
 }
 
 impl PrefixSource {
     pub fn new(prefix: String, source: Source) -> PrefixSource {
-        PrefixSource { source, prefix }
+        PrefixSource { source, prefix: StringSlice::from(prefix) }
     }
 }
 
 impl SourceTrait for PrefixSource {
-    fn source(&mut self) -> StringSlice {
-        let mut s = self.prefix.clone() + &self.source.source();
+    fn source(&mut self) -> StringCat {
+        let mut s = self.prefix.to_string();
+        s.push_string_cat(&self.source.source());
         if s.ends_with('\n') {
             s.pop();
             s = s.replace('\n', &(String::from("\n") + &self.prefix));
@@ -59,7 +62,7 @@ impl SourceTrait for PrefixSource {
         } else {
             s = s.replace('\n', &(String::from("\n") + &self.prefix));
         }
-        StringSlice::from(s)
+        StringCat::from(Rc::new(s))
     }
 
     fn node(&mut self, columns: bool, module: bool) -> SourceNode {
