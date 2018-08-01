@@ -77,7 +77,7 @@ impl SourceTrait for OriginalSource {
 
 fn find_split_pos(code: &StringSlice) -> Option<usize> {
     lazy_static! {
-        static ref REGEX: Regex = Regex::new("[^\n\r;{}]*[\n\r;{}]*").unwrap();
+        static ref REGEX: Regex = Regex::new("^[^\n\r;{}]*[\n\r;{}]*").unwrap();
     }
 
     let code = code.as_bytes();
