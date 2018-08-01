@@ -32,7 +32,7 @@ impl SourceTrait for LineToLineMappedSource {
     fn node(&mut self, _columns: bool, _module: bool) -> SourceNode {
         let mut chunks = Vec::<SmNode>::with_capacity(16);
 
-        for (i, line) in self.value.split_keep_seperator('\n').enumerate() {
+        for (i, line) in self.value.split_keep_seperator(b'\n').enumerate() {
             chunks.push(SmNode::NSourceNode(SourceNode::new(
                 Some((i + 1, 0)),
                 Some(self.name.clone()),

@@ -61,7 +61,7 @@ impl CodeNode {
         }
     }
 
-    pub fn get_normalized_nodes(self) -> Vec<CodeNode> {
-        vec![self]
+    pub fn get_normalized_nodes(self) -> Vec<Node> {
+        vec![Node::NCodeNode(self)]
     }
 }

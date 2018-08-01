@@ -68,10 +68,8 @@ impl SourceListMap {
             Node::NSingleLineNode(sln) => {
                 self.children.push(Node::NSingleLineNode(sln));
             }
-            Node::NSourceListMap(slm) => {
-                for child in slm.children {
-                    self.children.push(child);
-                }
+            Node::NSourceListMap(mut slm) => {
+                self.children.append(&mut slm.children);
             }
             Node::NStringIdx(_) => {
                 panic!("Generated code can not be an index");
@@ -123,19 +121,13 @@ impl SourceListMap {
         for child in children {
             match child {
                 Node::NCodeNode(cn) => {
-                    for n in cn.get_normalized_nodes() {
-                        normalized_nodes.push(Node::NCodeNode(n));
-                    }
+                    normalized_nodes.append(&mut cn.get_normalized_nodes());
                 }
                 Node::NSourceNode(sn) => {
-                    for n in sn.get_normalized_nodes() {
-                        normalized_nodes.push(Node::NSingleLineNode(n));
-                    }
+                    normalized_nodes.append(&mut sn.get_normalized_nodes());
                 }
                 Node::NSingleLineNode(sln) => {
-                    for n in sln.get_normalized_nodes() {
-                        normalized_nodes.push(Node::NSingleLineNode(n));
-                    }
+                    normalized_nodes.append(&mut sln.get_normalized_nodes());
                 }
                 _ => {}
             }
@@ -201,7 +193,7 @@ impl SourceListMap {
     pub fn to_string_with_source_map(&self, options_file: Option<i32>) -> StringWithSourceMap {
         let mut mc: MappingsContext = MappingsContext::new();
 
-        let mut src: String = String::new();
+        let mut src: String = String::with_capacity(80);
         for child in &self.children {
             match child {
                 Node::NCodeNode(ref sln) => src += sln.get_generated_code(),
@@ -212,7 +204,7 @@ impl SourceListMap {
             }
         }
 
-        let mut mappings: String = String::new();
+        let mut mappings: String = String::with_capacity(12);
         for child in &self.children {
             match child {
                 Node::NSourceNode(ref sln) => mappings += &sln.get_mappings(&mut mc),

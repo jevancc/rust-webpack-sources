@@ -3,6 +3,7 @@ use source_list_map::{types::Node as SlmNode, MappingFunction, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
 use std::cmp;
 use std::rc::Rc;
+use std::str;
 use types::string_slice::*;
 use utils;
 
@@ -68,11 +69,11 @@ impl ReplaceSource {
             results.push((&repl.2, false));
             results.push((splitted2.0, splitted2.2));
         }
-        let mut result_string = String::with_capacity(s.len());
+        let mut result_string = Vec::<u8>::with_capacity(s.len() * 2);
         for (s, _) in results.iter().rev() {
-            result_string.push_str(s);
+            result_string.extend_from_slice(&s.as_bytes());
         }
-        result_string
+        unsafe { str::from_utf8_unchecked(&result_string).to_string() }
     }
 
     // pub fn replacements_to_string(&mut self) -> String {
@@ -133,7 +134,7 @@ impl SourceTrait for ReplaceSource {
         let map = self.source.list_map(columns, module);
         let mut map = map.map_generated_code(&mut mf);
 
-        let mut extra_code = String::new();
+        let mut extra_code = String::with_capacity(80);
         while mf.replacement_idx >= 0 {
             extra_code += &self.replacements[mf.replacement_idx as usize].2;
             mf.replacement_idx -= 1;
@@ -192,7 +193,7 @@ impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
                 self.remove_chars = 0;
             }
 
-            let mut final_str = String::with_capacity(code_byte_len);
+            let mut final_str = Vec::<u8>::with_capacity(code_byte_len);
             while self.replacement_idx >= 0
                 && self.replacements[self.replacement_idx as usize].0
                     < ((new_current_idx as i64) << 4)
@@ -203,11 +204,13 @@ impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
 
                 if start > self.current_idx {
                     let end_bound = code_step_n_chars((start - self.current_idx) as usize);
-                    final_str.push_str(&code[start_bound as usize..end_bound as usize]);
+                    final_str.extend_from_slice(
+                        code[start_bound as usize..end_bound as usize].as_bytes(),
+                    );
                     self.current_idx = start;
                     start_bound = end_bound;
                 }
-                final_str.push_str(&repl.2);
+                final_str.extend_from_slice(repl.2.as_bytes());
 
                 if end <= new_current_idx {
                     if end > self.current_idx {
@@ -222,8 +225,8 @@ impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
                 self.replacement_idx -= 1;
             }
             self.current_idx = new_current_idx;
-            final_str.push_str(&code[start_bound as usize..]);
-            final_str
+            final_str.extend_from_slice(code[start_bound as usize..].as_bytes());
+            unsafe { str::from_utf8_unchecked(&final_str).to_string() }
         }
     }
 }

@@ -15,8 +15,8 @@ pub fn from_string_with_source_map(
     let mut current_source_index: usize = 0;
     let mut current_source_node_line: usize = 0;
 
-    let mut lines = code.split_keep_seperator('\n');
-    for mapping in mappings.split(';') {
+    let mut lines = code.split_keep_seperator(b'\n');
+    for mapping in mappings.split(b';') {
         if let Some(line) = lines.next() {
             if !mapping.is_empty() {
                 let mut line_added: bool = false;

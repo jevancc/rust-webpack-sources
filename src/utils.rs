@@ -26,7 +26,7 @@ pub fn split_string_slice(
     single_byte_char_only: bool,
 ) -> (StringSlice, StringSlice, bool, bool) {
     if pos <= 0 {
-        (StringSlice::from(""), s, true, single_byte_char_only)
+        (StringSlice::new(), s, true, single_byte_char_only)
     } else {
         let s_bytes = s.len();
         let split_pos = if single_byte_char_only {

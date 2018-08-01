@@ -42,11 +42,11 @@ impl StringSlice {
         }
     }
 
-    pub fn split(&self, pat: char) -> Split {
+    pub fn split(&self, pat: u8) -> Split {
         Split::new(self.clone(), pat, false)
     }
 
-    pub fn split_keep_seperator(&self, pat: char) -> Split {
+    pub fn split_keep_seperator(&self, pat: u8) -> Split {
         Split::new(self.clone(), pat, true)
     }
 
@@ -167,18 +167,15 @@ impl hash::Hash for StringSlice {
 pub struct Split {
     pub is_next: bool,
     pub rest: Option<StringSlice>,
-    pat: char,
-    pat_len: usize,
+    pat: u8,
     keep_seperator: bool,
 }
 
 impl Split {
-    pub fn new(s: StringSlice, pat: char, keep_seperator: bool) -> Self {
-        let pat_len = pat.len_utf8();
+    pub fn new(s: StringSlice, pat: u8, keep_seperator: bool) -> Self {
         Split {
             rest: Some(s),
             pat,
-            pat_len,
             keep_seperator,
             is_next: true,
         }
@@ -199,14 +196,14 @@ impl Iterator for Split {
             let mut rest: Option<StringSlice> = None;
             mem::swap(&mut self.rest, &mut rest);
             let s = rest.unwrap();
-            if let Some(pos) = s.as_str().find(self.pat) {
+            if let Some(pos) = s.as_bytes().iter().position(|&b| b == self.pat) {
                 if self.keep_seperator {
-                    let (s, r) = s.split_at(pos + self.pat_len);
+                    let (s, r) = s.split_at(pos + 1);
                     self.rest = Some(r);
                     Some(s)
                 } else {
                     let (s, sep_r) = s.split_at(pos);
-                    self.rest = Some(sep_r.offset(self.pat_len as isize));
+                    self.rest = Some(sep_r.offset(1 as isize));
                     Some(s)
                 }
             } else {

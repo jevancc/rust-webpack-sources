@@ -1,24 +1,26 @@
 use source::{Source, SourceTrait};
 use source_list_map::{MappingFunction, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
+use std::str;
 use types::string_slice::*;
 
 fn make_prefixed_string(s: StringSlice, prefix: &str, prefix_at_front: bool) -> StringSlice {
-    let mut result = String::with_capacity(s.len()*2);
+    let prefix = prefix.as_bytes();
+    let mut result = Vec::<u8>::with_capacity(s.len() * 2);
     if prefix_at_front {
-        result.push_str(prefix);
+        result.extend_from_slice(&prefix);
     }
 
-    let mut lines = s.split_keep_seperator('\n');
+    let mut lines = s.split_keep_seperator(b'\n');
     while let Some(line) = lines.next() {
-        result.push_str(&line);
+        result.extend_from_slice(line.as_bytes());
         if let Some(rest) = &lines.rest {
             if rest.len() > 0 {
-                result.push_str(prefix);
+                result.extend_from_slice(prefix);
             }
         }
     }
-    StringSlice::from(result)
+    StringSlice::from(unsafe { str::from_utf8_unchecked(&result).to_string() })
 }
 
 fn clone_and_prefix(node: SmNode, prefix: &str, append: &mut i32) -> SmNode {
@@ -63,7 +65,11 @@ impl PrefixSource {
 
 impl SourceTrait for PrefixSource {
     fn source(&mut self) -> StringSlice {
-        StringSlice::from(make_prefixed_string(self.source.source(), &self.prefix, true))
+        StringSlice::from(make_prefixed_string(
+            self.source.source(),
+            &self.prefix,
+            true,
+        ))
     }
 
     fn node(&mut self, columns: bool, module: bool) -> SourceNode {

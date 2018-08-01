@@ -135,21 +135,21 @@ impl SourceNode {
         }
     }
 
-    pub fn get_normalized_nodes(self) -> Vec<SingleLineNode> {
-        let mut results = Vec::<SingleLineNode>::new();
+    pub fn get_normalized_nodes(self) -> Vec<Node> {
+        let mut results = Vec::<Node>::with_capacity(self.number_of_lines);
         let mut current_line = self.starting_line;
 
-        let mut lines = StringSlice::from(self.generated_code).split_keep_seperator('\n');
+        let mut lines = StringSlice::from(self.generated_code).split_keep_seperator(b'\n');
         while let Some(line) = lines.next() {
             if !lines.is_next && self.ends_with_new_line {
                 break;
             }
-            results.push(SingleLineNode::new(
+            results.push(Node::NSingleLineNode(SingleLineNode::new(
                 line,
                 self.source.clone(),
                 self.original_source.clone(),
                 current_line,
-            ));
+            )));
             current_line += 1;
         }
         results
