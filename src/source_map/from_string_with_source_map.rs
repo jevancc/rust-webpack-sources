@@ -11,7 +11,7 @@ pub fn from_string_with_source_map_generator(
     let mut node = SourceNode::new(None, None, None, None);
 
     let code_len = code.len();
-    let mut lines = Vec::<(StringSlice, bool, bool)>::new(); // line, is_existing, single_byte_char_only
+    let mut lines = Vec::<(StringSlice, bool, bool)>::with_capacity(128); // line, is_existing, single_byte_char_only
     {
         let mut line_start = 0;
         let mut single_byte_char_only = true;
@@ -64,7 +64,7 @@ pub fn from_string_with_source_map_generator(
                     next_line.0,
                     generated_position.1 as i32 - last_generated_position.1 as i32,
                     next_line.2,
-                );
+                ).unwrap();
                 let code = splitted.0;
                 next_line.0 = splitted.1;
                 next_line.2 = splitted.3;
@@ -84,7 +84,8 @@ pub fn from_string_with_source_map_generator(
         }
         if last_generated_position.1 < generated_position.1 {
             let splitted =
-                utils::split_string_slice(next_line.0, generated_position.1 as i32, next_line.2);
+                utils::split_string_slice(next_line.0, generated_position.1 as i32, next_line.2)
+                    .unwrap();
             node.add(Node::NString(splitted.0));
             next_line.0 = splitted.1;
             next_line.2 = splitted.3; // new len

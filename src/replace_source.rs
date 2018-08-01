@@ -63,8 +63,15 @@ impl ReplaceSource {
         self.sort_replacements();
         for repl in &self.replacements {
             let rem_source = results.pop().unwrap();
-            let splitted1 = utils::split_str(rem_source.0, (repl.1 >> 4) as i32 + 1, rem_source.1);
-            let splitted2 = utils::split_str(splitted1.0, (repl.0 >> 4) as i32, splitted1.2);
+            let splitted1 =
+                match utils::split_str(rem_source.0, (repl.1 >> 4) as i32 + 1, rem_source.1) {
+                    Ok(sp) => sp,
+                    Err((_, s, sbc)) => (s, "", sbc, true),
+                };
+            let splitted2 = match utils::split_str(splitted1.0, (repl.0 >> 4) as i32, splitted1.2) {
+                Ok(sp) => sp,
+                Err((_, s, sbc)) => (s, "", sbc, true),
+            };
             results.push((splitted1.1, splitted1.3));
             results.push((&repl.2, false));
             results.push((splitted2.0, splitted2.2));
@@ -95,7 +102,7 @@ impl SourceTrait for ReplaceSource {
 
     fn node(&mut self, columns: bool, module: bool) -> SourceNode {
         self.sort_replacements();
-        let mut result = Vec::<SmNode>::new();
+        let mut result = Vec::<SmNode>::with_capacity(self.replacements.len() * 2);
         result.push(SmNode::NSourceNode(self.source.node(columns, module)));
         for repl in &self.replacements {
             let rem_source = result.pop().unwrap();
@@ -231,7 +238,6 @@ impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
     }
 }
 
-// TODO: This function is fucking slow.
 fn split_sourcenode(
     node: SmNode,
     mut split_position: i32,
@@ -241,10 +247,10 @@ fn split_sourcenode(
             let mut is_splitted = false;
             let mut left_children = Vec::<SmNode>::with_capacity(n.children.len());
             let mut right_children = Vec::<SmNode>::with_capacity(n.children.len());
-            let c_position = n.position;
-            let c_source = n.source;
-            let c_name = n.name;
-            let c_source_contents = n.source_contents;
+            let n_position = n.position;
+            let n_source = n.source;
+            let n_name = n.name;
+            let n_source_contents = n.source_contents;
             for child in n.children.into_iter() {
                 if !is_splitted {
                     match split_sourcenode(child, split_position) {
@@ -264,39 +270,34 @@ fn split_sourcenode(
             }
             if is_splitted {
                 let mut left = SourceNode::new(
-                    c_position.clone(),
-                    c_source.clone(),
-                    c_name.clone(),
+                    n_position.clone(),
+                    n_source.clone(),
+                    n_name.clone(),
                     Some(SmNode::NNodeVec(left_children)),
                 );
                 let right = SourceNode::new(
-                    c_position,
-                    c_source,
-                    c_name,
+                    n_position,
+                    n_source,
+                    n_name,
                     Some(SmNode::NNodeVec(right_children)),
                 );
-                left.source_contents = c_source_contents;
+                left.source_contents = n_source_contents;
                 Ok((SmNode::NSourceNode(left), SmNode::NSourceNode(right)))
             } else {
                 let mut node = SourceNode::new(
-                    c_position,
-                    c_source,
-                    c_name,
+                    n_position,
+                    n_source,
+                    n_name,
                     Some(SmNode::NNodeVec(left_children)),
                 );
-                node.source_contents = c_source_contents;
+                node.source_contents = n_source_contents;
                 Err((split_position, SmNode::NSourceNode(node)))
             }
         }
-        SmNode::NString(n) => {
-            let n_len = n.as_ref().chars().count();
-            if n_len as i32 <= split_position {
-                Err((split_position - n_len as i32, SmNode::NString(n)))
-            } else {
-                let (left, right, _, _) = utils::split_string_slice(n, split_position, false);
-                Ok((SmNode::NString(left), SmNode::NString(right)))
-            }
-        }
+        SmNode::NString(n) => match utils::split_string_slice(n, split_position, false) {
+            Ok((left, right, _, _)) => Ok((SmNode::NString(left), SmNode::NString(right))),
+            Err((p, s, _)) => Err((p, SmNode::NString(s))),
+        },
         _ => unreachable!(),
     }
 }
