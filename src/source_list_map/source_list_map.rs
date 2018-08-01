@@ -1,5 +1,6 @@
 use super::types::{GenCode, Node};
 use super::{CodeNode, MappingFunction, MappingsContext, SourceNode};
+use std::str;
 use types::{SourceMap, StringWithSourceMap};
 
 #[derive(Debug, Clone)]
@@ -115,7 +116,7 @@ impl SourceListMap {
     }
 
     pub fn map_generated_code<T: MappingFunction>(self, mf: &mut T) -> SourceListMap {
-        let mut normalized_nodes: Vec<Node> = Vec::new();
+        let mut normalized_nodes: Vec<Node> = Vec::with_capacity(self.children.len());
         let children = self.children;
 
         for child in children {
@@ -133,7 +134,7 @@ impl SourceListMap {
             }
         }
 
-        let mut optimized_nodes: Vec<Node> = Vec::new();
+        let mut optimized_nodes: Vec<Node> = Vec::with_capacity(normalized_nodes.len());
         for nodes in normalized_nodes {
             let sln = match nodes {
                 // Node::NSourceNode(n) => Some(Node::NSourceNode(n.map_generated_code(fn_name)),
@@ -184,7 +185,7 @@ impl SourceListMap {
         let mut output = String::new();
         for child in &self.children {
             if let Node::NSingleLineNode(sln) = child {
-                output += sln.get_generated_code();
+                output.push_str(&sln.get_generated_code());
             }
         }
         output
@@ -196,20 +197,24 @@ impl SourceListMap {
         let mut src: String = String::with_capacity(80);
         for child in &self.children {
             match child {
-                Node::NCodeNode(ref sln) => src += sln.get_generated_code(),
-                Node::NSourceNode(ref sln) => src += sln.get_generated_code(),
-                Node::NSingleLineNode(ref sln) => src += sln.get_generated_code(),
-                Node::NString(ref sln) => src += &sln,
+                Node::NCodeNode(ref sln) => src.push_str(sln.get_generated_code()),
+                Node::NSourceNode(ref sln) => src.push_str(sln.get_generated_code()),
+                Node::NSingleLineNode(ref sln) => src.push_str(sln.get_generated_code()),
+                Node::NString(ref sln) => src.push_str(&sln),
                 _ => {}
             }
         }
 
-        let mut mappings: String = String::with_capacity(12);
+        let mut mappings = Vec::<u8>::with_capacity(256);
         for child in &self.children {
             match child {
-                Node::NSourceNode(ref sln) => mappings += &sln.get_mappings(&mut mc),
-                Node::NCodeNode(ref sln) => mappings += &sln.get_mappings(&mut mc),
-                Node::NSingleLineNode(ref sln) => mappings += &sln.get_mappings(&mut mc),
+                Node::NSourceNode(ref sln) => {
+                    mappings.extend_from_slice(&sln.get_mappings(&mut mc))
+                }
+                Node::NCodeNode(ref sln) => mappings.extend_from_slice(&sln.get_mappings(&mut mc)),
+                Node::NSingleLineNode(ref sln) => {
+                    mappings.extend_from_slice(&sln.get_mappings(&mut mc))
+                }
                 _ => {}
             };
         }
@@ -223,7 +228,7 @@ impl SourceListMap {
                 file: Some(file),
                 sources: arrays.0.iter().map(|idx| idx.unwrap_or(-1)).collect(),
                 sources_content: arrays.1,
-                mappings,
+                mappings: unsafe { str::from_utf8_unchecked(&mappings).to_string() },
                 names: vec![],
                 source_root: None,
             },

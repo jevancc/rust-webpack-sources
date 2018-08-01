@@ -16,7 +16,7 @@ impl CodeNode {
     }
 
     pub fn add_generated_code(&mut self, generated_code: &str) {
-        self.generated_code += generated_code;
+        self.generated_code.push_str(generated_code);
     }
 
     pub fn map_generated_code<T: MappingFunction>(self, mf: &mut T) -> CodeNode {
@@ -38,14 +38,17 @@ impl CodeNode {
         &self.generated_code
     }
 
-    pub fn get_mappings(&self, mappings_context: &mut MappingsContext) -> String {
+    pub fn get_mappings(&self, mappings_context: &mut MappingsContext) -> Vec<u8> {
         let lines = utils::number_of_lines(&self.generated_code);
         if lines > 0 {
-            let mut mappings: String = ";".repeat(lines);
+            let mut mappings = Vec::<u8>::with_capacity(32);
+            for _ in 0..lines {
+                mappings.push(b';');
+            }
             mappings_context.unfinished_generated_line =
                 utils::get_unfinished_lines(&self.generated_code);
             if mappings_context.unfinished_generated_line > 0 {
-                mappings.push_str("A");
+                mappings.push(b'A');
             }
             mappings
         } else {
@@ -54,9 +57,9 @@ impl CodeNode {
                 utils::get_unfinished_lines(&self.generated_code);
 
             if prev_unfinished == 0 && mappings_context.unfinished_generated_line > 0 {
-                String::from("A")
+                vec![b'A']
             } else {
-                String::new()
+                Vec::new()
             }
         }
     }

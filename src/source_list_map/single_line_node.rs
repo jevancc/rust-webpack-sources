@@ -51,7 +51,7 @@ impl SingleLineNode {
     fn merge_single_line_node(mut self, other_node: &SingleLineNode) -> Result<Node, Node> {
         if self.source == other_node.source && self.original_source == other_node.original_source {
             if self.line == other_node.line {
-                self.generated_code += &other_node.generated_code;
+                self.generated_code.push_str(&other_node.generated_code);
                 self.number_of_lines += other_node.number_of_lines;
                 self.ends_with_new_line = other_node.ends_with_new_line;
                 Ok(Node::NSingleLineNode(self))
@@ -60,9 +60,9 @@ impl SingleLineNode {
                 && self.number_of_lines == 1
                 && other_node.number_of_lines <= 1
             {
-                let new_code = self.generated_code + &other_node.generated_code;
+                self.generated_code.push_str(&other_node.generated_code);
                 Ok(Node::NSourceNode(SourceNode::new(
-                    StringSlice::from(new_code),
+                    StringSlice::from(self.generated_code),
                     self.source,
                     self.original_source,
                     self.line,
@@ -86,11 +86,11 @@ impl SingleLineNode {
         &self.generated_code
     }
 
-    pub fn get_mappings(&self, mappings_context: &mut MappingsContext) -> String {
+    pub fn get_mappings(&self, mappings_context: &mut MappingsContext) -> Vec<u8> {
         if self.generated_code.is_empty() {
-            String::new()
+            Vec::new()
         } else {
-            let mut buf = Vec::<u8>::new();
+            let mut buf = Vec::<u8>::with_capacity(64);
             let line_mapping = ";AAAA".as_bytes();
             let lines = self.number_of_lines;
             let source_index = mappings_context.ensure_source(
@@ -128,7 +128,7 @@ impl SingleLineNode {
             } else if lines != 0 {
                 buf.extend_from_slice(line_mapping);
             }
-            unsafe { str::from_utf8_unchecked(&buf).to_string() }
+            buf
         }
     }
 

@@ -53,7 +53,7 @@ impl SourceNode {
             && self.ends_with_new_line
             && self.starting_line + self.number_of_lines == other_node.starting_line
         {
-            self.generated_code += &other_node.generated_code;
+            self.generated_code.push_str(&other_node.generated_code);
             self.number_of_lines += other_node.number_of_lines;
             self.ends_with_new_line = other_node.ends_with_new_line;
             Ok(Node::NSourceNode(self))
@@ -76,7 +76,7 @@ impl SourceNode {
     }
 
     fn add_single_line_node(&mut self, other_node: &SingleLineNode) -> &SourceNode {
-        self.generated_code += &other_node.generated_code;
+        self.generated_code.push_str(&other_node.generated_code);
         self.number_of_lines += other_node.number_of_lines;
         self.ends_with_new_line = other_node.ends_with_new_line;
         self
@@ -86,11 +86,11 @@ impl SourceNode {
         &self.generated_code
     }
 
-    pub fn get_mappings(&self, mappings_context: &mut MappingsContext) -> String {
+    pub fn get_mappings(&self, mappings_context: &mut MappingsContext) -> Vec<u8> {
         if self.generated_code.is_empty() {
-            String::new()
+            Vec::new()
         } else {
-            let mut buf = Vec::<u8>::new();
+            let mut buf = Vec::<u8>::with_capacity(64);
             let line_mapping = ";AACA".as_bytes();
             let lines = self.number_of_lines;
             let source_index = mappings_context.ensure_source(
@@ -131,7 +131,7 @@ impl SourceNode {
                 }
                 mappings_context.current_original_line += 1;
             }
-            unsafe { str::from_utf8_unchecked(&buf).to_string() }
+            buf
         }
     }
 
