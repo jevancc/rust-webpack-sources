@@ -1,3 +1,4 @@
+use regex::bytes::Regex;
 use source::SourceTrait;
 use source_list_map::{types::GenCode, types::Node as SlmNode, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
@@ -32,7 +33,7 @@ impl SourceTrait for OriginalSource {
     fn node(&mut self, columns: bool, _module: bool) -> SourceNode {
         let mut sn = SourceNode::new(None, None, None, None);
 
-        for (i, line) in self.value.split_keep_seperator('\n').enumerate() {
+        for (i, line) in self.value.split_keep_seperator(b'\n').enumerate() {
             if !columns {
                 sn.add(SmNode::NSourceNode(SourceNode::new(
                     Some((i + 1, 0)),
@@ -74,25 +75,17 @@ impl SourceTrait for OriginalSource {
     }
 }
 
-#[inline]
-fn is_splitter(c: char) -> bool {
-    match c {
-        '\n' | '\r' | ';' | '{' | '}' => true,
-        _ => false,
-    }
-}
-
-#[inline]
 fn find_split_pos(code: &StringSlice) -> Option<usize> {
-    let chars = code.char_indices();
-    let mut chars = chars
-        .skip_while(|c| !is_splitter(c.1))
-        .skip_while(|c| is_splitter(c.1));
-    chars.next().map(|(pos, _)| pos)
+    lazy_static! {
+        static ref REGEX: Regex = Regex::new("[^\n\r;{}]*[\n\r;{}]*").unwrap();
+    }
+
+    let code = code.as_bytes();
+    REGEX.find(&code).map(|m| m.end())
 }
 
 fn split_code(mut code: StringSlice) -> Vec<StringSlice> {
-    let mut result: Vec<StringSlice> = Vec::new();
+    let mut result: Vec<StringSlice> = Vec::with_capacity(128);
     while code.len() != 0 {
         let split_pos = find_split_pos(&code);
         if let Some(pos) = split_pos {

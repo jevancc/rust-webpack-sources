@@ -1,19 +1,18 @@
 [package]
+authors = ["Jevan Chan <jevan.cnchan@gmail.com>"]
 name = "webpack-sources"
 version = "0.2.7"
-authors = ["Jevan Chan <jevan.cnchan@gmail.com>"]
+[dependencies]
+bytecount = "0.3.1"
+lazy_static = "1.0"
+linked-hash-map = "0.5.1"
+regex = "1"
+serde = "1.0.59"
+source-map-mappings = "0.5.0"
+vlq = "0.5.1"
+wasm-bindgen = "0.2"
 
 [lib]
 crate-type = ["cdylib"]
-
-[dependencies]
-source-map-mappings = "0.5.0"
-wasm-bindgen = "0.2"
-serde = "1.0.59"
-serde_derive = "1.0.59"
-serde_json = "1.0.17"
-linked-hash-map = "0.5.1"
-vlq = "0.5.1"
-
 [profile.release]
 lto = true

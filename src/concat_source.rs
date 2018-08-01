@@ -1,6 +1,7 @@
 use source::{Source, SourceTrait};
 use source_list_map::{types::Node as SlmNode, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
+use std::str;
 use types::string_slice::*;
 
 #[derive(Debug)]
@@ -26,11 +27,11 @@ impl ConcatSource {
 
 impl SourceTrait for ConcatSource {
     fn source(&mut self) -> StringSlice {
-        let mut new = String::new();
+        let mut result = Vec::<u8>::with_capacity(512);
         for child in &mut self.children {
-            new += &child.source();
+            result.extend_from_slice(child.source().as_bytes());
         }
-        StringSlice::from(new)
+        StringSlice::from(unsafe { str::from_utf8_unchecked(&result).to_string() })
     }
 
     fn size(&mut self) -> usize {
