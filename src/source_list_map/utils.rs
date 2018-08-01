@@ -1,6 +1,8 @@
+use bytecount;
+
 #[inline]
 pub fn number_of_lines(s: &str) -> usize {
-    s.split('\n').count().saturating_sub(1)
+    bytecount::count(s.as_bytes(), b'\n')
 }
 
 #[inline]
