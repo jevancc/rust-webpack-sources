@@ -101,9 +101,9 @@ pub fn from_string_with_source_map_generator(
                 .next()
                 .unwrap_or((StringSlice::new(), false, true));
         }
-        let mut remaining = String::new();
+        let mut remaining = String::with_capacity(80);
         while next_line.1 {
-            remaining += &next_line.0;
+            remaining.push_str(&next_line.0);
             next_line = line_iter
                 .next()
                 .unwrap_or((StringSlice::new(), false, true));

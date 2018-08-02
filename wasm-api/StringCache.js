@@ -1,11 +1,6 @@
 let array = [];
 let set = new Map();
 
-function init() {
-    array.push("webpack/bootstrap");
-    set.set("webpack/bootstrap", 0);
-}
-
 function add(str) {
     let idx = indexOf(str);
     if (idx === undefined) {
@@ -44,9 +39,6 @@ function resolveIntArray(intArray) {
 module.exports.resolveIntArray = resolveIntArray;
 
 function indexOf(str) {
-    if (str === "webpack/bootstrap") {
-        return 0;
-    }
     return set.get(str);
 }
 module.exports.indexOf = indexOf;
@@ -54,6 +46,5 @@ module.exports.indexOf = indexOf;
 function clear() {
     array.splice(0, array.length);
     set.clear();
-    init();
 }
 module.exports.clear = clear;

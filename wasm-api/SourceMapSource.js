@@ -49,7 +49,9 @@ class SourceMapSource extends wasm._SourceMapSource {
 
         if (originalSource) {
             this._originalSource = originalSource;
-            this._set_original_source_sidx(StringCache.addUnchecked(originalSource));
+            this._set_original_source_sidx(
+                StringCache.addUnchecked(originalSource)
+            );
         }
         if (innerSourceMap) {
             this._innerSourceMap = innerSourceMap;

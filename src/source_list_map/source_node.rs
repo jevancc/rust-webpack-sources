@@ -32,7 +32,7 @@ impl SourceNode {
     }
 
     pub fn add_generated_code(&mut self, code: StringSlice) {
-        self.generated_code += &code;
+        self.generated_code.push_str(&code);
         self.number_of_lines += utils::number_of_lines(&code);
         self.ends_with_new_line = code.ends_with('\n');
     }

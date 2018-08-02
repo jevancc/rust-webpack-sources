@@ -165,7 +165,7 @@ impl WalkFunction for ToSourceMapContext {
         original_position: &Option<(usize, usize)>,
         original_name: &Option<i32>,
     ) {
-        self.generated_code += chunk;
+        self.generated_code.push_str(chunk);
         if original_source.is_some() && original_position.is_some() {
             if self.last_original_source != *original_source
                 || self.last_original_position != *original_position

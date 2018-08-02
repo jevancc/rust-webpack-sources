@@ -143,7 +143,7 @@ impl SourceTrait for ReplaceSource {
 
         let mut extra_code = String::with_capacity(80);
         while mf.replacement_idx >= 0 {
-            extra_code += &self.replacements[mf.replacement_idx as usize].2;
+            extra_code.push_str(&self.replacements[mf.replacement_idx as usize].2);
             mf.replacement_idx -= 1;
         }
 
