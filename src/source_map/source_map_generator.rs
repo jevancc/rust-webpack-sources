@@ -176,23 +176,32 @@ impl SourceMapGenerator {
     // originate from `SourceMapConsumer.OriginalPositionFor`
     pub fn original_position_for(&mut self, line: usize, column: usize) -> Mapping {
         self.mappings.sort();
-        let glb = self
-            .mappings
-            .list
-            .iter()
-            .take_while(|mapping| mapping.generated <= (line, column))
-            .last();
-        if let Some(mapping) = glb {
-            if mapping.generated.0 == line {
-                return mapping.clone();
-            }
-        }
-        return Mapping {
+
+        let empty_mapping = Mapping {
             generated: (0, 0),
             source: None,
             name: None,
             original: None,
         };
+
+        let mapping = match self
+            .mappings
+            .list
+            .binary_search_by(|probe| probe.generated.cmp(&(line, column)))
+        {
+            Ok(i) => &self.mappings.list[i],
+            Err(i) => if i == 0 {
+                return empty_mapping;
+            } else {
+                &self.mappings.list[i - 1]
+            },
+        };
+
+        if mapping.generated.0 == line {
+            mapping.clone()
+        } else {
+            empty_mapping
+        }
     }
 
     pub fn apply_source_map_generator(
