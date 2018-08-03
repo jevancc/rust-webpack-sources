@@ -1,12 +1,13 @@
 use super::types::Node;
+use super::utils::*;
 use super::{utils, MappingsContext, SingleLineNode};
-use std::str;
 use types::string_slice::*;
 use vlq;
 
 #[derive(Clone, Debug)]
 pub struct SourceNode {
-    pub generated_code: String,
+    pub generated_code: Vec<StringSlice>,
+    pub generated_code_len: usize,
     pub original_source: Option<i32>,
     pub source: Option<i32>,
     pub starting_line: usize,
@@ -24,7 +25,8 @@ impl SourceNode {
         SourceNode {
             ends_with_new_line: generated_code.ends_with('\n'),
             number_of_lines: utils::number_of_lines(&generated_code),
-            generated_code: generated_code.into_string(),
+            generated_code_len: generated_code.len(),
+            generated_code: vec![generated_code],
             original_source,
             source,
             starting_line,
@@ -32,9 +34,10 @@ impl SourceNode {
     }
 
     pub fn add_generated_code(&mut self, code: StringSlice) {
-        self.generated_code.push_str(&code);
+        self.generated_code_len += code.len();
         self.number_of_lines += utils::number_of_lines(&code);
         self.ends_with_new_line = code.ends_with('\n');
+        self.generated_code.push(code);
     }
 
     // pub fn map_generated_code(&self, fn_name: &str) -> SourceNode {
@@ -53,7 +56,9 @@ impl SourceNode {
             && self.ends_with_new_line
             && self.starting_line + self.number_of_lines == other_node.starting_line
         {
-            self.generated_code.push_str(&other_node.generated_code);
+            self.generated_code
+                .extend(other_node.generated_code.iter().cloned());
+            self.generated_code_len += other_node.generated_code_len;
             self.number_of_lines += other_node.number_of_lines;
             self.ends_with_new_line = other_node.ends_with_new_line;
             Ok(Node::NSourceNode(self))
@@ -76,18 +81,20 @@ impl SourceNode {
     }
 
     fn add_single_line_node(&mut self, other_node: &SingleLineNode) -> &SourceNode {
-        self.generated_code.push_str(&other_node.generated_code);
+        self.generated_code
+            .extend(other_node.generated_code.iter().cloned());
+        self.generated_code_len += other_node.generated_code_len;
         self.number_of_lines += other_node.number_of_lines;
         self.ends_with_new_line = other_node.ends_with_new_line;
         self
     }
 
-    pub fn get_generated_code(&self) -> &str {
-        &self.generated_code
+    pub fn get_generated_code(&self) -> (&Vec<StringSlice>, usize) {
+        (&self.generated_code, self.generated_code_len)
     }
 
     pub fn get_mappings(&self, mappings_context: &mut MappingsContext) -> Vec<u8> {
-        if self.generated_code.is_empty() {
+        if self.generated_code_len == 0 {
             Vec::new()
         } else {
             let mut buf = Vec::<u8>::with_capacity(64);
@@ -139,7 +146,8 @@ impl SourceNode {
         let mut results = Vec::<Node>::with_capacity(self.number_of_lines);
         let mut current_line = self.starting_line;
 
-        let mut lines = StringSlice::from(self.generated_code).split_keep_seperator(b'\n');
+        let mut lines = StringSlice::from(self.generated_code.into_string(self.generated_code_len))
+            .split_keep_seperator(b'\n');
         while let Some(line) = lines.next() {
             if !lines.is_next && self.ends_with_new_line {
                 break;

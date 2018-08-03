@@ -112,7 +112,7 @@ fn add_code(
 ) {
     match nodes.last_mut() {
         Some(Node::NCodeNode(ref mut n)) => {
-            n.add_generated_code(&generated_code);
+            n.add_generated_code(generated_code);
             return;
         }
         Some(Node::NSourceNode(ref mut n)) => {

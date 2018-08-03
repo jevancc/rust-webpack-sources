@@ -216,3 +216,16 @@ impl Iterator for Split {
         }
     }
 }
+
+pub trait PushStringSlices {
+    fn push_string_slices(&mut self, strs: &[StringSlice], len: usize);
+}
+
+impl PushStringSlices for String {
+    fn push_string_slices(&mut self, strs: &[StringSlice], len: usize) {
+        self.reserve(len);
+        for s in strs {
+            self.push_str(&s);
+        }
+    }
+}

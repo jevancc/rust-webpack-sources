@@ -1,6 +1,7 @@
 use super::types::{GenCode, Node};
 use super::{CodeNode, MappingFunction, MappingsContext, SourceNode};
 use std::str;
+use types::string_slice::*;
 use types::{SourceMap, StringWithSourceMap};
 
 #[derive(Debug, Clone)]
@@ -53,7 +54,7 @@ impl SourceListMap {
                         let len = self.children.len();
                         let mut ln = self.children.get_mut(len - 1).unwrap();
                         if let Node::NCodeNode(ref mut ln) = ln {
-                            ln.add_generated_code(&s);
+                            ln.add_generated_code(s);
                         }
                     } else {
                         self.children.push(Node::NCodeNode(CodeNode::new(s)));
@@ -178,6 +179,7 @@ impl SourceListMap {
                 }
             }
         }
+
         SourceListMap::new(Some(GenCode::CodeVec(optimized_nodes)), None, None)
     }
 
@@ -185,7 +187,8 @@ impl SourceListMap {
         let mut output = String::new();
         for child in &self.children {
             if let Node::NSingleLineNode(sln) = child {
-                output.push_str(&sln.get_generated_code());
+                let (strs, len) = sln.get_generated_code();
+                output.push_string_slices(strs, len);
             }
         }
         output
@@ -197,9 +200,18 @@ impl SourceListMap {
         let mut src: String = String::with_capacity(80);
         for child in &self.children {
             match child {
-                Node::NCodeNode(ref sln) => src.push_str(sln.get_generated_code()),
-                Node::NSourceNode(ref sln) => src.push_str(sln.get_generated_code()),
-                Node::NSingleLineNode(ref sln) => src.push_str(sln.get_generated_code()),
+                Node::NCodeNode(ref sln) => {
+                    let (strs, len) = sln.get_generated_code();
+                    src.push_string_slices(strs, len);
+                }
+                Node::NSourceNode(ref sln) => {
+                    let (strs, len) = sln.get_generated_code();
+                    src.push_string_slices(strs, len);
+                }
+                Node::NSingleLineNode(ref sln) => {
+                    let (strs, len) = sln.get_generated_code();
+                    src.push_string_slices(strs, len);
+                }
                 Node::NString(ref sln) => src.push_str(&sln),
                 _ => {}
             }
