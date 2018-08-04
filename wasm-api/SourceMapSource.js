@@ -20,13 +20,14 @@ class SourceMapSource extends wasm._SourceMapSource {
         this._value = value;
         this._valueIndex = StringCache.addUnchecked(value);
         this._name = name;
+        this._nameIndex = StringCache.add(name);
         this._sourceMap = sourceMap;
 
         if (sourceMap._wasmObj) {
             this.ptr = SourceMapSource._new_string_sidx_string_wasmmap(
                 value,
                 this._valueIndex,
-                name,
+                this._nameIndex,
                 sourceMap._wasmObj
             ).ptr;
         } else {
@@ -39,7 +40,7 @@ class SourceMapSource extends wasm._SourceMapSource {
             this.ptr = SourceMapSource._new_string_sidx_string_map(
                 value,
                 this._valueIndex,
-                name,
+                this._nameIndex,
                 sources,
                 sourcesContent,
                 mappings,
