@@ -1,6 +1,7 @@
 "use strict";
 
-var wasm = require("../build/webpack_sources");
+const Types = require("./Types");
+const wasm = require("../build/webpack_sources");
 
 class CodeNode extends wasm._CodeNode {
     constructor(generatedCode) {
@@ -11,11 +12,11 @@ class CodeNode extends wasm._CodeNode {
     }
 
     clone() {
-        var ret = new CodeNode();
+        let ret = new CodeNode();
         ret.ptr = wasm._codenode__clone(this.ptr);
         return ret;
     }
 }
 
-CodeNode.prototype.isCodeNode = true;
+CodeNode.prototype.type = Types.CodeNode;
 module.exports = CodeNode;

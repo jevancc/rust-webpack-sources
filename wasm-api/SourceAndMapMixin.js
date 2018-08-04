@@ -3,12 +3,14 @@
 	Author Tobias Koppers @sokra
 */
 "use strict";
+
 const SourceNode = require("./wasm-source-map").SourceNode;
 const SourceListMap = require("./wasm-source-list-map").SourceListMap;
+const Types = require("./Types");
 
 module.exports = function mixinSourceAndMap(proto) {
     proto.node = function(options) {
-        let node = new SourceNode(-2);
+        let node = new SourceNode(Types.Null);
         options = options || {};
         node.ptr = this._node_bool_bool(
             !(options.columns === false),
@@ -18,7 +20,7 @@ module.exports = function mixinSourceAndMap(proto) {
     };
 
     proto.listMap = function(options) {
-        let map = new SourceListMap(-2);
+        let map = new SourceListMap(Types.Null);
         options = options || {};
         map.ptr = this._list_map_bool_bool(
             !(options.columns === false),

@@ -4,11 +4,12 @@
 */
 "use strict";
 
-let SourceNode = require("./wasm-source-map").SourceNode;
-let SourceListMap = require("./wasm-source-list-map").SourceListMap;
-let StringCache = require("./StringCache");
-let WasmObjectPool = require("./WasmObjectPool");
-let wasm = require("./build/webpack_sources");
+const SourceNode = require("./wasm-source-map").SourceNode;
+const SourceListMap = require("./wasm-source-list-map").SourceListMap;
+const StringCache = require("./StringCache");
+const WasmObjectPool = require("./WasmObjectPool");
+const Types = require("./Types");
+const wasm = require("./build/webpack_sources");
 
 class LineToLineMappedSource extends wasm._LineToLineMappedSource {
     constructor(value, name, originalSource) {
@@ -42,5 +43,5 @@ class LineToLineMappedSource extends wasm._LineToLineMappedSource {
 
 require("./SourceAndMapMixin")(LineToLineMappedSource.prototype);
 
-LineToLineMappedSource.prototype.type = "LineToLineMappedSource";
+LineToLineMappedSource.prototype.type = Types.LineToLineMappedSource;
 module.exports = LineToLineMappedSource;

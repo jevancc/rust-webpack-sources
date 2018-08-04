@@ -3,10 +3,12 @@
 	Author Tobias Koppers @sokra
 */
 "use strict";
-let SourceNode = require("./wasm-source-map").SourceNode;
-let SourceListMap = require("./wasm-source-list-map").SourceListMap;
-let WasmObjectPool = require("./WasmObjectPool");
-let wasm = require("./build/webpack_sources");
+
+const SourceNode = require("./wasm-source-map").SourceNode;
+const SourceListMap = require("./wasm-source-list-map").SourceListMap;
+const WasmObjectPool = require("./WasmObjectPool");
+const Types = require("./Types");
+const wasm = require("./build/webpack_sources");
 
 class ConcatSource extends wasm._ConcatSource {
     constructor() {
@@ -22,22 +24,32 @@ class ConcatSource extends wasm._ConcatSource {
     add(item) {
         if (typeof item === "string") {
             this._add_string(item);
-        } else if (item.type === "RawSource") {
-            this._add_raw_source(item);
-        } else if (item.type === "OriginalSource") {
-            this._add_original_source(item);
-        } else if (item.type === "ReplaceSource") {
-            this._add_replace_source(item);
-        } else if (item.type === "PrefixSource") {
-            this._add_prefix_source(item);
-        } else if (item.type === "ConcatSource") {
-            this._add_concat_source(item);
-        } else if (item.type === "LineToLineMappedSource") {
-            this._add_line_to_line_mapped_source(item);
-        } else if (item.type === "SourceMapSource") {
-            this._add_source_map_source(item);
         } else {
-            throw new Error("Invalid source");
+            switch (item.type) {
+                case Types.RawSource:
+                    this._add_raw_source(item);
+                    break;
+                case Types.OriginalSource:
+                    this._add_original_source(item);
+                    break;
+                case Types.ReplaceSource:
+                    this._add_replace_source(item);
+                    break;
+                case Types.PrefixSource:
+                    this._add_prefix_source(item);
+                    break;
+                case Types.ConcatSource:
+                    this._add_concat_source(item);
+                    break;
+                case Types.LineToLineMappedSource:
+                    this._add_line_to_line_mapped_source(item);
+                    break;
+                case Types.SourceMapSource:
+                    this._add_source_map_source(item);
+                    break;
+                default:
+                    throw new TypeError("Invalid source type");
+            }
         }
 
         if (item.isConcatSource) {
@@ -69,5 +81,5 @@ class ConcatSource extends wasm._ConcatSource {
 
 require("./SourceAndMapMixin")(ConcatSource.prototype);
 
-ConcatSource.prototype.type = "ConcatSource";
+ConcatSource.prototype.type = Types.ConcatSource;
 module.exports = ConcatSource;

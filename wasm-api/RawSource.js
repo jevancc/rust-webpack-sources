@@ -3,10 +3,12 @@
 	Author Tobias Koppers @sokra
 */
 "use strict";
-let SourceNode = require("./wasm-source-map").SourceNode;
-let SourceListMap = require("./wasm-source-list-map").SourceListMap;
-let WasmObjectPool = require("./WasmObjectPool");
-let wasm = require("./build/webpack_sources");
+
+const SourceNode = require("./wasm-source-map").SourceNode;
+const SourceListMap = require("./wasm-source-list-map").SourceListMap;
+const WasmObjectPool = require("./WasmObjectPool");
+const Types = require("./Types");
+const wasm = require("./build/webpack_sources");
 
 let ptrCache = new Map();
 class RawSource extends wasm._RawSource {
@@ -51,5 +53,5 @@ class RawSource extends wasm._RawSource {
     }
 }
 
-RawSource.prototype.type = "RawSource";
+RawSource.prototype.type = Types.RawSource;
 module.exports = RawSource;

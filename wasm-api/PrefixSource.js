@@ -4,52 +4,65 @@
 */
 "use strict";
 
-let SourceNode = require("./wasm-source-map").SourceNode;
-let SourceListMap = require("./wasm-source-list-map").SourceListMap;
-let WasmObjectPool = require("./WasmObjectPool");
-let wasm = require("./build/webpack_sources");
+const SourceNode = require("./wasm-source-map").SourceNode;
+const SourceListMap = require("./wasm-source-list-map").SourceListMap;
+const WasmObjectPool = require("./WasmObjectPool");
+const Types = require("./Types");
+const wasm = require("./build/webpack_sources");
 
 class PrefixSource extends wasm._PrefixSource {
     constructor(prefix, source) {
         super(0);
         if (typeof source === "string") {
             this.ptr = PrefixSource._new_string_string(prefix, source).ptr;
-        } else if (source.type === "RawSource") {
-            this.ptr = PrefixSource._new_string_raw_source(prefix, source).ptr;
-        } else if (source.type === "OriginalSource") {
-            this.ptr = PrefixSource._new_string_original_source(
-                prefix,
-                source
-            ).ptr;
-        } else if (source.type === "ReplaceSource") {
-            this.ptr = PrefixSource._new_string_replace_source(
-                prefix,
-                source
-            ).ptr;
-        } else if (source.type === "PrefixSource") {
-            this.ptr = PrefixSource._new_string_prefix_source(
-                prefix,
-                source
-            ).ptr;
-        } else if (source.type === "ConcatSource") {
-            this.ptr = PrefixSource._new_string_concat_source(
-                prefix,
-                source
-            ).ptr;
-        } else if (source.type === "LineToLineMappedSource") {
-            this.ptr = PrefixSource._new_string_line_to_line_mapped_source(
-                prefix,
-                source
-            ).ptr;
-        } else if (source.type === "SourceMapSource") {
-            this.ptr = PrefixSource._new_string_source_map_source(
-                prefix,
-                source
-            ).ptr;
         } else {
-            throw new Error("Invalid source");
+            switch (source.type) {
+                case Types.RawSource:
+                    this.ptr = PrefixSource._new_string_raw_source(
+                        prefix,
+                        source
+                    ).ptr;
+                    break;
+                case Types.OriginalSource:
+                    this.ptr = PrefixSource._new_string_original_source(
+                        prefix,
+                        source
+                    ).ptr;
+                    break;
+                case Types.ReplaceSource:
+                    this.ptr = PrefixSource._new_string_replace_source(
+                        prefix,
+                        source
+                    ).ptr;
+                    break;
+                case Types.PrefixSource:
+                    this.ptr = PrefixSource._new_string_prefix_source(
+                        prefix,
+                        source
+                    ).ptr;
+                    break;
+                case Types.ConcatSource:
+                    this.ptr = PrefixSource._new_string_concat_source(
+                        prefix,
+                        source
+                    ).ptr;
+                    break;
+                case Types.LineToLineMappedSource:
+                    this.ptr = PrefixSource._new_string_line_to_line_mapped_source(
+                        prefix,
+                        source
+                    ).ptr;
+                    break;
+                case Types.SourceMapSource:
+                    this.ptr = PrefixSource._new_string_source_map_source(
+                        prefix,
+                        source
+                    ).ptr;
+                    break;
+                default:
+                    throw new TypeError("Invalid source type");
+            }
         }
-
         this._jsSource = source;
         this._jsPrefix = prefix;
         WasmObjectPool.add(this);
@@ -73,5 +86,5 @@ class PrefixSource extends wasm._PrefixSource {
 
 require("./SourceAndMapMixin")(PrefixSource.prototype);
 
-PrefixSource.prototype.type = "PrefixSource";
+PrefixSource.prototype.type = Types.PrefixSource;
 module.exports = PrefixSource;

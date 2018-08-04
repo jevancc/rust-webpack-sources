@@ -1,5 +1,7 @@
-let array = [];
-let set = new Map();
+"use strict";
+
+const array = [];
+const set = new Map();
 
 function add(str) {
     let idx = indexOf(str);

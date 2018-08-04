@@ -1,8 +1,9 @@
 "use strict";
 
-let wasm = require("../build/webpack_sources");
-let SourceListMap = require("./SourceListMap");
-let StringCache = require("../StringCache");
+const SourceListMap = require("./SourceListMap");
+const StringCache = require("../StringCache");
+const Types = require("./Types");
+const wasm = require("../build/webpack_sources");
 
 module.exports = function fromStringWithSourceMap(code, map) {
     let sources = (map.sources || []).map(StringCache.add);
@@ -11,7 +12,7 @@ module.exports = function fromStringWithSourceMap(code, map) {
     );
     let mappings = map.mappings;
 
-    let slp = new SourceListMap(-2);
+    let slp = new SourceListMap(Types.Null);
     slp.ptr = wasm._from_string_with_source_map(
         code,
         sources,

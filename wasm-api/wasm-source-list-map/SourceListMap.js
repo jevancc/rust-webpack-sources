@@ -1,19 +1,20 @@
 "use strict";
 
-let CodeNode = require("./CodeNode");
-let SourceNode = require("./SourceNode");
-let SingleLineNode = require("./SingleLineNode");
-let StringVec = require("./utils").StringVec;
-let NodeVec = require("./utils").NodeVec;
-let StringCache = require("../StringCache");
-let WasmObjectPool = require("../WasmObjectPool");
-let createStringWithSourceMap = require("../utils/createStringWithSourceMap");
-let wasm = require("../build/webpack_sources");
+const CodeNode = require("./CodeNode");
+const SourceNode = require("./SourceNode");
+const SingleLineNode = require("./SingleLineNode");
+const StringVec = require("./utils").StringVec;
+const NodeVec = require("./utils").NodeVec;
+const StringCache = require("../StringCache");
+const WasmObjectPool = require("../WasmObjectPool");
+const createStringWithSourceMap = require("../utils/createStringWithSourceMap");
+const Types = require("./Types");
+const wasm = require("../build/webpack_sources");
 
 class SourceListMap extends wasm._SourceListMap {
     constructor(generatedCode, source, originalSource) {
         super(0);
-        if (generatedCode !== -2) {
+        if (generatedCode !== Types.Null) {
             if (Array.isArray(generatedCode)) {
                 let nodes = NodeVec(generatedCode);
                 this.ptr = SourceListMap._new_nodes(nodes);
@@ -56,7 +57,7 @@ class SourceListMap extends wasm._SourceListMap {
     }
 
     mapGeneratedCode(fnIdx) {
-        let newSlp = new SourceListMap(-2);
+        let newSlp = new SourceListMap(Types.Null);
         switch (fnIdx) {
             case this.MappingFunction.Test:
                 newSlp.ptr = wasm._sourcelistmap_map_generated_code_test(
@@ -116,5 +117,5 @@ SourceListMap.prototype.MappingFunction = {
     Prefix: 3,
     Replace: 4
 };
-SourceListMap.prototype.isSourceListMap = true;
+SourceListMap.prototype.type = Types.SourceListMap;
 module.exports = SourceListMap;

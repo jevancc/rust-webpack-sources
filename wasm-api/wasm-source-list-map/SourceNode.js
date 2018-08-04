@@ -1,7 +1,8 @@
 "use strict";
 
-let StringCache = require("../StringCache");
-let wasm = require("../build/webpack_sources");
+const StringCache = require("../StringCache");
+const Types = require("./Types");
+const wasm = require("../build/webpack_sources");
 
 class SourceNode extends wasm._SourceNode {
     constructor(generatedCode, source, originalSource, startingLine) {
@@ -35,5 +36,5 @@ class SourceNode extends wasm._SourceNode {
     }
 }
 
-SourceNode.prototype.isSourceNode = true;
+SourceNode.prototype.type = Types.SourceNode;
 module.exports = SourceNode;

@@ -1,4 +1,6 @@
-let pool = [];
+"use strict";
+
+const pool = [];
 
 function add(source) {
     pool.push(source);

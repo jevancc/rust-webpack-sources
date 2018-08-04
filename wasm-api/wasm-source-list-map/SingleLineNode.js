@@ -1,7 +1,8 @@
 "use strict";
 
-let StringCache = require("../StringCache");
-let wasm = require("../build/webpack_sources");
+const StringCache = require("../StringCache");
+const Types = require("./Types");
+const wasm = require("../build/webpack_sources");
 
 class SingleLineNode extends wasm._SingleLineNode {
     constructor(generatedCode, source, originalSource, startingLine) {
@@ -35,5 +36,5 @@ class SingleLineNode extends wasm._SingleLineNode {
     }
 }
 
-SingleLineNode.prototype.isSingleLineNode = true;
+SingleLineNode.prototype.type = Types.SingleLineNode;
 module.exports = SingleLineNode;

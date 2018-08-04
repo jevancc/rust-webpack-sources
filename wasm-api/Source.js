@@ -4,9 +4,6 @@
 */
 "use strict";
 
-var SourceNode = require("source-map").SourceNode;
-var SourceMapConsumer = require("source-map").SourceMapConsumer;
-
 class Source {
     source() {
         throw new Error("Abstract");

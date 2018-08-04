@@ -4,15 +4,16 @@
 */
 "use strict";
 
-let SourceNode = require("./wasm-source-map").SourceNode;
-let SourceListMap = require("./wasm-source-list-map").SourceListMap;
-let fromStringWithSourceMap = require("./wasm-source-list-map")
+const SourceNode = require("./wasm-source-map").SourceNode;
+const SourceListMap = require("./wasm-source-list-map").SourceListMap;
+const fromStringWithSourceMap = require("./wasm-source-list-map")
     .fromStringWithSourceMap;
-let SourceMapConsumer = require("source-map").SourceMapConsumer;
-let SourceMapGenerator = require("source-map").SourceMapGenerator;
-let StringCache = require("./StringCache");
-let WasmObjectPool = require("./WasmObjectPool");
-let wasm = require("./build/webpack_sources");
+const SourceMapConsumer = require("source-map").SourceMapConsumer;
+const SourceMapGenerator = require("source-map").SourceMapGenerator;
+const StringCache = require("./StringCache");
+const WasmObjectPool = require("./WasmObjectPool");
+const Types = require("./Types");
+const wasm = require("./build/webpack_sources");
 
 class SourceMapSource extends wasm._SourceMapSource {
     constructor(value, name, sourceMap, originalSource, innerSourceMap) {
@@ -98,5 +99,5 @@ class SourceMapSource extends wasm._SourceMapSource {
 
 require("./SourceAndMapMixin")(SourceMapSource.prototype);
 
-SourceMapSource.prototype.type = "SourceMapSource";
+SourceMapSource.prototype.type = Types.SourceMapSource;
 module.exports = SourceMapSource;

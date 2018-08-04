@@ -4,42 +4,52 @@
 */
 "use strict";
 
-let SourceNode = require("./wasm-source-map").SourceNode;
-let SourceListMap = require("./wasm-source-list-map").SourceListMap;
-let fromStringWithSourceMap = require("./wasm-source-list-map")
+const SourceNode = require("./wasm-source-map").SourceNode;
+const SourceListMap = require("./wasm-source-list-map").SourceListMap;
+const fromStringWithSourceMap = require("./wasm-source-list-map")
     .fromStringWithSourceMap;
-let SourceMapConsumer = require("source-map").SourceMapConsumer;
-let WasmObjectPool = require("./WasmObjectPool");
-let wasm = require("./build/webpack_sources");
+const SourceMapConsumer = require("source-map").SourceMapConsumer;
+const WasmObjectPool = require("./WasmObjectPool");
+const Types = require("./Types");
+const wasm = require("./build/webpack_sources");
 
 class ReplaceSource extends wasm._ReplaceSource {
     constructor(source, name) {
         super(0);
         this._jsSource = source;
         this._jsName = name;
-        this._sourceCache = null;
         this._replacements = null;
 
         if (typeof source === "string") {
             this.ptr = ReplaceSource._new_string(source).ptr;
-        } else if (source.type === "RawSource") {
-            this.ptr = ReplaceSource._new_raw_source(source).ptr;
-        } else if (source.type === "OriginalSource") {
-            this.ptr = ReplaceSource._new_original_source(source).ptr;
-        } else if (source.type === "ReplaceSource") {
-            this.ptr = ReplaceSource._new_replace_source(source).ptr;
-        } else if (source.type === "PrefixSource") {
-            this.ptr = ReplaceSource._new_prefix_source(source).ptr;
-        } else if (source.type === "ConcatSource") {
-            this.ptr = ReplaceSource._new_concat_source(source).ptr;
-        } else if (source.type === "LineToLineMappedSource") {
-            this.ptr = ReplaceSource._new_line_to_line_mapped_source(
-                source
-            ).ptr;
-        } else if (source.type === "SourceMapSource") {
-            this.ptr = ReplaceSource._new_source_map_source(source).ptr;
         } else {
-            throw new Error("Invalid source");
+            switch (source.type) {
+                case Types.RawSource:
+                    this.ptr = ReplaceSource._new_raw_source(source).ptr;
+                    break;
+                case Types.OriginalSource:
+                    this.ptr = ReplaceSource._new_original_source(source).ptr;
+                    break;
+                case Types.ReplaceSource:
+                    this.ptr = ReplaceSource._new_replace_source(source).ptr;
+                    break;
+                case Types.PrefixSource:
+                    this.ptr = ReplaceSource._new_prefix_source(source).ptr;
+                    break;
+                case Types.ConcatSource:
+                    this.ptr = ReplaceSource._new_concat_source(source).ptr;
+                    break;
+                case Types.LineToLineMappedSource:
+                    this.ptr = ReplaceSource._new_line_to_line_mapped_source(
+                        source
+                    ).ptr;
+                    break;
+                case Types.SourceMapSource:
+                    this.ptr = ReplaceSource._new_source_map_source(source).ptr;
+                    break;
+                default:
+                    throw new TypeError("Invalid source type");
+            }
         }
         WasmObjectPool.add(this);
     }
@@ -86,7 +96,7 @@ class ReplaceSource extends wasm._ReplaceSource {
 
     original() {
         throw new Error("ReplaceSource.original() is deprecated");
-        // return this._source;
+        // return this._jsSource;
     }
 
     replacements() {
@@ -104,5 +114,5 @@ class ReplaceSource extends wasm._ReplaceSource {
 
 require("./SourceAndMapMixin")(ReplaceSource.prototype);
 
-ReplaceSource.prototype.type = "ReplaceSource";
+ReplaceSource.prototype.type = Types.ReplaceSource;
 module.exports = ReplaceSource;

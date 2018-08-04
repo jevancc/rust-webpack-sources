@@ -1,6 +1,7 @@
-let StringCache = require("../StringCache");
-let WasmObjectPool = require("../WasmObjectPool");
-let wasm = require("../build/webpack_sources");
+const StringCache = require("../StringCache");
+const WasmObjectPool = require("../WasmObjectPool");
+const Types = require("../Types");
+const wasm = require("../build/webpack_sources");
 
 function defineConst(obj, prop, getter) {
     Object.defineProperty(obj, prop, {
@@ -31,15 +32,14 @@ function defineHidden(obj, prop, val) {
     });
 }
 
-const Null = Symbol(null);
 function createStringWithSourceMap(WasmStringWithSourceMap, file, isNames) {
     let stringWithSourceMap = new Object();
     let sourceMap = new Object();
-    let cachedS = Null;
-    let cachedSources = Null;
-    let cachedSourcesContent = Null;
-    let cachedMappings = Null;
-    let cachedNames = Null;
+    let cachedS = Types.Null;
+    let cachedSources = Types.Null;
+    let cachedSourcesContent = Types.Null;
+    let cachedMappings = Types.Null;
+    let cachedNames = Types.Null;
     let modified = false;
 
     WasmObjectPool.add(WasmStringWithSourceMap);
@@ -51,7 +51,7 @@ function createStringWithSourceMap(WasmStringWithSourceMap, file, isNames) {
         sourceMap,
         "sources",
         function() {
-            if (cachedSources === Null) {
+            if (cachedSources === Types.Null) {
                 cachedSources = StringCache.resolveIntArray(
                     WasmStringWithSourceMap.sources()
                 );
@@ -68,7 +68,7 @@ function createStringWithSourceMap(WasmStringWithSourceMap, file, isNames) {
         sourceMap,
         "sourcesContent",
         function() {
-            if (cachedSourcesContent === Null) {
+            if (cachedSourcesContent === Types.Null) {
                 cachedSourcesContent = StringCache.resolveIntArray(
                     WasmStringWithSourceMap.sources_content()
                 );
@@ -90,7 +90,7 @@ function createStringWithSourceMap(WasmStringWithSourceMap, file, isNames) {
         sourceMap,
         "mappings",
         function() {
-            if (cachedMappings === Null) {
+            if (cachedMappings === Types.Null) {
                 cachedMappings = WasmStringWithSourceMap.mappings();
             }
             return cachedMappings;
@@ -106,7 +106,7 @@ function createStringWithSourceMap(WasmStringWithSourceMap, file, isNames) {
             sourceMap,
             "names",
             function() {
-                if (cachedNames === Null) {
+                if (cachedNames === Types.Null) {
                     cachedNames = StringCache.resolveIntArray(
                         WasmStringWithSourceMap.names()
                     );
@@ -133,7 +133,7 @@ function createStringWithSourceMap(WasmStringWithSourceMap, file, isNames) {
         stringWithSourceMap,
         "source",
         function() {
-            if (cachedS === Null) {
+            if (cachedS === Types.Null) {
                 cachedS = WasmStringWithSourceMap.s();
             }
             return cachedS;

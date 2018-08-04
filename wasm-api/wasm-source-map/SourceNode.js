@@ -1,14 +1,15 @@
 "use strict";
 
-let StringCache = require("../StringCache");
-let WasmObjectPool = require("../WasmObjectPool");
-let createStringWithSourceMap = require("../utils/createStringWithSourceMap");
-let wasm = require("../build/webpack_sources");
+const StringCache = require("../StringCache");
+const WasmObjectPool = require("../WasmObjectPool");
+const createStringWithSourceMap = require("../utils/createStringWithSourceMap");
+const Types = require("./Types");
+const wasm = require("../build/webpack_sources");
 
 class SourceNode extends wasm._MSourceNode {
     constructor(line, column, source, chunks) {
         super(0);
-        if (line !== -2) {
+        if (line !== Types.Null) {
             if (source) {
                 let sourceIndex = StringCache.add(source);
                 this.ptr = SourceNode._new_number_number_sidx_null(
@@ -30,7 +31,7 @@ class SourceNode extends wasm._MSourceNode {
             chunk.forEach(function(ck) {
                 this.add(ck);
             }, this);
-        } else if (chunk.isSourceNode) {
+        } else if (chunk.type === Types.SourceNode) {
             this._add_sourcenode(chunk);
         } else if (typeof chunk === "string") {
             this._add_string(chunk);
@@ -48,5 +49,5 @@ class SourceNode extends wasm._MSourceNode {
     }
 }
 
-SourceNode.prototype.isSourceNode = true;
+SourceNode.prototype.type = Types.SourceNode;
 module.exports = SourceNode;
