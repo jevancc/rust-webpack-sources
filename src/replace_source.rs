@@ -174,67 +174,73 @@ impl<'a> ReplaceMappingFunction<'a> {
 
 impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
     fn map(&mut self, code: String) -> String {
-        let code_len = code.chars().count();
-        let code_byte_len = code.len();
-        let new_current_idx = self.current_idx + code_len as i32;
+        let code_len = code.len();
 
-        if self.remove_chars > code_len as i32 {
-            self.remove_chars -= code_len as i32;
-            self.current_idx = new_current_idx;
-            String::new()
-        } else {
-            let mut code_iter = code.char_indices();
-            code_iter.next();
-            let mut code_iter_bound = 0;
-            let mut code_step_n_chars = |n: usize| {
-                if n > 0 {
-                    code_iter_bound = code_iter.nth(n - 1).map_or(code_byte_len, |(bs, _)| bs);
-                }
-                code_iter_bound
-            };
-
-            let mut start_bound = 0;
-            if self.remove_chars > 0 {
-                start_bound = code_step_n_chars(self.remove_chars as usize);
-                self.current_idx += self.remove_chars;
-                self.remove_chars = 0;
-            }
-
-            let mut final_str = Vec::<u8>::with_capacity(code_byte_len);
-            while self.replacement_idx >= 0
-                && self.replacements[self.replacement_idx as usize].0
-                    < ((new_current_idx as i64) << 4)
-            {
-                let repl = &self.replacements[self.replacement_idx as usize];
-                let start = (repl.0 >> 4) as i32;
-                let end = (repl.1 >> 4) as i32 + 1;
-
-                if start > self.current_idx {
-                    let end_bound = code_step_n_chars((start - self.current_idx) as usize);
-                    final_str.extend_from_slice(
-                        code[start_bound as usize..end_bound as usize].as_bytes(),
-                    );
-                    self.current_idx = start;
-                    start_bound = end_bound;
-                }
-                final_str.extend_from_slice(repl.2.as_bytes());
-
-                if end <= new_current_idx {
-                    if end > self.current_idx {
-                        start_bound = code_step_n_chars((end - self.current_idx) as usize);
-                    }
-                    self.current_idx = cmp::max(self.current_idx, end);
+        let mut code_iter_bound = 0;
+        let mut code_iter = code.char_indices();
+        let mut code_step_n_chars = |n: i32| {
+            let mut rem_cnt = 0;
+            while rem_cnt < n {
+                if let Some((p, c)) = code_iter.next() {
+                    code_iter_bound = p + c.len_utf8();
+                    rem_cnt += 1;
                 } else {
-                    start_bound = code_step_n_chars((new_current_idx - start) as usize);
-                    self.remove_chars = end - new_current_idx;
+                    return Err((n - rem_cnt, rem_cnt));
                 }
-
-                self.replacement_idx -= 1;
             }
-            self.current_idx = new_current_idx;
-            final_str.extend_from_slice(code[start_bound as usize..].as_bytes());
-            unsafe { str::from_utf8_unchecked(&final_str).to_string() }
+            Ok((code_iter_bound, rem_cnt))
+        };
+
+        let mut start_bound = 0;
+        if self.remove_chars > 0 {
+            match code_step_n_chars(self.remove_chars) {
+                Ok((p, chars)) => {
+                    self.current_idx += chars;
+                    self.remove_chars = 0;
+                    start_bound = p;
+                }
+                Err((n, chars)) => {
+                    self.current_idx += chars;
+                    self.remove_chars = n;
+                    return String::new();
+                }
+            }
         }
+
+        let mut final_str = String::with_capacity(code_len * 2);
+        while self.replacement_idx >= 0 {
+            let repl = &self.replacements[self.replacement_idx as usize];
+            let start = (repl.0 >> 4) as i32;
+            let end = (repl.1 >> 4) as i32 + 1;
+
+            match code_step_n_chars(start - self.current_idx) {
+                Ok((p, chars)) => {
+                    self.current_idx += chars;
+                    final_str.push_str(&code[start_bound as usize..p as usize]);
+                }
+                Err((_, chars)) => {
+                    self.current_idx += chars;
+                    break;
+                }
+            }
+            final_str.push_str(&repl.2);
+
+            self.replacement_idx -= 1;
+            match code_step_n_chars(end - self.current_idx) {
+                Ok((p, chars)) => {
+                    self.current_idx += chars;
+                    start_bound = p;
+                }
+                Err((n, chars)) => {
+                    self.current_idx += chars;
+                    self.remove_chars = cmp::max(n, 0);
+                    start_bound = code_len;
+                    break;
+                }
+            }
+        }
+        final_str.push_str(&code[start_bound as usize..]);
+        final_str
     }
 }
 
