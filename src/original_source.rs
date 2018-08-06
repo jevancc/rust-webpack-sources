@@ -75,21 +75,15 @@ impl SourceTrait for OriginalSource {
     }
 }
 
-fn find_split_pos(code: &StringSlice) -> Option<usize> {
+fn split_code(mut code: StringSlice) -> Vec<StringSlice> {
     lazy_static! {
-        static ref REGEX: Regex = Regex::new("^[^\n\r;{}]*[\n\r;{}]*").unwrap();
+        static ref REGEX: Regex = Regex::new(r"[^\n\r;{}]*[\n\r;{}]*").unwrap();
     }
 
-    let code = code.as_bytes();
-    REGEX.find(&code).map(|m| m.end())
-}
-
-fn split_code(mut code: StringSlice) -> Vec<StringSlice> {
     let mut result: Vec<StringSlice> = Vec::with_capacity(128);
     while code.len() != 0 {
-        let split_pos = find_split_pos(&code);
-        if let Some(pos) = split_pos {
-            let splitted = code.split_at(pos);
+        if let Some(p) = REGEX.find(&code.as_bytes()).map(|m| m.end()) {
+            let splitted = code.split_at(p);
             result.push(splitted.0);
             code = splitted.1;
         } else {
