@@ -1,7 +1,7 @@
 [package]
 authors = ["Jevan Chan <jevan.cnchan@gmail.com>"]
 name = "webpack-sources"
-version = "0.2.8"
+version = "0.2.9"
 [dependencies]
 bytecount = "0.3.1"
 lazy_static = "1.0"
