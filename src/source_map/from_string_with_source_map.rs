@@ -4,14 +4,14 @@ use types::string_slice::StringSlice;
 use utils;
 
 pub fn from_string_with_source_map_generator(
-    // code must be "UnsafePtr" here and guarantee the string lives longer than returned SourceNode
     code: StringSlice,
     generator: &mut SourceMapGenerator,
 ) -> SourceNode {
     let mut node = SourceNode::new(None, None, None, None);
 
     let code_len = code.len();
-    let mut lines = Vec::<(StringSlice, bool, bool)>::with_capacity(128); // line, is_existing, single_byte_char_only
+    // line, is_existing, single_byte_char_only
+    let mut lines = Vec::<(StringSlice, bool, bool)>::with_capacity(128);
     {
         let mut line_start = 0;
         let mut single_byte_char_only = true;

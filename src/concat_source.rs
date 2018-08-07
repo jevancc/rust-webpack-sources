@@ -47,7 +47,6 @@ impl SourceTrait for ConcatSource {
         for child in &mut self.children {
             map.add(
                 if let Source::SString(s) = child {
-                    // TODO: Check why error occurs when returning SlmNode::NString
                     SlmNode::NString(s.clone())
                 } else {
                     SlmNode::NSourceListMap(child.list_map(columns, module))

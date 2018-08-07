@@ -36,6 +36,7 @@ pub fn split_str(
     }
 }
 
+// TODO: merge with `split_str`
 pub fn split_string_slice(
     s: StringSlice,
     pos: i32,

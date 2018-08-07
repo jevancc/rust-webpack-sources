@@ -92,10 +92,7 @@ impl SourceListMap {
                         0,
                         Node::NSourceNode(SourceNode::new(s, source, original_source, 1)),
                     );
-                }
-                // TODO: branch for last child node with preprendGeneratedCode
-                // else if !self.children.is_empty() {}
-                else {
+                } else {
                     self.children.insert(0, Node::NCodeNode(CodeNode::new(s)));
                 }
             }

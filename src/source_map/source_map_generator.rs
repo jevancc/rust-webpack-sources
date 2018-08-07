@@ -219,8 +219,6 @@ impl SourceMapGenerator {
             source_file
         };
 
-        // let source_root = self.source_root.clone();
-        // process source_root
         self.mappings.set_unsorted();
         let mut new_sources = Vec::<i32>::with_capacity(self.sources.len());
         let mut new_names = Vec::<i32>::with_capacity(self.names.len());
@@ -230,7 +228,6 @@ impl SourceMapGenerator {
                     let original = generator.original_position_for(line, column);
                     if original.source.is_some() {
                         mapping.source = original.source;
-                        // process source_root
                         if original.name.is_some() {
                             mapping.name = original.name;
                         }
