@@ -1,4 +1,4 @@
-var cp = require("child_process");
+const cp = require("child_process");
 
 exports.run = function run(cmd, options) {
     console.log("> " + cmd.join(" "));

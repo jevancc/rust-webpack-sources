@@ -1,24 +1,31 @@
-var fs = require("fs");
-var path = require("path");
-var utils = require("./utils");
+const fs = require("fs");
+const path = require("path");
+const utils = require("./utils");
 
-var ROOT = path.join(__dirname, "../");
-var BUILD_DIR = path.join(ROOT, "wasm-api/build");
-var CWD = path.join(ROOT, ".");
-var CRATE_NAME = "webpack_sources";
+const ROOT = path.join(__dirname, "../");
+const BUILD_DIR = path.join(ROOT, "wasm-api/build");
+const CWD = path.join(ROOT, ".");
+const CRATE_NAME = "webpack_sources";
 
 function main() {
     if (!fs.existsSync(BUILD_DIR)) {
         fs.mkdirSync(BUILD_DIR);
     }
 
-    var options = {
+    let options = {
         cwd: CWD,
         stdio: "inherit"
     };
 
     utils.run(
-        ["cargo", "build", "--target", "wasm32-unknown-unknown", "--release"],
+        [
+            "cargo",
+            "+nightly",
+            "build",
+            "--target",
+            "wasm32-unknown-unknown",
+            "--release"
+        ],
         options
     );
     utils.run(
