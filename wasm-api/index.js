@@ -1,3 +1,5 @@
+const assert = require("assert");
+
 exports.Source = require("./Source");
 
 exports.RawSource = require("./RawSource");
@@ -21,4 +23,13 @@ exports.clear = function() {
     require("./WasmObjectPool").clear();
     require("./RawSource")._clearPtrCache();
     require("./OriginalSource")._clearPtrCache();
+};
+
+exports.register = function() {
+    assert(require.cache[require.resolve("webpack-sources")] === undefined);
+    require.cache[require.resolve("webpack-sources")] =
+        require.cache[require.resolve("wasm-webpack-sources")];
+    process.emitWarning(
+        "You are now using experimental package `wasm-webpack-sources`"
+    );
 };
