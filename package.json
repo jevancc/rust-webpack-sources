@@ -24,8 +24,7 @@
   },
   "homepage": "https://github.com/jevancc/rust-webpack-sources#readme",
   "dependencies": {
-    "source-list-map": "^2.0.0",
-    "source-map": "^0.6.1"
+    "chalk": "^2.4.1"
   },
   "devDependencies": {
     "mocha": "^5.2.0",

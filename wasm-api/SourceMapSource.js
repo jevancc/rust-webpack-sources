@@ -4,8 +4,6 @@ const SourceNode = require("./wasm-source-map").SourceNode;
 const SourceListMap = require("./wasm-source-list-map").SourceListMap;
 const fromStringWithSourceMap = require("./wasm-source-list-map")
     .fromStringWithSourceMap;
-const SourceMapConsumer = require("source-map").SourceMapConsumer;
-const SourceMapGenerator = require("source-map").SourceMapGenerator;
 const StringCache = require("./StringCache");
 const WasmObjectPool = require("./WasmObjectPool");
 const Types = require("./Types");

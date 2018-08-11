@@ -4,7 +4,6 @@ const SourceNode = require("./wasm-source-map").SourceNode;
 const SourceListMap = require("./wasm-source-list-map").SourceListMap;
 const fromStringWithSourceMap = require("./wasm-source-list-map")
     .fromStringWithSourceMap;
-const SourceMapConsumer = require("source-map").SourceMapConsumer;
 const WasmObjectPool = require("./WasmObjectPool");
 const Types = require("./Types");
 const wasm = require("./build/webpack_sources");
