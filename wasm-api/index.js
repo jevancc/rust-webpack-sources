@@ -1,4 +1,5 @@
 const assert = require("assert");
+const chalk = require("chalk");
 
 exports.Source = require("./Source");
 
@@ -27,9 +28,13 @@ exports.clear = function() {
 
 exports.register = function() {
     assert(require.cache[require.resolve("webpack-sources")] === undefined);
+
     require.cache[require.resolve("webpack-sources")] =
         require.cache[require.resolve("wasm-webpack-sources")];
-    process.emitWarning(
-        "You are now using experimental package `wasm-webpack-sources`"
+
+    console.log(chalk.yellow(`Override:
+    ${require.resolve("webpack-sources")} -> ${require.resolve("wasm-webpack-sources")}`))
+    console.log(
+        chalk.yellow("You are now using experimental package `wasm-webpack-sources`\n")
     );
 };
