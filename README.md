@@ -7,11 +7,30 @@ The rust implementation of `webpack-sources` with WebAssembly Node.js API.
 
 ## Usage
 
+
+### 1. With `webpack-cli` (Recommend)
+First, install `webpack-cli`, `webpack`, and `wasm-webpack-sources` in your local project:
+```
+$ npm install webpack wasm-webpack-sources https://github.com/jevancc/webpack-cli
+```
+After the installation, you can enable the experimental WebAssembly package with an optional argument `--output-use-webassembly`:
+```
+$ webpack --output-use-webassembly
+```
+When this argument is provided, you will see the following message:
+```
+Override:
+    <webpack-sources resolve> -> <wasm-webpack-sources resolve>
+You are now using experimental package `wasm-webpack-sources`
+```
+
+### 2. With cloned webpack repository
 You can install
-this package with yarn under an alias to try it in Webpack:
+this package with yarn under an alias to try it with your local Webpack:
 ```
 $ yarn add webpack-sources@npm:wasm-webpack-sources
 ```
+This command will replace `webpack-soruces` with `wasm-webpack-sources` in `node_modules`.
 
 ## Important Notice
 * The size of file is stored in 32bit signed integer, hence this package does not support files larger than 2GB.
@@ -27,7 +46,6 @@ There is no deallocation in current release.
 The deallocation process invloves extra works to be made in webpack and plugins which use and create objects with `webpack-sources`. So far, these works haven't be done so it may impose the potential risk of memory leak.
 
 Be careful when you are using it in the cases where process is not exited after the compilation such as `dev-server`.
-
 
 ## Build
 
