@@ -133,7 +133,6 @@ impl SourceMapGenerator {
                 //     ) {
                 //         continue;
                 //     }
-                // }
                 buf.push(b',');
             }
 
@@ -274,16 +273,14 @@ impl SourceMapGenerator {
                     generator.add_source(*sidx);
                     generator.set_source_content(*sidx, contents.next());
                     set.insert(*sidx)
-                })
-                .collect()
+                }).collect()
         } else {
             sources
                 .into_iter()
                 .map(|sidx| {
                     generator.set_source_content(sidx, contents.next());
                     sidx
-                })
-                .collect()
+                }).collect()
         };
         let names: Vec<i32> = if check_dup {
             let mut set: HashSet<i32> = HashSet::new();

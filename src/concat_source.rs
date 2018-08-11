@@ -72,8 +72,7 @@ impl SourceTrait for ConcatSource {
                         } else {
                             SmNode::NSourceNode(child.node(columns, module))
                         }
-                    })
-                    .collect(),
+                    }).collect(),
             )),
         )
     }

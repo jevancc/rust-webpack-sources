@@ -60,11 +60,14 @@ pub fn from_string_with_source_map_generator(
                 last_generated_position.0 += 1;
                 last_generated_position.1 = 0;
             } else {
-                let splitted = utils::split_string_slice(
+                let splitted = match utils::split_string_slice(
                     next_line.0,
                     generated_position.1 as i32 - last_generated_position.1 as i32,
                     next_line.2,
-                ).unwrap();
+                ) {
+                    Ok(splitted) => splitted,
+                    Err((_, s, c)) => (s, StringSlice::new(), c, true),
+                };
                 let code = splitted.0;
                 next_line.0 = splitted.1;
                 next_line.2 = splitted.3;
@@ -83,12 +86,17 @@ pub fn from_string_with_source_map_generator(
             last_generated_position.0 += 1;
         }
         if last_generated_position.1 < generated_position.1 {
-            let splitted =
-                utils::split_string_slice(next_line.0, generated_position.1 as i32, next_line.2)
-                    .unwrap();
+            let splitted = match utils::split_string_slice(
+                next_line.0,
+                generated_position.1 as i32,
+                next_line.2,
+            ) {
+                Ok(splitted) => splitted,
+                Err((_, s, c)) => (s, StringSlice::new(), c, true),
+            };
             node.add(Node::NString(splitted.0));
             next_line.0 = splitted.1;
-            next_line.2 = splitted.3; // new len
+            next_line.2 = splitted.3;
             last_generated_position.1 = generated_position.1;
         }
         last_mapping = Some(mapping.clone());

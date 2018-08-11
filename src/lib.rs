@@ -1,4 +1,4 @@
-#![feature(proc_macro, wasm_custom_section, wasm_import_module)]
+#![feature(wasm_custom_section, wasm_import_module, use_extern_macros)]
 extern crate linked_hash_map;
 extern crate serde;
 extern crate source_map_mappings;
