@@ -38,7 +38,7 @@ module.exports = function mixinSourceAndMap(proto) {
             return ret;
         } else {
             let node = this.node(options);
-            let ret = this.node(options).toStringWithSourceMap({
+            let ret = node.toStringWithSourceMap({
                 file: "x"
             }).map;
             if (node.free) {
@@ -61,7 +61,7 @@ module.exports = function mixinSourceAndMap(proto) {
             return ret;
         } else {
             let node = this.node(options);
-            let ret = this.node(options).toStringWithSourceMap({
+            let ret = node.toStringWithSourceMap({
                 file: "x"
             });
             if (node.free) {

@@ -43,7 +43,9 @@ impl SourceNode {
                 self.children.push(Node::NSourceNode(sn));
             }
             Node::NString(s) => {
-                self.children.push(Node::NString(s));
+                if s.len() > 0 {
+                    self.children.push(Node::NString(s));
+                }
             }
         }
     }
@@ -115,6 +117,7 @@ impl SourceNode {
         let is_original = mapping
             .as_ref()
             .map_or(false, |mapping| mapping.source.is_some());
+
         if !is_original {
             self.add(Node::NString(code));
         } else {
@@ -199,7 +202,7 @@ impl WalkFunction for ToSourceMapContext {
                 self.generated_position.0 += 1; // line++
                 self.generated_position.1 = 0; // column = 0
 
-                if b == chunk_len - 1 {
+                if b + 1 == chunk_len {
                     self.last_original_source = None;
                     self.source_mapping_active = false;
                 } else if self.source_mapping_active {

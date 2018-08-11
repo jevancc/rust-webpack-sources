@@ -113,8 +113,7 @@ impl SourceMapGenerator {
         let mut previous_original: (usize, usize) = (0, 0);
         let mut previous_name: usize = 0;
         let mut previous_source: usize = 0;
-        let mut result = String::new();
-        let mut buf = Vec::<u8>::new();
+        let mut buf = Vec::<u8>::with_capacity(256);
 
         self.mappings.sort();
         for (i, mapping) in self.mappings.list.iter().enumerate() {
@@ -166,10 +165,8 @@ impl SourceMapGenerator {
                     previous_name = *name_idx;
                 }
             }
-            result += unsafe { str::from_utf8_unchecked(&buf) };
-            buf.clear();
         }
-        result
+        unsafe { str::from_utf8_unchecked(&buf).to_string() }
     }
 
     // originate from `SourceMapConsumer.OriginalPositionFor`
