@@ -44,7 +44,8 @@ mod to_string_with_source_map {
                 "Test.A = { value: 1234 };",
                 "}());",
                 "/* Generated Source */"
-            ].join("\n")
+            ]
+                .join("\n")
         );
 
         let mut correct_map = SourceMapGenerator::new(Some(str_cache.add("foo.js")), None, false);
@@ -113,7 +114,8 @@ mod to_string_with_source_map {
                 "Generated",
                 "Source",
                 "*/"
-            ].join("\n")
+            ]
+                .join("\n")
         );
 
         let mut correct_map = SourceMapGenerator::new(Some(str_cache.add("foo.js")), None, false);

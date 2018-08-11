@@ -32,9 +32,15 @@ exports.register = function() {
     require.cache[require.resolve("webpack-sources")] =
         require.cache[require.resolve("wasm-webpack-sources")];
 
-    console.log(chalk.yellow(`Override:
-    ${require.resolve("webpack-sources")} -> ${require.resolve("wasm-webpack-sources")}`))
     console.log(
-        chalk.yellow("You are now using experimental package `wasm-webpack-sources`\n")
+        chalk.yellow(`Override:
+    ${require.resolve("webpack-sources")} -> ${require.resolve(
+            "wasm-webpack-sources"
+        )}`)
+    );
+    console.log(
+        chalk.yellow(
+            "You are now using experimental package `wasm-webpack-sources`\n"
+        )
     );
 };
