@@ -1,3 +1,4 @@
+const path = require("path");
 const assert = require("assert");
 const chalk = require("chalk");
 
@@ -19,28 +20,40 @@ exports.SingleLineNode = require("./wasm-source-list-map").SingleLineNode;
 exports.SourceNode = require("./wasm-source-list-map").SourceNode;
 exports.CodeNode = require("./wasm-source-list-map").CodeNode;
 
-exports.clear = function() {
+function clear() {
     require("./StringCache").clear();
     require("./WasmObjectPool").clear();
     require("./RawSource")._clearPtrCache();
     require("./OriginalSource")._clearPtrCache();
-};
+}
+exports.clear = clear;
 
-exports.register = function() {
-    assert(require.cache[require.resolve("webpack-sources")] === undefined);
+const moduleResolvePath = path.resolve(__dirname, "../").split(path.sep);
+const moduleResolveName = moduleResolvePath[moduleResolvePath.length - 1];
+function register() {
+    try {
+        assert(require.cache[require.resolve("webpack-sources")] === undefined);
+        require.cache[require.resolve("webpack-sources")] =
+            require.cache[require.resolve("wasm-webpack-sources")];
 
-    require.cache[require.resolve("webpack-sources")] =
-        require.cache[require.resolve("wasm-webpack-sources")];
+        console.log(
+            chalk.yellow(`Override:
+        ${require.resolve("webpack-sources")} -> ${require.resolve(
+                "wasm-webpack-sources"
+            )}`)
+        );
+        console.log(
+            chalk.yellow(
+                "You are now using experimental package `wasm-webpack-sources`\n"
+            )
+        );
+    } catch (err) {
+        console.log(err.stack);
+        console.log(chalk.red("Fail to override `webpack-sources`\n"));
+    }
+}
+exports.register = register;
 
-    console.log(
-        chalk.yellow(`Override:
-    ${require.resolve("webpack-sources")} -> ${require.resolve(
-            "wasm-webpack-sources"
-        )}`)
-    );
-    console.log(
-        chalk.yellow(
-            "You are now using experimental package `wasm-webpack-sources`\n"
-        )
-    );
-};
+if (moduleResolveName === "wasm-webpack-sources") {
+    register();
+}
