@@ -15,7 +15,7 @@ $ npm install webpack wasm-webpack-sources https://github.com/jevancc/webpack-cl
 ```
 After the installation, you can try the experimental WebAssembly package with argument `-r wasm-webpack-sources`:
 ```
-$ webpack -r wasm-webpack-sources
+$ npx webpack -r wasm-webpack-sources
 ```
 When the module is successfully loaded, you will see the following message:
 ```
