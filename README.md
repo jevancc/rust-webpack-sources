@@ -13,11 +13,11 @@ First, install `webpack-cli`, `webpack`, and `wasm-webpack-sources` in your loca
 ```
 $ npm install webpack wasm-webpack-sources https://github.com/jevancc/webpack-cli
 ```
-After the installation, you can enable the experimental WebAssembly package with an optional argument `--output-use-webassembly`:
+After the installation, you can try the experimental WebAssembly package with argument `-r wasm-webpack-sources`:
 ```
-$ webpack --output-use-webassembly
+$ webpack -r wasm-webpack-sources
 ```
-When this argument is provided, you will see the following message:
+When the module is successfully loaded, you will see the following message:
 ```
 Override:
     <webpack-sources resolve> -> <wasm-webpack-sources resolve>
