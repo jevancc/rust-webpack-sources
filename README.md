@@ -1,4 +1,4 @@
-# rust-webpack-sources
+# wasm-webpack-sources
 
 The rust implementation of `webpack-sources` with WebAssembly Node.js API.
 
