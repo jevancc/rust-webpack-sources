@@ -15,7 +15,7 @@ fn make_prefixed_string(s: StringSlice, prefix: &str, prefix_at_front: bool) -> 
     while let Some(line) = lines.next() {
         result.extend_from_slice(line.as_bytes());
         if let Some(rest) = &lines.rest {
-            if rest.len() > 0 {
+            if !rest.is_empty() {
                 result.extend_from_slice(prefix);
             }
         }

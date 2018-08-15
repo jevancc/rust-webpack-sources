@@ -43,7 +43,7 @@ impl SourceNode {
                 self.children.push(Node::NSourceNode(sn));
             }
             Node::NString(s) => {
-                if s.len() > 0 {
+                if !s.is_empty() {
                     self.children.push(Node::NString(s));
                 }
             }

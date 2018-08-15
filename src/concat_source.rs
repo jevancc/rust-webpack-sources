@@ -12,7 +12,7 @@ pub struct ConcatSource {
 impl ConcatSource {
     pub fn new() -> ConcatSource {
         ConcatSource {
-            children: Vec::new(),
+            children: Vec::with_capacity(12),
         }
     }
 

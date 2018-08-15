@@ -4,6 +4,10 @@ use source_list_map::{types::GenCode, types::Node as SlmNode, SourceListMap};
 use source_map::{types::Node as SmNode, SourceNode};
 use types::string_slice::*;
 
+lazy_static! {
+    static ref SPLITTER_REGEX: Regex = Regex::new(r"[^\n\r;{}]*[\n\r;{}]*").unwrap();
+}
+
 #[derive(Debug)]
 pub struct OriginalSource {
     pub value: StringSlice,
@@ -33,7 +37,7 @@ impl SourceTrait for OriginalSource {
     fn node(&mut self, columns: bool, _module: bool) -> SourceNode {
         let mut sn = SourceNode::new(None, None, None, None);
 
-        for (i, line) in self.value.split_keep_seperator(b'\n').enumerate() {
+        for (i, mut line) in self.value.split_keep_seperator(b'\n').enumerate() {
             if !columns {
                 sn.add(SmNode::NSourceNode(SourceNode::new(
                     Some((i + 1, 0)),
@@ -44,8 +48,15 @@ impl SourceTrait for OriginalSource {
             } else {
                 let mut sn2 = SourceNode::new(None, None, None, None);
                 let mut pos: usize = 0;
-                let splitted_codes = split_code(line);
-                for item in splitted_codes.into_iter() {
+
+                while !line.is_empty() {
+                    let p = SPLITTER_REGEX
+                        .find(&line.as_bytes())
+                        .map_or(line.len(), |m| m.end());
+                    let splitted = line.split_at(p);
+                    let item = splitted.0;
+                    line = splitted.1;
+
                     if item.trim().is_empty() {
                         sn2.add(SmNode::NString(item));
                     } else {
@@ -73,23 +84,4 @@ impl SourceTrait for OriginalSource {
             Some(self.value_idx),
         )
     }
-}
-
-fn split_code(mut code: StringSlice) -> Vec<StringSlice> {
-    lazy_static! {
-        static ref REGEX: Regex = Regex::new(r"[^\n\r;{}]*[\n\r;{}]*").unwrap();
-    }
-
-    let mut result: Vec<StringSlice> = Vec::with_capacity(128);
-    while code.len() != 0 {
-        if let Some(p) = REGEX.find(&code.as_bytes()).map(|m| m.end()) {
-            let splitted = code.split_at(p);
-            result.push(splitted.0);
-            code = splitted.1;
-        } else {
-            result.push(code);
-            break;
-        }
-    }
-    result
 }
