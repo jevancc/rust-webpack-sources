@@ -34,13 +34,12 @@ impl SourceMap {
         mappings: String,
         names: Vec<i32>,
     ) {
-        let data = SourceMapContent {
+        self.data = Some(SourceMapContent {
             sources,
             sources_content,
             mappings: StringSlice::from(mappings),
             names,
-        };
-        self.data = Some(data);
+        });
     }
 
     pub fn set_generator(&mut self, generator: SourceMapGenerator) {
@@ -48,6 +47,7 @@ impl SourceMap {
     }
 
     pub fn get_data(&mut self) -> &mut SourceMapContent {
+        assert!(self.data.is_some() || self.generator.is_some());
         if self.data.is_none() {
             let map = self.generator.as_mut().unwrap().to_source_map();
             self.set_data(map.sources, map.sources_content, map.mappings, map.names);
@@ -56,6 +56,7 @@ impl SourceMap {
     }
 
     pub fn get_generator(&mut self) -> &mut SourceMapGenerator {
+        assert!(self.data.is_some() || self.generator.is_some());
         if self.generator.is_none() {
             let data = self.data.clone().unwrap();
             self.set_generator(SourceMapGenerator::from_source_map(
@@ -95,12 +96,7 @@ impl SourceMapSource {
         map_generator: Option<SourceMapGenerator>,
     ) -> SourceMapSource {
         let mut map = SourceMap::new();
-        map.set_data(
-            map_sources,
-            map_sources_content,
-            map_mappings,
-            map_names,
-        );
+        map.set_data(map_sources, map_sources_content, map_mappings, map_names);
         if let Some(generator) = map_generator {
             map.set_generator(generator);
         }
@@ -148,12 +144,7 @@ impl SourceMapSource {
         map_generator: Option<SourceMapGenerator>,
     ) {
         let mut map = SourceMap::new();
-        map.set_data(
-            map_sources,
-            map_sources_content,
-            map_mappings,
-            map_names,
-        );
+        map.set_data(map_sources, map_sources_content, map_mappings, map_names);
         if let Some(generator) = map_generator {
             map.set_generator(generator);
         }
