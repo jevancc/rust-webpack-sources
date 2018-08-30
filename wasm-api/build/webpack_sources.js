@@ -147,6 +147,9 @@ module.exports._sourcelistmap_map_generated_code_prefix = function(arg0, arg1) {
     );
 };
 
+function free_LineToLineMappedSource(ptr) {
+    wasm.__wbg__linetolinemappedsource_free(ptr);
+}
 /**
  */
 class _LineToLineMappedSource {
@@ -161,7 +164,7 @@ class _LineToLineMappedSource {
     free() {
         const ptr = this.ptr;
         this.ptr = 0;
-        wasm.__wbg__linetolinemappedsource_free(ptr);
+        free_LineToLineMappedSource(ptr);
     }
     /**
      * @param {string} arg0
@@ -190,11 +193,11 @@ class _LineToLineMappedSource {
         const retptr = globalArgumentPtr();
         wasm._linetolinemappedsource__source(retptr, this.ptr);
         const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
 
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
+        const realRet = getStringFromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 1);
         return realRet;
     }
     /**
@@ -242,11 +245,15 @@ class _LineToLineMappedSource {
     }
 }
 module.exports._LineToLineMappedSource = _LineToLineMappedSource;
+
+function free_OriginalSource(ptr) {
+    wasm.__wbg__originalsource_free(ptr);
+}
 /**
  */
-class JsStringWithSourceMap {
+class _OriginalSource {
     static __construct(ptr) {
-        return new JsStringWithSourceMap(ptr);
+        return new _OriginalSource(ptr);
     }
 
     constructor(ptr) {
@@ -256,113 +263,95 @@ class JsStringWithSourceMap {
     free() {
         const ptr = this.ptr;
         this.ptr = 0;
-        wasm.__wbg_jsstringwithsourcemap_free(ptr);
+        free_OriginalSource(ptr);
+    }
+    /**
+     * @param {string} arg0
+     * @param {number} arg1
+     * @param {number} arg2
+     * @returns {_OriginalSource}
+     */
+    static _new_string_sidx_sidx(arg0, arg1, arg2) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return _OriginalSource.__construct(
+            wasm._originalsource__new_string_sidx_sidx(ptr0, len0, arg1, arg2)
+        );
     }
     /**
      * @returns {string}
      */
-    s() {
+    _source() {
         if (this.ptr === 0) {
             throw new Error("Attempt to use a moved value");
         }
         const retptr = globalArgumentPtr();
-        wasm.jsstringwithsourcemap_s(retptr, this.ptr);
+        wasm._originalsource__source(retptr, this.ptr);
         const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
 
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
+        const realRet = getStringFromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 1);
         return realRet;
     }
     /**
      * @returns {number}
      */
-    version() {
+    _size() {
         if (this.ptr === 0) {
             throw new Error("Attempt to use a moved value");
         }
-        return wasm.jsstringwithsourcemap_version(this.ptr);
+        return wasm._originalsource__size(this.ptr);
     }
     /**
      * @returns {number}
      */
-    file() {
+    _name() {
         if (this.ptr === 0) {
             throw new Error("Attempt to use a moved value");
         }
-        return wasm.jsstringwithsourcemap_file(this.ptr);
+        return wasm._originalsource__name(this.ptr);
     }
     /**
-     * @returns {Int32Array}
+     * @param {boolean} arg0
+     * @param {boolean} arg1
+     * @returns {_SourceListMap}
      */
-    sources() {
+    _list_map_bool_bool(arg0, arg1) {
         if (this.ptr === 0) {
             throw new Error("Attempt to use a moved value");
         }
-        const retptr = globalArgumentPtr();
-        wasm.jsstringwithsourcemap_sources(retptr, this.ptr);
-        const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
-
-        const realRet = getArrayI32FromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 4);
-        return realRet;
+        return _SourceListMap.__construct(
+            wasm._originalsource__list_map_bool_bool(
+                this.ptr,
+                arg0 ? 1 : 0,
+                arg1 ? 1 : 0
+            )
+        );
     }
     /**
-     * @returns {Int32Array}
+     * @param {boolean} arg0
+     * @param {boolean} arg1
+     * @returns {_MSourceNode}
      */
-    sources_content() {
+    _node_bool_bool(arg0, arg1) {
         if (this.ptr === 0) {
             throw new Error("Attempt to use a moved value");
         }
-        const retptr = globalArgumentPtr();
-        wasm.jsstringwithsourcemap_sources_content(retptr, this.ptr);
-        const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
-
-        const realRet = getArrayI32FromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 4);
-        return realRet;
-    }
-    /**
-     * @returns {Int32Array}
-     */
-    names() {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        const retptr = globalArgumentPtr();
-        wasm.jsstringwithsourcemap_names(retptr, this.ptr);
-        const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
-
-        const realRet = getArrayI32FromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 4);
-        return realRet;
-    }
-    /**
-     * @returns {string}
-     */
-    mappings() {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        const retptr = globalArgumentPtr();
-        wasm.jsstringwithsourcemap_mappings(retptr, this.ptr);
-        const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
-
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
-        return realRet;
+        return _MSourceNode.__construct(
+            wasm._originalsource__node_bool_bool(
+                this.ptr,
+                arg0 ? 1 : 0,
+                arg1 ? 1 : 0
+            )
+        );
     }
 }
-module.exports.JsStringWithSourceMap = JsStringWithSourceMap;
+module.exports._OriginalSource = _OriginalSource;
+
+function freeNodeVec(ptr) {
+    wasm.__wbg_nodevec_free(ptr);
+}
 /**
  */
 class NodeVec {
@@ -377,7 +366,7 @@ class NodeVec {
     free() {
         const ptr = this.ptr;
         this.ptr = 0;
-        wasm.__wbg_nodevec_free(ptr);
+        freeNodeVec(ptr);
     }
     /**
      * @returns {NodeVec}
@@ -438,97 +427,15 @@ class NodeVec {
     }
 }
 module.exports.NodeVec = NodeVec;
-/**
- */
-class _RawSource {
-    static __construct(ptr) {
-        return new _RawSource(ptr);
-    }
 
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg__rawsource_free(ptr);
-    }
-    /**
-     * @param {string} arg0
-     * @returns {_RawSource}
-     */
-    static _new_string(arg0) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _RawSource.__construct(wasm._rawsource__new_string(ptr0, len0));
-    }
-    /**
-     * @returns {string}
-     */
-    _source() {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        const retptr = globalArgumentPtr();
-        wasm._rawsource__source(retptr, this.ptr);
-        const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
-
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
-        return realRet;
-    }
-    /**
-     * @returns {number}
-     */
-    _size() {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        return wasm._rawsource__size(this.ptr);
-    }
-    /**
-     * @param {boolean} arg0
-     * @param {boolean} arg1
-     * @returns {_SourceListMap}
-     */
-    _list_map_bool_bool(arg0, arg1) {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        return _SourceListMap.__construct(
-            wasm._rawsource__list_map_bool_bool(
-                this.ptr,
-                arg0 ? 1 : 0,
-                arg1 ? 1 : 0
-            )
-        );
-    }
-    /**
-     * @param {boolean} arg0
-     * @param {boolean} arg1
-     * @returns {_MSourceNode}
-     */
-    _node_bool_bool(arg0, arg1) {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        return _MSourceNode.__construct(
-            wasm._rawsource__node_bool_bool(
-                this.ptr,
-                arg0 ? 1 : 0,
-                arg1 ? 1 : 0
-            )
-        );
-    }
+function free_ConcatSource(ptr) {
+    wasm.__wbg__concatsource_free(ptr);
 }
-module.exports._RawSource = _RawSource;
 /**
  */
-class _MSourceNode {
+class _ConcatSource {
     static __construct(ptr) {
-        return new _MSourceNode(ptr);
+        return new _ConcatSource(ptr);
     }
 
     constructor(ptr) {
@@ -538,26 +445,13 @@ class _MSourceNode {
     free() {
         const ptr = this.ptr;
         this.ptr = 0;
-        wasm.__wbg__msourcenode_free(ptr);
+        free_ConcatSource(ptr);
     }
     /**
-     * @param {number} arg0
-     * @param {number} arg1
-     * @param {number} arg2
-     * @returns {_MSourceNode}
+     * @returns {_ConcatSource}
      */
-    static _new_number_number_sidx_null(arg0, arg1, arg2) {
-        return _MSourceNode.__construct(
-            wasm._msourcenode__new_number_number_sidx_null(arg0, arg1, arg2)
-        );
-    }
-    /**
-     * @returns {_MSourceNode}
-     */
-    static _new_null_null_null_null() {
-        return _MSourceNode.__construct(
-            wasm._msourcenode__new_null_null_null_null()
-        );
+    static _new() {
+        return _ConcatSource.__construct(wasm._concatsource__new());
     }
     /**
      * @param {string} arg0
@@ -568,63 +462,80 @@ class _MSourceNode {
             throw new Error("Attempt to use a moved value");
         }
         const [ptr0, len0] = passStringToWasm(arg0);
-        return wasm._msourcenode__add_string(this.ptr, ptr0, len0);
+        return wasm._concatsource__add_string(this.ptr, ptr0, len0);
     }
     /**
-     * @param {_MSourceNode} arg0
+     * @param {_RawSource} arg0
      * @returns {void}
      */
-    _add_sourcenode(arg0) {
+    _add_raw_source(arg0) {
         if (this.ptr === 0) {
             throw new Error("Attempt to use a moved value");
         }
-        const ptr0 = arg0.ptr;
-        if (ptr0 === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        arg0.ptr = 0;
-        return wasm._msourcenode__add_sourcenode(this.ptr, ptr0);
+        return wasm._concatsource__add_raw_source(this.ptr, arg0.ptr);
     }
     /**
-     * @returns {JsStringWithSourceMap}
+     * @param {_OriginalSource} arg0
+     * @returns {void}
      */
-    _to_string_with_source_map_null() {
+    _add_original_source(arg0) {
         if (this.ptr === 0) {
             throw new Error("Attempt to use a moved value");
         }
-        return JsStringWithSourceMap.__construct(
-            wasm._msourcenode__to_string_with_source_map_null(this.ptr)
-        );
-    }
-}
-module.exports._MSourceNode = _MSourceNode;
-/**
- */
-class _OriginalSource {
-    static __construct(ptr) {
-        return new _OriginalSource(ptr);
-    }
-
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg__originalsource_free(ptr);
+        return wasm._concatsource__add_original_source(this.ptr, arg0.ptr);
     }
     /**
-     * @param {string} arg0
-     * @param {number} arg1
-     * @param {number} arg2
-     * @returns {_OriginalSource}
+     * @param {_ReplaceSource} arg0
+     * @returns {void}
      */
-    static _new_string_sidx_sidx(arg0, arg1, arg2) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _OriginalSource.__construct(
-            wasm._originalsource__new_string_sidx_sidx(ptr0, len0, arg1, arg2)
+    _add_replace_source(arg0) {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        return wasm._concatsource__add_replace_source(this.ptr, arg0.ptr);
+    }
+    /**
+     * @param {_PrefixSource} arg0
+     * @returns {void}
+     */
+    _add_prefix_source(arg0) {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        return wasm._concatsource__add_prefix_source(this.ptr, arg0.ptr);
+    }
+    /**
+     * @param {_ConcatSource} arg0
+     * @returns {void}
+     */
+    _add_concat_source(arg0) {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        return wasm._concatsource__add_concat_source(this.ptr, arg0.ptr);
+    }
+    /**
+     * @param {_LineToLineMappedSource} arg0
+     * @returns {void}
+     */
+    _add_line_to_line_mapped_source(arg0) {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        return wasm._concatsource__add_line_to_line_mapped_source(
+            this.ptr,
+            arg0.ptr
         );
+    }
+    /**
+     * @param {_SourceMapSource} arg0
+     * @returns {void}
+     */
+    _add_source_map_source(arg0) {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        return wasm._concatsource__add_source_map_source(this.ptr, arg0.ptr);
     }
     /**
      * @returns {string}
@@ -634,13 +545,13 @@ class _OriginalSource {
             throw new Error("Attempt to use a moved value");
         }
         const retptr = globalArgumentPtr();
-        wasm._originalsource__source(retptr, this.ptr);
+        wasm._concatsource__source(retptr, this.ptr);
         const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
 
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
+        const realRet = getStringFromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 1);
         return realRet;
     }
     /**
@@ -650,16 +561,7 @@ class _OriginalSource {
         if (this.ptr === 0) {
             throw new Error("Attempt to use a moved value");
         }
-        return wasm._originalsource__size(this.ptr);
-    }
-    /**
-     * @returns {number}
-     */
-    _name() {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        return wasm._originalsource__name(this.ptr);
+        return wasm._concatsource__size(this.ptr);
     }
     /**
      * @param {boolean} arg0
@@ -671,7 +573,7 @@ class _OriginalSource {
             throw new Error("Attempt to use a moved value");
         }
         return _SourceListMap.__construct(
-            wasm._originalsource__list_map_bool_bool(
+            wasm._concatsource__list_map_bool_bool(
                 this.ptr,
                 arg0 ? 1 : 0,
                 arg1 ? 1 : 0
@@ -688,7 +590,7 @@ class _OriginalSource {
             throw new Error("Attempt to use a moved value");
         }
         return _MSourceNode.__construct(
-            wasm._originalsource__node_bool_bool(
+            wasm._concatsource__node_bool_bool(
                 this.ptr,
                 arg0 ? 1 : 0,
                 arg1 ? 1 : 0
@@ -696,99 +598,11 @@ class _OriginalSource {
         );
     }
 }
-module.exports._OriginalSource = _OriginalSource;
-/**
- */
-class _CodeNode {
-    static __construct(ptr) {
-        return new _CodeNode(ptr);
-    }
+module.exports._ConcatSource = _ConcatSource;
 
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg__codenode_free(ptr);
-    }
-    /**
-     * @param {string} arg0
-     * @returns {_CodeNode}
-     */
-    static _new_string(arg0) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _CodeNode.__construct(wasm._codenode__new_string(ptr0, len0));
-    }
-    /**
-     * @returns {_CodeNode}
-     */
-    _clone() {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        return _CodeNode.__construct(wasm._codenode__clone(this.ptr));
-    }
+function free_PrefixSource(ptr) {
+    wasm.__wbg__prefixsource_free(ptr);
 }
-module.exports._CodeNode = _CodeNode;
-/**
- */
-class _SourceNode {
-    static __construct(ptr) {
-        return new _SourceNode(ptr);
-    }
-
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg__sourcenode_free(ptr);
-    }
-    /**
-     * @param {string} arg0
-     * @param {number} arg1
-     * @returns {_SourceNode}
-     */
-    static _new_string_null_null_number(arg0, arg1) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _SourceNode.__construct(
-            wasm._sourcenode__new_string_null_null_number(ptr0, len0, arg1)
-        );
-    }
-    /**
-     * @param {string} arg0
-     * @param {number} arg1
-     * @param {number} arg2
-     * @param {number} arg3
-     * @returns {_SourceNode}
-     */
-    static _new_string_sidx_sidx_number(arg0, arg1, arg2, arg3) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _SourceNode.__construct(
-            wasm._sourcenode__new_string_sidx_sidx_number(
-                ptr0,
-                len0,
-                arg1,
-                arg2,
-                arg3
-            )
-        );
-    }
-    /**
-     * @returns {_SourceNode}
-     */
-    _clone() {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        return _SourceNode.__construct(wasm._sourcenode__clone(this.ptr));
-    }
-}
-module.exports._SourceNode = _SourceNode;
 /**
  */
 class _PrefixSource {
@@ -803,7 +617,7 @@ class _PrefixSource {
     free() {
         const ptr = this.ptr;
         this.ptr = 0;
-        wasm.__wbg__prefixsource_free(ptr);
+        free_PrefixSource(ptr);
     }
     /**
      * @param {string} arg0
@@ -912,11 +726,11 @@ class _PrefixSource {
         const retptr = globalArgumentPtr();
         wasm._prefixsource__source(retptr, this.ptr);
         const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
 
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
+        const realRet = getStringFromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 1);
         return realRet;
     }
     /**
@@ -964,11 +778,15 @@ class _PrefixSource {
     }
 }
 module.exports._PrefixSource = _PrefixSource;
+
+function freeJsStringWithSourceMap(ptr) {
+    wasm.__wbg_jsstringwithsourcemap_free(ptr);
+}
 /**
  */
-class _ConcatSource {
+class JsStringWithSourceMap {
     static __construct(ptr) {
-        return new _ConcatSource(ptr);
+        return new JsStringWithSourceMap(ptr);
     }
 
     constructor(ptr) {
@@ -978,219 +796,117 @@ class _ConcatSource {
     free() {
         const ptr = this.ptr;
         this.ptr = 0;
-        wasm.__wbg__concatsource_free(ptr);
-    }
-    /**
-     * @returns {_ConcatSource}
-     */
-    static _new() {
-        return _ConcatSource.__construct(wasm._concatsource__new());
-    }
-    /**
-     * @param {string} arg0
-     * @returns {void}
-     */
-    _add_string(arg0) {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return wasm._concatsource__add_string(this.ptr, ptr0, len0);
-    }
-    /**
-     * @param {_RawSource} arg0
-     * @returns {void}
-     */
-    _add_raw_source(arg0) {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        return wasm._concatsource__add_raw_source(this.ptr, arg0.ptr);
-    }
-    /**
-     * @param {_OriginalSource} arg0
-     * @returns {void}
-     */
-    _add_original_source(arg0) {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        return wasm._concatsource__add_original_source(this.ptr, arg0.ptr);
-    }
-    /**
-     * @param {_ReplaceSource} arg0
-     * @returns {void}
-     */
-    _add_replace_source(arg0) {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        return wasm._concatsource__add_replace_source(this.ptr, arg0.ptr);
-    }
-    /**
-     * @param {_PrefixSource} arg0
-     * @returns {void}
-     */
-    _add_prefix_source(arg0) {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        return wasm._concatsource__add_prefix_source(this.ptr, arg0.ptr);
-    }
-    /**
-     * @param {_ConcatSource} arg0
-     * @returns {void}
-     */
-    _add_concat_source(arg0) {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        return wasm._concatsource__add_concat_source(this.ptr, arg0.ptr);
-    }
-    /**
-     * @param {_LineToLineMappedSource} arg0
-     * @returns {void}
-     */
-    _add_line_to_line_mapped_source(arg0) {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        return wasm._concatsource__add_line_to_line_mapped_source(
-            this.ptr,
-            arg0.ptr
-        );
-    }
-    /**
-     * @param {_SourceMapSource} arg0
-     * @returns {void}
-     */
-    _add_source_map_source(arg0) {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        return wasm._concatsource__add_source_map_source(this.ptr, arg0.ptr);
+        freeJsStringWithSourceMap(ptr);
     }
     /**
      * @returns {string}
      */
-    _source() {
+    s() {
         if (this.ptr === 0) {
             throw new Error("Attempt to use a moved value");
         }
         const retptr = globalArgumentPtr();
-        wasm._concatsource__source(retptr, this.ptr);
+        wasm.jsstringwithsourcemap_s(retptr, this.ptr);
         const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
 
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
+        const realRet = getStringFromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 1);
         return realRet;
     }
     /**
      * @returns {number}
      */
-    _size() {
+    version() {
         if (this.ptr === 0) {
             throw new Error("Attempt to use a moved value");
         }
-        return wasm._concatsource__size(this.ptr);
+        return wasm.jsstringwithsourcemap_version(this.ptr);
     }
     /**
-     * @param {boolean} arg0
-     * @param {boolean} arg1
-     * @returns {_SourceListMap}
+     * @returns {number}
      */
-    _list_map_bool_bool(arg0, arg1) {
+    file() {
         if (this.ptr === 0) {
             throw new Error("Attempt to use a moved value");
         }
-        return _SourceListMap.__construct(
-            wasm._concatsource__list_map_bool_bool(
-                this.ptr,
-                arg0 ? 1 : 0,
-                arg1 ? 1 : 0
-            )
-        );
+        return wasm.jsstringwithsourcemap_file(this.ptr);
     }
     /**
-     * @param {boolean} arg0
-     * @param {boolean} arg1
-     * @returns {_MSourceNode}
+     * @returns {Int32Array}
      */
-    _node_bool_bool(arg0, arg1) {
+    sources() {
         if (this.ptr === 0) {
             throw new Error("Attempt to use a moved value");
         }
-        return _MSourceNode.__construct(
-            wasm._concatsource__node_bool_bool(
-                this.ptr,
-                arg0 ? 1 : 0,
-                arg1 ? 1 : 0
-            )
-        );
+        const retptr = globalArgumentPtr();
+        wasm.jsstringwithsourcemap_sources(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
+
+        const realRet = getArrayI32FromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 4);
+        return realRet;
+    }
+    /**
+     * @returns {Int32Array}
+     */
+    sources_content() {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        const retptr = globalArgumentPtr();
+        wasm.jsstringwithsourcemap_sources_content(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
+
+        const realRet = getArrayI32FromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 4);
+        return realRet;
+    }
+    /**
+     * @returns {Int32Array}
+     */
+    names() {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        const retptr = globalArgumentPtr();
+        wasm.jsstringwithsourcemap_names(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
+
+        const realRet = getArrayI32FromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 4);
+        return realRet;
+    }
+    /**
+     * @returns {string}
+     */
+    mappings() {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        const retptr = globalArgumentPtr();
+        wasm.jsstringwithsourcemap_mappings(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
+
+        const realRet = getStringFromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 1);
+        return realRet;
     }
 }
-module.exports._ConcatSource = _ConcatSource;
-/**
- */
-class _SingleLineNode {
-    static __construct(ptr) {
-        return new _SingleLineNode(ptr);
-    }
+module.exports.JsStringWithSourceMap = JsStringWithSourceMap;
 
-    constructor(ptr) {
-        this.ptr = ptr;
-    }
-
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        wasm.__wbg__singlelinenode_free(ptr);
-    }
-    /**
-     * @param {string} arg0
-     * @param {number} arg1
-     * @returns {_SingleLineNode}
-     */
-    static _new_string_null_null_number(arg0, arg1) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _SingleLineNode.__construct(
-            wasm._singlelinenode__new_string_null_null_number(ptr0, len0, arg1)
-        );
-    }
-    /**
-     * @param {string} arg0
-     * @param {number} arg1
-     * @param {number} arg2
-     * @param {number} arg3
-     * @returns {_SingleLineNode}
-     */
-    static _new_string_sidx_sidx_number(arg0, arg1, arg2, arg3) {
-        const [ptr0, len0] = passStringToWasm(arg0);
-        return _SingleLineNode.__construct(
-            wasm._singlelinenode__new_string_sidx_sidx_number(
-                ptr0,
-                len0,
-                arg1,
-                arg2,
-                arg3
-            )
-        );
-    }
-    /**
-     * @returns {_SingleLineNode}
-     */
-    _clone() {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        return _SingleLineNode.__construct(
-            wasm._singlelinenode__clone(this.ptr)
-        );
-    }
+function free_SourceMapSource(ptr) {
+    wasm.__wbg__sourcemapsource_free(ptr);
 }
-module.exports._SingleLineNode = _SingleLineNode;
 /**
  */
 class _SourceMapSource {
@@ -1205,7 +921,7 @@ class _SourceMapSource {
     free() {
         const ptr = this.ptr;
         this.ptr = 0;
-        wasm.__wbg__sourcemapsource_free(ptr);
+        free_SourceMapSource(ptr);
     }
     /**
      * @param {string} arg0
@@ -1349,11 +1065,11 @@ class _SourceMapSource {
         const retptr = globalArgumentPtr();
         wasm._sourcemapsource__source(retptr, this.ptr);
         const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
 
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
+        const realRet = getStringFromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 1);
         return realRet;
     }
     /**
@@ -1401,6 +1117,303 @@ class _SourceMapSource {
     }
 }
 module.exports._SourceMapSource = _SourceMapSource;
+
+function free_SourceListMap(ptr) {
+    wasm.__wbg__sourcelistmap_free(ptr);
+}
+/**
+ */
+class _SourceListMap {
+    static __construct(ptr) {
+        return new _SourceListMap(ptr);
+    }
+
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        free_SourceListMap(ptr);
+    }
+    /**
+     * @returns {_SourceListMap}
+     */
+    static _new() {
+        return _SourceListMap.__construct(wasm._sourcelistmap__new());
+    }
+    /**
+     * @param {NodeVec} arg0
+     * @returns {_SourceListMap}
+     */
+    static _new_nodes(arg0) {
+        const ptr0 = arg0.ptr;
+        if (ptr0 === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        arg0.ptr = 0;
+        return _SourceListMap.__construct(wasm._sourcelistmap__new_nodes(ptr0));
+    }
+    /**
+     * @param {NodeVec} arg0
+     * @returns {void}
+     */
+    _add_node(arg0) {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        const ptr0 = arg0.ptr;
+        if (ptr0 === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        arg0.ptr = 0;
+        return wasm._sourcelistmap__add_node(this.ptr, ptr0);
+    }
+    /**
+     * @param {NodeVec} arg0
+     * @param {number} arg1
+     * @param {number} arg2
+     * @returns {void}
+     */
+    _add_node_sidx_sidx(arg0, arg1, arg2) {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        const ptr0 = arg0.ptr;
+        if (ptr0 === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        arg0.ptr = 0;
+        return wasm._sourcelistmap__add_node_sidx_sidx(
+            this.ptr,
+            ptr0,
+            arg1,
+            arg2
+        );
+    }
+    /**
+     * @param {NodeVec} arg0
+     * @returns {void}
+     */
+    _prepend_node(arg0) {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        const ptr0 = arg0.ptr;
+        if (ptr0 === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        arg0.ptr = 0;
+        return wasm._sourcelistmap__prepend_node(this.ptr, ptr0);
+    }
+    /**
+     * @param {NodeVec} arg0
+     * @param {number} arg1
+     * @param {number} arg2
+     * @returns {void}
+     */
+    _prepend_node_sidx_sidx(arg0, arg1, arg2) {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        const ptr0 = arg0.ptr;
+        if (ptr0 === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        arg0.ptr = 0;
+        return wasm._sourcelistmap__prepend_node_sidx_sidx(
+            this.ptr,
+            ptr0,
+            arg1,
+            arg2
+        );
+    }
+    /**
+     * @returns {string}
+     */
+    _to_string() {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        const retptr = globalArgumentPtr();
+        wasm._sourcelistmap__to_string(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
+
+        const realRet = getStringFromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 1);
+        return realRet;
+    }
+    /**
+     * @returns {JsStringWithSourceMap}
+     */
+    _to_string_with_source_map_null() {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        return JsStringWithSourceMap.__construct(
+            wasm._sourcelistmap__to_string_with_source_map_null(this.ptr)
+        );
+    }
+}
+module.exports._SourceListMap = _SourceListMap;
+
+function free_SourceNode(ptr) {
+    wasm.__wbg__sourcenode_free(ptr);
+}
+/**
+ */
+class _SourceNode {
+    static __construct(ptr) {
+        return new _SourceNode(ptr);
+    }
+
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        free_SourceNode(ptr);
+    }
+    /**
+     * @param {string} arg0
+     * @param {number} arg1
+     * @returns {_SourceNode}
+     */
+    static _new_string_null_null_number(arg0, arg1) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return _SourceNode.__construct(
+            wasm._sourcenode__new_string_null_null_number(ptr0, len0, arg1)
+        );
+    }
+    /**
+     * @param {string} arg0
+     * @param {number} arg1
+     * @param {number} arg2
+     * @param {number} arg3
+     * @returns {_SourceNode}
+     */
+    static _new_string_sidx_sidx_number(arg0, arg1, arg2, arg3) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return _SourceNode.__construct(
+            wasm._sourcenode__new_string_sidx_sidx_number(
+                ptr0,
+                len0,
+                arg1,
+                arg2,
+                arg3
+            )
+        );
+    }
+    /**
+     * @returns {_SourceNode}
+     */
+    _clone() {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        return _SourceNode.__construct(wasm._sourcenode__clone(this.ptr));
+    }
+}
+module.exports._SourceNode = _SourceNode;
+
+function free_RawSource(ptr) {
+    wasm.__wbg__rawsource_free(ptr);
+}
+/**
+ */
+class _RawSource {
+    static __construct(ptr) {
+        return new _RawSource(ptr);
+    }
+
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        free_RawSource(ptr);
+    }
+    /**
+     * @param {string} arg0
+     * @returns {_RawSource}
+     */
+    static _new_string(arg0) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return _RawSource.__construct(wasm._rawsource__new_string(ptr0, len0));
+    }
+    /**
+     * @returns {string}
+     */
+    _source() {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        const retptr = globalArgumentPtr();
+        wasm._rawsource__source(retptr, this.ptr);
+        const mem = getUint32Memory();
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
+
+        const realRet = getStringFromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 1);
+        return realRet;
+    }
+    /**
+     * @returns {number}
+     */
+    _size() {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        return wasm._rawsource__size(this.ptr);
+    }
+    /**
+     * @param {boolean} arg0
+     * @param {boolean} arg1
+     * @returns {_SourceListMap}
+     */
+    _list_map_bool_bool(arg0, arg1) {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        return _SourceListMap.__construct(
+            wasm._rawsource__list_map_bool_bool(
+                this.ptr,
+                arg0 ? 1 : 0,
+                arg1 ? 1 : 0
+            )
+        );
+    }
+    /**
+     * @param {boolean} arg0
+     * @param {boolean} arg1
+     * @returns {_MSourceNode}
+     */
+    _node_bool_bool(arg0, arg1) {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        return _MSourceNode.__construct(
+            wasm._rawsource__node_bool_bool(
+                this.ptr,
+                arg0 ? 1 : 0,
+                arg1 ? 1 : 0
+            )
+        );
+    }
+}
+module.exports._RawSource = _RawSource;
+
+function free_ReplaceSource(ptr) {
+    wasm.__wbg__replacesource_free(ptr);
+}
 /**
  */
 class _ReplaceSource {
@@ -1415,7 +1428,7 @@ class _ReplaceSource {
     free() {
         const ptr = this.ptr;
         this.ptr = 0;
-        wasm.__wbg__replacesource_free(ptr);
+        free_ReplaceSource(ptr);
     }
     /**
      * @param {string} arg0
@@ -1542,11 +1555,11 @@ class _ReplaceSource {
         const retptr = globalArgumentPtr();
         wasm._replacesource__source(retptr, this.ptr);
         const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
+        const rustptr = mem[retptr / 4];
+        const rustlen = mem[retptr / 4 + 1];
 
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
+        const realRet = getStringFromWasm(rustptr, rustlen).slice();
+        wasm.__wbindgen_free(rustptr, rustlen * 1);
         return realRet;
     }
     /**
@@ -1594,11 +1607,15 @@ class _ReplaceSource {
     }
 }
 module.exports._ReplaceSource = _ReplaceSource;
+
+function free_CodeNode(ptr) {
+    wasm.__wbg__codenode_free(ptr);
+}
 /**
  */
-class _SourceListMap {
+class _CodeNode {
     static __construct(ptr) {
-        return new _SourceListMap(ptr);
+        return new _CodeNode(ptr);
     }
 
     constructor(ptr) {
@@ -1608,116 +1625,154 @@ class _SourceListMap {
     free() {
         const ptr = this.ptr;
         this.ptr = 0;
-        wasm.__wbg__sourcelistmap_free(ptr);
+        free_CodeNode(ptr);
     }
     /**
-     * @returns {_SourceListMap}
+     * @param {string} arg0
+     * @returns {_CodeNode}
      */
-    static _new() {
-        return _SourceListMap.__construct(wasm._sourcelistmap__new());
+    static _new_string(arg0) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return _CodeNode.__construct(wasm._codenode__new_string(ptr0, len0));
     }
     /**
-     * @param {NodeVec} arg0
-     * @returns {_SourceListMap}
+     * @returns {_CodeNode}
      */
-    static _new_nodes(arg0) {
-        const ptr0 = arg0.ptr;
-        if (ptr0 === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        arg0.ptr = 0;
-        return _SourceListMap.__construct(wasm._sourcelistmap__new_nodes(ptr0));
-    }
-    /**
-     * @param {NodeVec} arg0
-     * @returns {void}
-     */
-    _add_node(arg0) {
+    _clone() {
         if (this.ptr === 0) {
             throw new Error("Attempt to use a moved value");
         }
-        const ptr0 = arg0.ptr;
-        if (ptr0 === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        arg0.ptr = 0;
-        return wasm._sourcelistmap__add_node(this.ptr, ptr0);
+        return _CodeNode.__construct(wasm._codenode__clone(this.ptr));
     }
-    /**
-     * @param {NodeVec} arg0
-     * @param {number} arg1
-     * @param {number} arg2
-     * @returns {void}
-     */
-    _add_node_sidx_sidx(arg0, arg1, arg2) {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        const ptr0 = arg0.ptr;
-        if (ptr0 === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        arg0.ptr = 0;
-        return wasm._sourcelistmap__add_node_sidx_sidx(
-            this.ptr,
-            ptr0,
-            arg1,
-            arg2
-        );
-    }
-    /**
-     * @param {NodeVec} arg0
-     * @returns {void}
-     */
-    _prepend_node(arg0) {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        const ptr0 = arg0.ptr;
-        if (ptr0 === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        arg0.ptr = 0;
-        return wasm._sourcelistmap__prepend_node(this.ptr, ptr0);
-    }
-    /**
-     * @param {NodeVec} arg0
-     * @param {number} arg1
-     * @param {number} arg2
-     * @returns {void}
-     */
-    _prepend_node_sidx_sidx(arg0, arg1, arg2) {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        const ptr0 = arg0.ptr;
-        if (ptr0 === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        arg0.ptr = 0;
-        return wasm._sourcelistmap__prepend_node_sidx_sidx(
-            this.ptr,
-            ptr0,
-            arg1,
-            arg2
-        );
-    }
-    /**
-     * @returns {string}
-     */
-    _to_string() {
-        if (this.ptr === 0) {
-            throw new Error("Attempt to use a moved value");
-        }
-        const retptr = globalArgumentPtr();
-        wasm._sourcelistmap__to_string(retptr, this.ptr);
-        const mem = getUint32Memory();
-        const ptr = mem[retptr / 4];
-        const len = mem[retptr / 4 + 1];
+}
+module.exports._CodeNode = _CodeNode;
 
-        const realRet = getStringFromWasm(ptr, len).slice();
-        wasm.__wbindgen_free(ptr, len * 1);
-        return realRet;
+function free_SingleLineNode(ptr) {
+    wasm.__wbg__singlelinenode_free(ptr);
+}
+/**
+ */
+class _SingleLineNode {
+    static __construct(ptr) {
+        return new _SingleLineNode(ptr);
+    }
+
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        free_SingleLineNode(ptr);
+    }
+    /**
+     * @param {string} arg0
+     * @param {number} arg1
+     * @returns {_SingleLineNode}
+     */
+    static _new_string_null_null_number(arg0, arg1) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return _SingleLineNode.__construct(
+            wasm._singlelinenode__new_string_null_null_number(ptr0, len0, arg1)
+        );
+    }
+    /**
+     * @param {string} arg0
+     * @param {number} arg1
+     * @param {number} arg2
+     * @param {number} arg3
+     * @returns {_SingleLineNode}
+     */
+    static _new_string_sidx_sidx_number(arg0, arg1, arg2, arg3) {
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return _SingleLineNode.__construct(
+            wasm._singlelinenode__new_string_sidx_sidx_number(
+                ptr0,
+                len0,
+                arg1,
+                arg2,
+                arg3
+            )
+        );
+    }
+    /**
+     * @returns {_SingleLineNode}
+     */
+    _clone() {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        return _SingleLineNode.__construct(
+            wasm._singlelinenode__clone(this.ptr)
+        );
+    }
+}
+module.exports._SingleLineNode = _SingleLineNode;
+
+function free_MSourceNode(ptr) {
+    wasm.__wbg__msourcenode_free(ptr);
+}
+/**
+ */
+class _MSourceNode {
+    static __construct(ptr) {
+        return new _MSourceNode(ptr);
+    }
+
+    constructor(ptr) {
+        this.ptr = ptr;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        free_MSourceNode(ptr);
+    }
+    /**
+     * @param {number} arg0
+     * @param {number} arg1
+     * @param {number} arg2
+     * @returns {_MSourceNode}
+     */
+    static _new_number_number_sidx_null(arg0, arg1, arg2) {
+        return _MSourceNode.__construct(
+            wasm._msourcenode__new_number_number_sidx_null(arg0, arg1, arg2)
+        );
+    }
+    /**
+     * @returns {_MSourceNode}
+     */
+    static _new_null_null_null_null() {
+        return _MSourceNode.__construct(
+            wasm._msourcenode__new_null_null_null_null()
+        );
+    }
+    /**
+     * @param {string} arg0
+     * @returns {void}
+     */
+    _add_string(arg0) {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        const [ptr0, len0] = passStringToWasm(arg0);
+        return wasm._msourcenode__add_string(this.ptr, ptr0, len0);
+    }
+    /**
+     * @param {_MSourceNode} arg0
+     * @returns {void}
+     */
+    _add_sourcenode(arg0) {
+        if (this.ptr === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        const ptr0 = arg0.ptr;
+        if (ptr0 === 0) {
+            throw new Error("Attempt to use a moved value");
+        }
+        arg0.ptr = 0;
+        return wasm._msourcenode__add_sourcenode(this.ptr, ptr0);
     }
     /**
      * @returns {JsStringWithSourceMap}
@@ -1727,11 +1782,11 @@ class _SourceListMap {
             throw new Error("Attempt to use a moved value");
         }
         return JsStringWithSourceMap.__construct(
-            wasm._sourcelistmap__to_string_with_source_map_null(this.ptr)
+            wasm._msourcenode__to_string_with_source_map_null(this.ptr)
         );
     }
 }
-module.exports._SourceListMap = _SourceListMap;
+module.exports._MSourceNode = _MSourceNode;
 
 module.exports.__wbindgen_throw = function(ptr, len) {
     throw new Error(getStringFromWasm(ptr, len));
