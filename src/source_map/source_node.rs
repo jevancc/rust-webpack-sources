@@ -96,7 +96,7 @@ impl SourceNode {
         context.map
     }
 
-    fn walk<T: WalkFunction>(&self, context: &mut T) {
+    pub fn walk<T: WalkFunction>(&self, context: &mut T) {
         for child in &self.children {
             match child {
                 Node::NSourceNode(sn) => {
@@ -224,7 +224,7 @@ impl WalkFunction for ToSourceMapContext {
     }
 }
 
-trait WalkFunction {
+pub trait WalkFunction {
     fn process_chunk(
         &mut self,
         chunk: &str,

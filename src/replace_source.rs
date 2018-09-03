@@ -1,6 +1,6 @@
 use source::{Source, SourceTrait};
 use source_list_map::{types::Node as SlmNode, MappingFunction, SourceListMap};
-use source_map::{types::Node as SmNode, SourceNode};
+use source_map::{types::Node as SmNode, SourceNode, WalkFunction};
 use std::cmp;
 use std::rc::Rc;
 use std::str;
@@ -83,15 +83,6 @@ impl ReplaceSource {
         unsafe { str::from_utf8_unchecked(&result_string).to_string() }
     }
 
-    // pub fn replacements_to_string(&mut self) -> String {
-    //     self.sort_replacements();
-    //     let repls: Vec<(i64, i64, &str, usize)> = self
-    //         .replacements
-    //         .iter()
-    //         .map(|x| (x.0 >> 4, x.1 >> 4, x.2.as_str(), x.3))
-    //         .collect();
-    //     serde_json::to_string(&repls).unwrap()
-    // }
 }
 
 impl SourceTrait for ReplaceSource {
@@ -102,37 +93,7 @@ impl SourceTrait for ReplaceSource {
 
     fn node(&mut self, columns: bool, module: bool) -> SourceNode {
         self.sort_replacements();
-        let mut result = Vec::<SmNode>::with_capacity(self.replacements.len() * 2);
-        result.push(SmNode::NSourceNode(self.source.node(columns, module)));
-        for repl in &self.replacements {
-            let rem_source = result.pop().unwrap();
-            match split_sourcenode(rem_source, (repl.1 >> 4) as i32 + 1) {
-                Ok((l1, r1)) => match split_sourcenode(l1, (repl.0 >> 4) as i32) {
-                    Ok((l2, r2)) => {
-                        result.push(r1);
-                        result.push(replacement_to_sourcenode(r2, StringSlice::from(&repl.2)));
-                        result.push(l2);
-                    }
-                    Err((_, l1)) => {
-                        result.push(r1.clone());
-                        result.push(replacement_to_sourcenode(r1, StringSlice::from(&repl.2)));
-                        result.push(l1);
-                    }
-                },
-                Err((_, rem_source)) => match split_sourcenode(rem_source, (repl.0 >> 4) as i32) {
-                    Ok((l2, r2)) => {
-                        result.push(replacement_to_sourcenode(r2, StringSlice::from(&repl.2)));
-                        result.push(l2);
-                    }
-                    Err((_, rem_source)) => {
-                        result.push(SmNode::NString(StringSlice::from(&repl.2)));
-                        result.push(rem_source);
-                    }
-                },
-            }
-        }
-        result.reverse();
-        SourceNode::new(None, None, None, Some(SmNode::NNodeVec(result)))
+        // WIP
     }
 
     fn list_map(&mut self, columns: bool, module: bool) -> SourceListMap {
@@ -154,7 +115,7 @@ impl SourceTrait for ReplaceSource {
     }
 }
 
-pub struct ReplaceMappingFunction<'a> {
+struct ReplaceMappingFunction<'a> {
     pub current_idx: i32,
     pub replacement_idx: i32,
     pub remove_chars: i32,
@@ -244,80 +205,33 @@ impl<'a> MappingFunction for ReplaceMappingFunction<'a> {
     }
 }
 
-fn split_sourcenode(
-    node: SmNode,
-    mut split_position: i32,
-) -> Result<(SmNode, SmNode), (i32, SmNode)> {
-    match node {
-        SmNode::NSourceNode(n) => {
-            let mut is_splitted = false;
-            let mut left_children = Vec::<SmNode>::with_capacity(n.children.len());
-            let mut right_children = Vec::<SmNode>::with_capacity(n.children.len());
-            let n_position = n.position;
-            let n_source = n.source;
-            let n_name = n.name;
-            let n_source_contents = n.source_contents;
-            for child in n.children.into_iter() {
-                if !is_splitted {
-                    match split_sourcenode(child, split_position) {
-                        Ok((l, r)) => {
-                            left_children.push(l);
-                            right_children.push(r);
-                            is_splitted = true;
-                        }
-                        Err((p, n)) => {
-                            split_position = p;
-                            left_children.push(n);
-                        }
-                    }
-                } else {
-                    right_children.push(child);
-                }
-            }
-            if is_splitted {
-                let mut left = SourceNode::new(
-                    n_position.clone(),
-                    n_source.clone(),
-                    n_name.clone(),
-                    Some(SmNode::NNodeVec(left_children)),
-                );
-                let right = SourceNode::new(
-                    n_position,
-                    n_source,
-                    n_name,
-                    Some(SmNode::NNodeVec(right_children)),
-                );
-                left.source_contents = n_source_contents;
-                Ok((SmNode::NSourceNode(left), SmNode::NSourceNode(right)))
-            } else {
-                let mut node = SourceNode::new(
-                    n_position,
-                    n_source,
-                    n_name,
-                    Some(SmNode::NNodeVec(left_children)),
-                );
-                node.source_contents = n_source_contents;
-                Err((split_position, SmNode::NSourceNode(node)))
-            }
+struct ReplaceWalkFunction<'a> {
+    pub node: SourceNode,
+    pub replacements: &'a Vec<(i64, i64, Rc<String>, usize)>,
+    pub position: i32,
+}
+
+impl<'a> ReplaceWalkFunction<'a> {
+    pub fn new(replacements: &'a Vec<(i64, i64, Rc<String>, usize)>) -> Self {
+        ReplaceWalkFunction {
+            node: SourceNode::new(None, None, None, None),
+            replacements,
+            position: 0,
         }
-        SmNode::NString(n) => match utils::split_string_slice(n, split_position, false) {
-            Ok((left, right, _, _)) => Ok((SmNode::NString(left), SmNode::NString(right))),
-            Err((p, s, _)) => Err((p, SmNode::NString(s))),
-        },
-        _ => unreachable!(),
     }
 }
 
-#[inline]
-fn replacement_to_sourcenode(old_node: SmNode, new_string: StringSlice) -> SmNode {
-    if let SmNode::NSourceNode(node) = old_node {
-        let mut map = node.to_source_map_generator(None, None);
-        let original_mapping = map.original_position_for(1, 0);
-        let position = original_mapping.original;
-        let file = original_mapping.source;
-        let chunks = Some(SmNode::NString(new_string));
-        SmNode::NSourceNode(SourceNode::new(position, file, None, chunks))
-    } else {
-        unreachable!()
+impl<'a> WalkFunction for ReplaceWalkFunction<'a> {
+    fn process_chunk(
+        &mut self,
+        chunk: &str,
+        original_source: &Option<i32>,
+        original_position: &Option<(usize, usize)>,
+        original_name: &Option<i32>,
+    ) {
+
+    }
+    fn process_source_content(&mut self, source: i32, source_content: i32) {
+        self.node.set_source_content(source, source_content);
     }
 }
